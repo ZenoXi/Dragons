@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30804.86
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Dragons", "Dragons\Dragons.vcxproj", "{621058C4-CC43-4D69-B078-F4342E3DFE73}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x64 = Debug|x64
+		Debug|x86 = Debug|x86
+		Release|x64 = Release|x64
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{621058C4-CC43-4D69-B078-F4342E3DFE73}.Debug|x64.ActiveCfg = Debug|x64
+		{621058C4-CC43-4D69-B078-F4342E3DFE73}.Debug|x64.Build.0 = Debug|x64
+		{621058C4-CC43-4D69-B078-F4342E3DFE73}.Debug|x86.ActiveCfg = Debug|Win32
+		{621058C4-CC43-4D69-B078-F4342E3DFE73}.Debug|x86.Build.0 = Debug|Win32
+		{621058C4-CC43-4D69-B078-F4342E3DFE73}.Release|x64.ActiveCfg = Release|x64
+		{621058C4-CC43-4D69-B078-F4342E3DFE73}.Release|x64.Build.0 = Release|x64
+		{621058C4-CC43-4D69-B078-F4342E3DFE73}.Release|x86.ActiveCfg = Release|Win32
+		{621058C4-CC43-4D69-B078-F4342E3DFE73}.Release|x86.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {3C55694A-0FDD-4111-A679-C86D2AA7CB8F}
+	EndGlobalSection
+EndGlobal
