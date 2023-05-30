@@ -10,10 +10,11 @@ struct GameState
 {
     std::vector<Player> players;
     int currentPlayer = -1;
+    int opposingPlayer = -1;
 
-    std::vector<std::unique_ptr<Cards::Card>> offenseDeck;
-    std::vector<std::unique_ptr<Cards::Card>> defenseDeck;
-    std::vector<std::unique_ptr<Cards::Card>> utilityDeck;
-    std::vector<std::unique_ptr<Cards::Card>> comboDeck;
-    std::vector<std::unique_ptr<Cards::Card>> graveyard;
+    std::vector<std::unique_ptr<cards::Card>> offenseDeck;
+    std::vector<std::unique_ptr<cards::Card>> defenseDeck;
+    std::vector<std::unique_ptr<cards::Card>> utilityDeck;
+    std::vector<std::unique_ptr<cards::Card>> comboDeck;
+    std::vector<std::unique_ptr<cards::Card>> graveyard;
 };

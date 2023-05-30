@@ -140,11 +140,15 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Core\Cards\Offense\DesperateStrike.cpp" />
+    <ClCompile Include="Core\Cards\Offense\SacrificialAttack.cpp" />
     <ClCompile Include="Core\Core.cpp" />
     <ClCompile Include="Dragons.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Core\Cards\Card.h" />
+    <ClInclude Include="Core\Cards\Offense\DesperateStrike.h" />
+    <ClInclude Include="Core\Cards\Offense\SacrificialAttack.h" />
     <ClInclude Include="Core\Core.h" />
     <ClInclude Include="Core\GameState.h" />
     <ClInclude Include="Core\Player.h" />
