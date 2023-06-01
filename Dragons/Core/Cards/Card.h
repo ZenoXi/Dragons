@@ -14,6 +14,7 @@ namespace cards
     struct PlayResult
     {
         bool discard = true;
+        bool notPlayed = false;
     };
 
     enum class CardType
@@ -27,8 +28,10 @@ namespace cards
     class Card
     {
     public:
-        virtual bool CanPlay(Core* core, ActionProperties actionProps) = 0;
+        virtual bool CanPlay(Core* core, ActionProperties actionProps, PlayProperties* playProps) { return true; }
         virtual PlayResult Play(Core* core, ActionProperties actionProps, PlayProperties* playProps) = 0;
+        virtual void Draw(Core* core, ActionProperties actionProps) {}
+        virtual void Discard(Core* core, ActionProperties actionProps) {}
         virtual bool IsActive() { return false; }
         virtual int GetActionCost() { return 1; }
 

@@ -140,22 +140,35 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Core\Cards\Offense\BloodDonation.cpp" />
     <ClCompile Include="Core\Cards\Offense\DesperateStrike.cpp" />
     <ClCompile Include="Core\Cards\Offense\FairFight.cpp" />
+    <ClCompile Include="Core\Cards\Offense\HellfireSword.cpp" />
+    <ClCompile Include="Core\Cards\Offense\RapidAttack.cpp" />
     <ClCompile Include="Core\Cards\Offense\SacrificialAttack.cpp" />
+    <ClCompile Include="Core\Cards\Offense\StarCurse.cpp" />
+    <ClCompile Include="Core\Cards\Offense\VitalSpot.cpp" />
     <ClCompile Include="Core\Core.cpp" />
     <ClCompile Include="Dragons.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Core\ActionProperties.h" />
     <ClInclude Include="Core\Cards\Card.h" />
+    <ClInclude Include="Core\Cards\Offense\BloodDonation.h" />
     <ClInclude Include="Core\Cards\Offense\DesperateStrike.h" />
     <ClInclude Include="Core\Cards\Offense\FairFight.h" />
+    <ClInclude Include="Core\Cards\Offense\HellfireSword.h" />
+    <ClInclude Include="Core\Cards\Offense\RapidAttack.h" />
     <ClInclude Include="Core\Cards\Offense\SacrificialAttack.h" />
+    <ClInclude Include="Core\Cards\Offense\StarCurse.h" />
+    <ClInclude Include="Core\Cards\Offense\VitalSpot.h" />
     <ClInclude Include="Core\Core.h" />
+    <ClInclude Include="Core\DamageProperties.h" />
     <ClInclude Include="Core\Events\ActionEvents.h" />
+    <ClInclude Include="Core\Events\CardMoveEvents.h" />
     <ClInclude Include="Core\Events\EventSubscriber.h" />
     <ClInclude Include="Core\Events\GameEvents.h" />
+    <ClInclude Include="Core\Events\StatsEvents.h" />
     <ClInclude Include="Core\Events\TurnEvents.h" />
     <ClInclude Include="Core\GameConstants.h" />
     <ClInclude Include="Core\GameState.h" />

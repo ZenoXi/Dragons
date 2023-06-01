@@ -3,6 +3,7 @@
 #include "GameConstants.h"
 #include "Events/TurnEvents.h"
 #include "Events/ActionEvents.h"
+#include "Events/StatsEvents.h"
 
 void Core::InitState()
 {
@@ -110,7 +111,9 @@ bool Core::PlayCard(cards::Card* card, std::optional<ActionProperties> actionPro
 
 void Core::Damage(DamageProperties props)
 {
-    // Emit pre damage event
+    PreDamageEvent preDamageEvent;
+    preDamageEvent.props = &props;
+    _events.RaiseEvent(preDamageEvent);
 
     Player& targetPlayer = _state.players[props.target];
     if (!props.ignoreArmor)
@@ -142,28 +145,56 @@ void Core::Damage(DamageProperties props)
             props.amount = 0;
         }
     }
-
-    // Emit post damage event
 }
 
 void Core::Heal(int target, int amount)
 {
+    PreHealEvent preHealEvent;
+    preHealEvent.target = &target;
+    preHealEvent.amount = &amount;
+    _events.RaiseEvent(preHealEvent);
 
+    if (amount > 0)
+    {
+        _state.players[target].armor += amount;
+    }
 }
 
 void Core::AddArmor(int target, int amount)
 {
+    PreAddArmorEvent preAddArmorEvent;
+    preAddArmorEvent.target = &target;
+    preAddArmorEvent.amount = &amount;
+    _events.RaiseEvent(preAddArmorEvent);
 
+    if (amount > 0)
+    {
+        _state.players[target].armor += amount;
+    }
 }
 
 void Core::DestroyArmor(int target)
 {
+    bool cancel = false;
+    PreDestroyArmorEvent preDestroyArmorEvent;
+    preDestroyArmorEvent.target = &target;
+    preDestroyArmorEvent.cancel = &cancel;
+    _events.RaiseEvent(preDestroyArmorEvent);
 
+    _state.players[target].armor = 0;
 }
 
-void Core::SetMaxHealth(int target, int amount)
+void Core::SetMaxHealth(int target, int value)
 {
+    PreSetMaxHealthEvent preSetMaxHealthEvent;
+    preSetMaxHealthEvent.target = &target;
+    preSetMaxHealthEvent.value = &value;
+    _events.RaiseEvent(preSetMaxHealthEvent);
 
+    if (value != _state.players[target].maxHealth)
+    {
+        _state.players[target].maxHealth = value;
+    }
 }
 
 void Core::AddCardToHand(std::unique_ptr<cards::Card> card, int playerIndex)

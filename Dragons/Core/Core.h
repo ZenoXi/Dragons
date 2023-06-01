@@ -2,17 +2,10 @@
 
 #include "GameState.h"
 #include "ActionProperties.h"
+#include "DamageProperties.h"
 #include "Events/GameEvents.h"
 
 #include <optional>
-
-struct DamageProperties
-{
-    int target;
-    int amount;
-    bool ignoreArmor;
-    bool trueDamage;
-};
 
 class Core
 {
@@ -25,6 +18,7 @@ public:
     void InitState();
     void ClearState();
     const GameState& GetState() { return _state; }
+    GameEvents& Events() { return _events; }
 
     // Main game actions
     bool CanPlayCard(cards::Card* card);

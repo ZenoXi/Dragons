@@ -6,16 +6,15 @@ class Core;
 
 namespace cards
 {
-    class DesperateStrike : public Card
+    class HellfireSword : public Card
     {
     public:
-        DesperateStrike() {}
+        HellfireSword() {}
 
-        bool CanPlay(Core* core, ActionProperties actionProps, PlayProperties* playProps);
         PlayResult Play(Core* core, ActionProperties actionProps, PlayProperties* playProps);
 
         CardType GetCardType() { return CardType::OFFENSE; }
-        std::wstring GetCardName() { return L"Desperate Strike"; }
+        std::wstring GetCardName() { return L"Hellfire Sword"; }
         std::wstring GetCardDescription() { return L""; }
     };
 }

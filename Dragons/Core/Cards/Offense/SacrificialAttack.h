@@ -11,7 +11,6 @@ namespace cards
     public:
         SacrificialAttack() {}
 
-        bool CanPlay(Core* core, ActionProperties actionProps);
         PlayResult Play(Core* core, ActionProperties actionProps, PlayProperties* playProps);
 
         CardType GetCardType() { return CardType::OFFENSE; }
