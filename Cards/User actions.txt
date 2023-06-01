@@ -1,0 +1,13 @@
+Choose number +(bounds)
+Continue button
+Choose card(s) from hand +(amount of cards, type limiting)
+Choose card(s) from graveyard +(amount of cards, type limiting)
+Choose card from list
+Play card(s) +(amount of cards, type limiting)
+Draw card(s) +(amount of cards, deck limiting)
+Discard card(s) +(amount of cards, type limiting)
+Choose deck(s) +(amount of decks)
+Reveal card(s) in deck(s) +(amount of cards, deck limiting)
+
+
+

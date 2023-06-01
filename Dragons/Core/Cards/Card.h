@@ -15,6 +15,7 @@ namespace cards
     {
         bool discard = true;
         bool notPlayed = false;
+        bool waitForInput = false;
     };
 
     enum class CardType
