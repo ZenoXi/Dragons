@@ -10,4 +10,6 @@ struct TurnBeginEvent
 struct TurnEndEvent
 {
     static const char* _NAME_() { return "turn_end"; }
+    int playerIndex;
+    int opponentIndex;
 };

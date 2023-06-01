@@ -47,4 +47,9 @@ public:
         : EventSubscriber<_Event>(eventClass)
         , _handler(handler)
     {}
+
+    void SetHandler(std::function<void(_Event)> handler)
+    {
+        _handler = handler;
+    }
 };

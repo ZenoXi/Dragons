@@ -10,18 +10,22 @@ class Core;
 
 namespace cards
 {
-    class FairFight : public Card
+    class RapidAttack : public Card
     {
         std::unique_ptr<EventHandler<TurnEndEvent>> _turnEndHandler = nullptr;
+        bool _playedThisTurn = false;
+        int _playedBy = -1;
 
     public:
-        FairFight() {}
+        RapidAttack() {}
 
+        bool CanPlay(Core* core, ActionProperties actionProps, PlayProperties* playProps);
         PlayResult Play(Core* core, ActionProperties actionProps, PlayProperties* playProps);
+        //void Draw(Core* core, ActionProperties actionProps);
         bool IsActive() { return true; }
 
         CardType GetCardType() { return CardType::OFFENSE; }
-        std::wstring GetCardName() { return L"Fair Fight"; }
+        std::wstring GetCardName() { return L"Rapid Attack"; }
         std::wstring GetCardDescription() { return L""; }
     };
 }
