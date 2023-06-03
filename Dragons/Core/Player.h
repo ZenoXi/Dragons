@@ -17,4 +17,17 @@ struct Player
     std::vector<std::unique_ptr<cards::Card>> activeCards;
 
     int index;
+
+    int CardsInHand(cards::CardType type) const
+    {
+        int count = 0;
+        for (auto& card : hand)
+        {
+            if (card->GetCardType() == type)
+            {
+                count++;
+            }
+        }
+        return count;
+    }
 };

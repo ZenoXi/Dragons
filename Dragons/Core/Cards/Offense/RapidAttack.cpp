@@ -9,7 +9,7 @@ bool cards::RapidAttack::CanPlay(Core* core, ActionProperties actionProps, PlayP
 
 cards::PlayResult cards::RapidAttack::Play(Core* core, ActionProperties actionProps, PlayProperties* playProps)
 {
-    if (!CanPlay(core, actionProps))
+    if (!CanPlay(core, actionProps, playProps))
     {
         PlayResult result{};
         result.discard = false;
@@ -27,14 +27,11 @@ cards::PlayResult cards::RapidAttack::Play(Core* core, ActionProperties actionPr
     _playedThisTurn = true;
     _playedBy = actionProps.player;
 
-    // At the end of the turn reset play
+    // At the end of the turn reset play flag
     _turnEndHandler = std::make_unique<EventHandler<TurnEndEvent>>(core->Events(), [=](TurnEndEvent event)
     {
         _playedThisTurn = false;
     });
 
-    // Do not discard
-    PlayResult result{};
-    result.discard = false;
-    return result;
+    return PlayResult::DontDiscard();
 }

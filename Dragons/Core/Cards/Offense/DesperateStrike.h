@@ -14,8 +14,8 @@ namespace cards
         bool CanPlay(Core* core, ActionProperties actionProps, PlayProperties* playProps);
         PlayResult Play(Core* core, ActionProperties actionProps, PlayProperties* playProps);
 
-        CardType GetCardType() { return CardType::OFFENSE; }
-        std::wstring GetCardName() { return L"Desperate Strike"; }
-        std::wstring GetCardDescription() { return L""; }
+        CardType GetCardType() const { return CardType::OFFENSE; }
+        std::wstring GetCardName() const { return L"Desperate Strike"; }
+        std::wstring GetCardDescription() const { return L""; }
     };
 }

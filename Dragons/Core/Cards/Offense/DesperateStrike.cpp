@@ -19,5 +19,5 @@ cards::PlayResult cards::DesperateStrike::Play(Core* core, ActionProperties acti
         damageProps.amount = 3;
         core->Damage(damageProps);
     }
-    return PlayResult{};
+    return PlayResult::Default();
 }

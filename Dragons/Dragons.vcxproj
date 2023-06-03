@@ -141,27 +141,40 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Core\Cards\Offense\BloodDonation.cpp" />
+    <ClCompile Include="Core\Cards\Offense\DeathPoison.cpp" />
     <ClCompile Include="Core\Cards\Offense\DesperateStrike.cpp" />
     <ClCompile Include="Core\Cards\Offense\FairFight.cpp" />
+    <ClCompile Include="Core\Cards\Offense\FireMoon.cpp" />
+    <ClCompile Include="Core\Cards\Offense\HeavySlash.cpp" />
     <ClCompile Include="Core\Cards\Offense\HellfireSword.cpp" />
+    <ClCompile Include="Core\Cards\Offense\LastBreath.cpp" />
     <ClCompile Include="Core\Cards\Offense\RapidAttack.cpp" />
     <ClCompile Include="Core\Cards\Offense\SacrificialAttack.cpp" />
+    <ClCompile Include="Core\Cards\Offense\Stab.cpp" />
     <ClCompile Include="Core\Cards\Offense\StarCurse.cpp" />
     <ClCompile Include="Core\Cards\Offense\VitalSpot.cpp" />
+    <ClCompile Include="Core\Cards\Offense\WeaponScroll.cpp" />
     <ClCompile Include="Core\Core.cpp" />
     <ClCompile Include="Dragons.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Core\ActionProperties.h" />
     <ClInclude Include="Core\Cards\Card.h" />
+    <ClInclude Include="Core\Cards\CardType.h" />
     <ClInclude Include="Core\Cards\Offense\BloodDonation.h" />
+    <ClInclude Include="Core\Cards\Offense\DeathPoison.h" />
     <ClInclude Include="Core\Cards\Offense\DesperateStrike.h" />
     <ClInclude Include="Core\Cards\Offense\FairFight.h" />
+    <ClInclude Include="Core\Cards\Offense\FireMoon.h" />
+    <ClInclude Include="Core\Cards\Offense\HeavySlash.h" />
     <ClInclude Include="Core\Cards\Offense\HellfireSword.h" />
+    <ClInclude Include="Core\Cards\Offense\LastBreath.h" />
     <ClInclude Include="Core\Cards\Offense\RapidAttack.h" />
     <ClInclude Include="Core\Cards\Offense\SacrificialAttack.h" />
+    <ClInclude Include="Core\Cards\Offense\Stab.h" />
     <ClInclude Include="Core\Cards\Offense\StarCurse.h" />
     <ClInclude Include="Core\Cards\Offense\VitalSpot.h" />
+    <ClInclude Include="Core\Cards\Offense\WeaponScroll.h" />
     <ClInclude Include="Core\Core.h" />
     <ClInclude Include="Core\DamageProperties.h" />
     <ClInclude Include="Core\Events\ActionEvents.h" />
@@ -173,6 +186,7 @@
     <ClInclude Include="Core\GameConstants.h" />
     <ClInclude Include="Core\GameState.h" />
     <ClInclude Include="Core\Player.h" />
+    <ClInclude Include="Core\UserInputRequest.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

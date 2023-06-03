@@ -22,14 +22,14 @@ public:
 
     // Main game actions
     bool CanPlayCard(cards::Card* card);
-    bool CanPlayCard(cards::Card* card, std::optional<ActionProperties> actionProps);
-    bool PlayCard(cards::Card* card);
-    bool PlayCard(cards::Card* card, std::optional<ActionProperties> actionProps, cards::PlayProperties* playProps);
+    bool CanPlayCard(cards::Card* card, std::optional<ActionProperties> actionProps, cards::PlayProperties* playProps);
+    cards::PlayResult PlayCard(cards::Card* card);
+    cards::PlayResult PlayCard(cards::Card* card, std::optional<ActionProperties> actionProps, cards::PlayProperties* playProps);
     bool DrawCard(cards::CardType type, int playerIndex);
     bool DiscardCard(cards::Card* card, int playerIndex);
 
     // Stat manipulation
-    void Damage(DamageProperties props);
+    DamageResult Damage(DamageProperties props);
     void Heal(int target, int amount);
     void AddArmor(int target, int amount);
     void DestroyArmor(int target);
@@ -40,8 +40,8 @@ public:
     std::unique_ptr<cards::Card> RemoveCardFromHand(cards::Card* card, int playerIndex);
     void AddCardToActiveCards(std::unique_ptr<cards::Card> card, int playerIndex);
     std::unique_ptr<cards::Card> RemoveCardFromActiveCards(cards::Card* card, int playerIndex);
-    bool AddCardToDeck(std::unique_ptr<cards::Card> card, cards::CardType deck);
-    std::unique_ptr<cards::Card> RemoveCardFromDeck(cards::Card* card, cards::CardType deck);
+    bool AddCardToDeck(std::unique_ptr<cards::Card> card);
+    std::unique_ptr<cards::Card> RemoveCardFromDeck(cards::Card* card);
     void AddCardToGraveyard(std::unique_ptr<cards::Card> card);
     std::unique_ptr<cards::Card> RemoveCardFromGraveyard(cards::Card* card);
 };

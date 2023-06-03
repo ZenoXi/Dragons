@@ -45,10 +45,10 @@ void Core::ClearState()
 
 bool Core::CanPlayCard(cards::Card* card)
 {
-    return CanPlayCard(card, std::nullopt);
+    return CanPlayCard(card, std::nullopt, nullptr);
 }
 
-bool Core::CanPlayCard(cards::Card* card, std::optional<ActionProperties> actionProps)
+bool Core::CanPlayCard(cards::Card* card, std::optional<ActionProperties> actionProps, cards::PlayProperties* playProps)
 {
     ActionProperties actionPropsLocal;
     if (actionProps)
@@ -60,15 +60,23 @@ bool Core::CanPlayCard(cards::Card* card, std::optional<ActionProperties> action
     if (actionPropsLocal.opponent == DEFAULT_OPPONENT)
         actionPropsLocal.opponent = _state.opposingPlayer;
 
-    return card->CanPlay(this, actionPropsLocal);
+    bool canPlay = card->CanPlay(this, actionPropsLocal, playProps);
+
+    // Emit event
+    CanPlayEvent canPlayEvent;
+    canPlayEvent.card = card;
+    canPlayEvent.actionProps = &actionPropsLocal;
+    canPlayEvent.playProps = playProps;
+    canPlayEvent.canPlay = &canPlay;
+    _events.RaiseEvent(canPlayEvent);
 }
 
-bool Core::PlayCard(cards::Card* card)
+cards::PlayResult Core::PlayCard(cards::Card* card)
 {
     return PlayCard(card, std::nullopt, nullptr);
 }
 
-bool Core::PlayCard(cards::Card* card, std::optional<ActionProperties> actionProps, cards::PlayProperties* playProps)
+cards::PlayResult Core::PlayCard(cards::Card* card, std::optional<ActionProperties> actionProps, cards::PlayProperties* playProps)
 {
     ActionProperties actionPropsLocal;
     if (actionProps)
@@ -83,7 +91,11 @@ bool Core::PlayCard(cards::Card* card, std::optional<ActionProperties> actionPro
     auto& hand = _state.players[actionPropsLocal.player].hand;
     auto foundCardIt = std::find_if(hand.begin(), hand.end(), [&](std::unique_ptr<cards::Card>& cardPtr) { return cardPtr.get() == card; });
     if (foundCardIt == hand.end())
-        return false;
+    {
+        cards::PlayResult result;
+        result.notPlayed = true;
+        return result;
+    }
 
     // Emit pre play event
     PreCardPlayedEvent preCardPlayedEvent;
@@ -98,22 +110,26 @@ bool Core::PlayCard(cards::Card* card, std::optional<ActionProperties> actionPro
         _state.graveyard.push_back(std::move(*foundCardIt));
         hand.erase(foundCardIt);
     }
+    if (!result.notPlayed)
+    {
+        // Emit post play event
+        PostCardPlayedEvent postCardPlayedEvent;
+        postCardPlayedEvent.card = card;
+        postCardPlayedEvent.actionProps = &actionPropsLocal;
+        postCardPlayedEvent.playProps = playProps;
+        _events.RaiseEvent(postCardPlayedEvent);
+    }
 
-    // Emit post play event
-    PostCardPlayedEvent postCardPlayedEvent;
-    postCardPlayedEvent.card = card;
-    postCardPlayedEvent.actionProps = &actionPropsLocal;
-    postCardPlayedEvent.playProps = playProps;
-    _events.RaiseEvent(postCardPlayedEvent);
-
-    return true;
+    return result;
 }
 
-void Core::Damage(DamageProperties props)
+DamageResult Core::Damage(DamageProperties props)
 {
     PreDamageEvent preDamageEvent;
     preDamageEvent.props = &props;
     _events.RaiseEvent(preDamageEvent);
+
+    DamageResult result;
 
     Player& targetPlayer = _state.players[props.target];
     if (!props.ignoreArmor)
@@ -123,11 +139,13 @@ void Core::Damage(DamageProperties props)
             if (props.amount > targetPlayer.armor)
             {
                 props.amount -= targetPlayer.armor;
+                result.removedArmorAmount += targetPlayer.armor;
                 targetPlayer.armor = 0;
             }
             else
             {
                 targetPlayer.armor -= props.amount;
+                result.removedArmorAmount += props.amount;
                 props.amount = 0;
             }
         }
@@ -137,14 +155,18 @@ void Core::Damage(DamageProperties props)
         if (props.amount >= targetPlayer.health)
         {
             props.amount -= targetPlayer.health;
+            result.removedHealthAmount += targetPlayer.health;
             targetPlayer.health = 0;
         }
         else
         {
             targetPlayer.health -= props.amount;
+            result.removedHealthAmount += props.amount;
             props.amount = 0;
         }
     }
+
+    return result;
 }
 
 void Core::Heal(int target, int amount)
@@ -199,6 +221,7 @@ void Core::SetMaxHealth(int target, int value)
 
 void Core::AddCardToHand(std::unique_ptr<cards::Card> card, int playerIndex)
 {
+    card->OnEnterHand(this, playerIndex);
     _state.players[playerIndex].hand.push_back(std::move(card));
 }
 
@@ -218,6 +241,7 @@ std::unique_ptr<cards::Card> Core::RemoveCardFromHand(cards::Card* card, int pla
 
 void Core::AddCardToActiveCards(std::unique_ptr<cards::Card> card, int playerIndex)
 {
+    card->OnEnterActiveCards(this, playerIndex);
     _state.players[playerIndex].activeCards.push_back(std::move(card));
 }
 
@@ -235,10 +259,10 @@ std::unique_ptr<cards::Card> Core::RemoveCardFromActiveCards(cards::Card* card, 
     return nullptr;
 }
 
-bool Core::AddCardToDeck(std::unique_ptr<cards::Card> card, cards::CardType deck)
+bool Core::AddCardToDeck(std::unique_ptr<cards::Card> card)
 {
     std::vector<std::unique_ptr<cards::Card>>& deckRef = _state.offenseDeck;
-    switch (deck)
+    switch (card->GetCardType())
     {
     case cards::CardType::OFFENSE:
         deckRef = _state.offenseDeck;
@@ -256,14 +280,15 @@ bool Core::AddCardToDeck(std::unique_ptr<cards::Card> card, cards::CardType deck
         return false;
     }
 
+    card->OnEnterDeck(this);
     deckRef.push_back(std::move(card));
     return true;
 }
 
-std::unique_ptr<cards::Card> Core::RemoveCardFromDeck(cards::Card* card, cards::CardType deck)
+std::unique_ptr<cards::Card> Core::RemoveCardFromDeck(cards::Card* card)
 {
     std::vector<std::unique_ptr<cards::Card>>& deckRef = _state.offenseDeck;
-    switch (deck)
+    switch (card->GetCardType())
     {
     case cards::CardType::OFFENSE:
         deckRef = _state.offenseDeck;
@@ -295,6 +320,7 @@ std::unique_ptr<cards::Card> Core::RemoveCardFromDeck(cards::Card* card, cards::
 
 void Core::AddCardToGraveyard(std::unique_ptr<cards::Card> card)
 {
+    card->OnEnterGraveyard(this);
     _state.graveyard.push_back(std::move(card));
 }
 

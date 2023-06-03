@@ -6,20 +6,20 @@ class Core;
 
 namespace cards
 {
-    class BloodDonation : public Card
+    class LastBreath : public Card
     {
-        bool _waitingForDamageInput = false;
-        bool _waitingToDrawCards = false;
+        bool _waitingToPlayCards = false;
 
     public:
-        BloodDonation() {}
+        LastBreath() {}
 
         bool CanPlay(Core* core, ActionProperties actionProps, PlayProperties* playProps);
         PlayResult Play(Core* core, ActionProperties actionProps, PlayProperties* playProps);
         PlayResult Resume(UserInputResponse response, Core* core, ActionProperties actionProps, PlayProperties* playProps);
+        int GetActionCost() { return 2; }
 
         CardType GetCardType() const { return CardType::OFFENSE; }
-        std::wstring GetCardName() const { return L"Blood Donation"; }
+        std::wstring GetCardName() const { return L"Last Breath"; }
         std::wstring GetCardDescription() const { return L""; }
     };
 }

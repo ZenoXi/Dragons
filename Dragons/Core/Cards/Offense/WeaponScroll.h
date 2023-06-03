@@ -6,20 +6,19 @@ class Core;
 
 namespace cards
 {
-    class BloodDonation : public Card
+    class WeaponScroll : public Card
     {
-        bool _waitingForDamageInput = false;
-        bool _waitingToDrawCards = false;
+        bool _waitingForCardChoice = false;
 
     public:
-        BloodDonation() {}
+        WeaponScroll() {}
 
         bool CanPlay(Core* core, ActionProperties actionProps, PlayProperties* playProps);
         PlayResult Play(Core* core, ActionProperties actionProps, PlayProperties* playProps);
         PlayResult Resume(UserInputResponse response, Core* core, ActionProperties actionProps, PlayProperties* playProps);
 
         CardType GetCardType() const { return CardType::OFFENSE; }
-        std::wstring GetCardName() const { return L"Blood Donation"; }
+        std::wstring GetCardName() const { return L"Weapon Scroll"; }
         std::wstring GetCardDescription() const { return L""; }
     };
 }

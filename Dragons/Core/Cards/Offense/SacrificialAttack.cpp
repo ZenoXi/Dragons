@@ -14,5 +14,5 @@ cards::PlayResult cards::SacrificialAttack::Play(Core* core, ActionProperties ac
     damageProps.target = actionProps.player;
     core->Damage(damageProps);
 
-    return PlayResult{};
+    return PlayResult::Default();
 }

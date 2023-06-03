@@ -20,8 +20,14 @@ namespace cards
         PlayResult Play(Core* core, ActionProperties actionProps, PlayProperties* playProps);
         bool IsActive() { return true; }
 
-        CardType GetCardType() { return CardType::OFFENSE; }
-        std::wstring GetCardName() { return L"Fair Fight"; }
-        std::wstring GetCardDescription() { return L""; }
+        CardType GetCardType() const { return CardType::OFFENSE; }
+        std::wstring GetCardName() const { return L"Fair Fight"; }
+        std::wstring GetCardDescription() const { return L""; }
+
+    private:
+        void _OnEnterHand(Core* core, int playerIndex);
+        void _OnEnterActiveCards(Core* core, int playerIndex);
+        void _OnEnterDeck(Core* core);
+        void _OnEnterGraveyard(Core* core);
     };
 }

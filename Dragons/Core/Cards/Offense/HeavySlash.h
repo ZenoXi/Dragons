@@ -2,7 +2,7 @@
 
 #include "../Card.h"
 #include "../../Events/EventSubscriber.h"
-#include "../../Events/StatsEvents.h"
+#include "../../Events/TurnEvents.h"
 
 #include <memory>
 
@@ -10,18 +10,18 @@ class Core;
 
 namespace cards
 {
-    class VitalSpot : public Card
+    class HeavySlash : public Card
     {
-        std::unique_ptr<EventHandler<PreDamageEvent>> _preDamageHandler = nullptr;
+        std::unique_ptr<EventHandler<TurnBeginEvent>> _turnBeginHandler = nullptr;
 
     public:
-        VitalSpot() {}
+        HeavySlash() {}
 
         PlayResult Play(Core* core, ActionProperties actionProps, PlayProperties* playProps);
         bool IsActive() { return true; }
 
         CardType GetCardType() const { return CardType::OFFENSE; }
-        std::wstring GetCardName() const { return L"Vital Spot"; }
+        std::wstring GetCardName() const { return L"Heavy Slash"; }
         std::wstring GetCardDescription() const { return L""; }
 
     private:
