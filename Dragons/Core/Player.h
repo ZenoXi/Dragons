@@ -13,6 +13,7 @@ struct Player
     int actionsLeft;
     int extraPlays;
     int extraDraws;
+    int extraDiscards;
     std::vector<std::unique_ptr<cards::Card>> hand;
     std::vector<std::unique_ptr<cards::Card>> activeCards;
 

@@ -30,6 +30,12 @@ cards::PlayResult cards::LastBreath::Resume(UserInputResponse response, Core* co
     if (_waitingToPlayCards)
     {
         _waitingToPlayCards = false;
+
+        // Discard remaining cards
+        auto& handRef = core->GetState().players[actionProps.player].hand;
+        while (!handRef.empty())
+            core->DiscardCard(handRef.front().get(), actionProps.player);
+
         return PlayResult::Default();
     }
 

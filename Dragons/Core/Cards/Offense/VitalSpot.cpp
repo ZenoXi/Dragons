@@ -31,7 +31,7 @@ void cards::VitalSpot::_OnEnterActiveCards(Core* core, int playerIndex)
         event.props->trueDamage = true;
         event.props->ignoreArmor = true;
 
-        auto cardPtr = core->RemoveCardFromActiveCards(this, event.props->source);
+        auto cardPtr = core->RemoveCardFromActiveCards(this, GetPosition().playerIndex);
         core->AddCardToGraveyard(std::move(cardPtr));
     });
 }

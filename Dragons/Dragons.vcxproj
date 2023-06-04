@@ -140,9 +140,21 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Core\Cards\Defense\ArmorUp.cpp" />
+    <ClCompile Include="Core\Cards\Defense\Barrier.cpp" />
+    <ClCompile Include="Core\Cards\Defense\Cure.cpp" />
     <ClCompile Include="Core\Cards\Defense\DivineProtection.cpp" />
+    <ClCompile Include="Core\Cards\Defense\Healer.cpp" />
+    <ClCompile Include="Core\Cards\Defense\HelpingHand.cpp" />
+    <ClCompile Include="Core\Cards\Defense\LifeFlower.cpp" />
+    <ClCompile Include="Core\Cards\Defense\PeacePact.cpp" />
+    <ClCompile Include="Core\Cards\Defense\Preparations.cpp" />
+    <ClCompile Include="Core\Cards\Defense\Recreation.cpp" />
     <ClCompile Include="Core\Cards\Defense\ShieldingNet.cpp" />
+    <ClCompile Include="Core\Cards\Defense\SoothingSpell.cpp" />
     <ClCompile Include="Core\Cards\Defense\SpiritShelter.cpp" />
+    <ClCompile Include="Core\Cards\Defense\TreeOfLife.cpp" />
+    <ClCompile Include="Core\Cards\Defense\WarBlessing.cpp" />
     <ClCompile Include="Core\Cards\Offense\BloodDonation.cpp" />
     <ClCompile Include="Core\Cards\Offense\DeathPoison.cpp" />
     <ClCompile Include="Core\Cards\Offense\DesperateStrike.cpp" />
@@ -164,9 +176,21 @@
     <ClInclude Include="Core\ActionProperties.h" />
     <ClInclude Include="Core\Cards\Card.h" />
     <ClInclude Include="Core\Cards\CardType.h" />
+    <ClInclude Include="Core\Cards\Defense\ArmorUp.h" />
+    <ClInclude Include="Core\Cards\Defense\Barrier.h" />
+    <ClInclude Include="Core\Cards\Defense\Cure.h" />
     <ClInclude Include="Core\Cards\Defense\DivineProtection.h" />
+    <ClInclude Include="Core\Cards\Defense\Healer.h" />
+    <ClInclude Include="Core\Cards\Defense\HelpingHand.h" />
+    <ClInclude Include="Core\Cards\Defense\LifeFlower.h" />
+    <ClInclude Include="Core\Cards\Defense\PeacePact.h" />
+    <ClInclude Include="Core\Cards\Defense\Preparations.h" />
+    <ClInclude Include="Core\Cards\Defense\Recreation.h" />
     <ClInclude Include="Core\Cards\Defense\ShieldingNet.h" />
+    <ClInclude Include="Core\Cards\Defense\SoothingSpell.h" />
     <ClInclude Include="Core\Cards\Defense\SpiritShelter.h" />
+    <ClInclude Include="Core\Cards\Defense\TreeOfLife.h" />
+    <ClInclude Include="Core\Cards\Defense\WarBlessing.h" />
     <ClInclude Include="Core\Cards\Offense\BloodDonation.h" />
     <ClInclude Include="Core\Cards\Offense\DeathPoison.h" />
     <ClInclude Include="Core\Cards\Offense\DesperateStrike.h" />

@@ -2,7 +2,6 @@
 
 #include "../Card.h"
 #include "../../Events/EventSubscriber.h"
-#include "../../Events/TurnEvents.h"
 #include "../../Events/StatsEvents.h"
 
 #include <memory>
@@ -11,21 +10,18 @@ class Core;
 
 namespace cards
 {
-    class DivineProtection : public Card
+    class Barrier : public Card
     {
-        std::unique_ptr<EventHandler<TurnBeginEvent>> _turnBeginHandler = nullptr;
-        std::unique_ptr<EventHandler<TurnEndEvent>> _turnEndHandler = nullptr;
-        std::unique_ptr<EventHandler<PreHealthChangeEvent>> _healthChangeHandler = nullptr;
-        bool _activated = false;
+        std::unique_ptr<EventHandler<PreDamageEvent_NerfPass>> _preDamageHandler = nullptr;
 
     public:
-        DivineProtection() {}
+        Barrier() {}
 
         PlayResult Play(Core* core, ActionProperties actionProps, PlayProperties* playProps);
         bool IsActive() { return true; }
 
-        CardType GetCardType() const { return CardType::OFFENSE; }
-        std::wstring GetCardName() const { return L"Divine Protection"; }
+        CardType GetCardType() const { return CardType::DEFENSE; }
+        std::wstring GetCardName() const { return L"Barrier"; }
         std::wstring GetCardDescription() const { return L""; }
 
     private:

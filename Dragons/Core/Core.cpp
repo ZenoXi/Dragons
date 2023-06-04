@@ -150,34 +150,64 @@ DamageResult Core::Damage(DamageProperties props)
     {
         if (targetPlayer.armor > 0)
         {
-            if (props.amount > targetPlayer.armor)
+            int newArmorValue;
+            if (props.amount >= targetPlayer.armor)
             {
                 props.amount -= targetPlayer.armor;
                 result.removedArmorAmount += targetPlayer.armor;
-                targetPlayer.armor = 0;
+                newArmorValue = 0;
             }
             else
             {
-                targetPlayer.armor -= props.amount;
+                newArmorValue = targetPlayer.armor - props.amount;
                 result.removedArmorAmount += props.amount;
                 props.amount = 0;
             }
+
+            PreArmorChangeEvent preArmorChange;
+            preArmorChange.target = props.target;
+            preArmorChange.oldValue = targetPlayer.armor;
+            preArmorChange.newValue = &newArmorValue;
+            _events.RaiseEvent(preArmorChange);
+
+            targetPlayer.armor = newArmorValue;
+
+            PostArmorChangeEvent postArmorChange;
+            postArmorChange.target = props.target;
+            postArmorChange.oldValue = preArmorChange.oldValue;
+            postArmorChange.newValue = newArmorValue;
+            _events.RaiseEvent(postArmorChange);
         }
     }
     if (props.amount > 0)
     {
+        int newHealthValue;
         if (props.amount >= targetPlayer.health)
         {
             props.amount -= targetPlayer.health;
             result.removedHealthAmount += targetPlayer.health;
-            targetPlayer.health = 0;
+            newHealthValue = 0;
         }
         else
         {
-            targetPlayer.health -= props.amount;
+            newHealthValue = targetPlayer.health - props.amount;
             result.removedHealthAmount += props.amount;
             props.amount = 0;
         }
+
+        PreHealthChangeEvent preHealthChange;
+        preHealthChange.target = props.target;
+        preHealthChange.oldValue = targetPlayer.health;
+        preHealthChange.newValue = &newHealthValue;
+        _events.RaiseEvent(preHealthChange);
+
+        targetPlayer.health = newHealthValue;
+
+        PostHealthChangeEvent postHealthChange;
+        postHealthChange.target = props.target;
+        postHealthChange.oldValue = preHealthChange.oldValue;
+        postHealthChange.newValue = newHealthValue;
+        _events.RaiseEvent(postHealthChange);
     }
 
     return result;
@@ -190,10 +220,26 @@ void Core::Heal(int target, int amount)
     preHealEvent.amount = &amount;
     _events.RaiseEvent(preHealEvent);
 
-    if (amount > 0)
-    {
-        _state.players[target].armor += amount;
-    }
+    if (amount <= 0)
+        return;
+
+    int newHealthValue = _state.players[target].health + amount;
+    if (newHealthValue > _state.players[target].maxHealth)
+        newHealthValue = _state.players[target].maxHealth;
+
+    PreHealthChangeEvent preHealthChange;
+    preHealthChange.target = target;
+    preHealthChange.oldValue = _state.players[target].health;
+    preHealthChange.newValue = &newHealthValue;
+    _events.RaiseEvent(preHealthChange);
+
+    _state.players[target].health = newHealthValue;
+
+    PostHealthChangeEvent postHealthChange;
+    postHealthChange.target = target;
+    postHealthChange.oldValue = preHealthChange.oldValue;
+    postHealthChange.newValue = newHealthValue;
+    _events.RaiseEvent(postHealthChange);
 }
 
 void Core::AddArmor(int target, int amount)
@@ -203,10 +249,24 @@ void Core::AddArmor(int target, int amount)
     preAddArmorEvent.amount = &amount;
     _events.RaiseEvent(preAddArmorEvent);
 
-    if (amount > 0)
-    {
-        _state.players[target].armor += amount;
-    }
+    if (amount <= 0)
+        return;
+
+    int newArmorValue = _state.players[target].armor + amount;
+
+    PreArmorChangeEvent preArmorChange;
+    preArmorChange.target = target;
+    preArmorChange.oldValue = _state.players[target].armor;
+    preArmorChange.newValue = &newArmorValue;
+    _events.RaiseEvent(preArmorChange);
+
+    _state.players[target].armor = newArmorValue;
+
+    PostArmorChangeEvent postArmorChange;
+    postArmorChange.target = target;
+    postArmorChange.oldValue = preArmorChange.oldValue;
+    postArmorChange.newValue = newArmorValue;
+    _events.RaiseEvent(postArmorChange);
 }
 
 void Core::DestroyArmor(int target)
@@ -217,19 +277,65 @@ void Core::DestroyArmor(int target)
     preDestroyArmorEvent.cancel = &cancel;
     _events.RaiseEvent(preDestroyArmorEvent);
 
-    _state.players[target].armor = 0;
+    if (cancel)
+        return;
+
+    int newArmorValue = 0;
+
+    PreArmorChangeEvent preArmorChange;
+    preArmorChange.target = target;
+    preArmorChange.oldValue = _state.players[target].armor;
+    preArmorChange.newValue = &newArmorValue;
+    _events.RaiseEvent(preArmorChange);
+
+    _state.players[target].armor = newArmorValue;
+
+    PostArmorChangeEvent postArmorChange;
+    postArmorChange.target = target;
+    postArmorChange.oldValue = preArmorChange.oldValue;
+    postArmorChange.newValue = newArmorValue;
+    _events.RaiseEvent(postArmorChange);
 }
 
 void Core::SetMaxHealth(int target, int value)
 {
-    PreMaxHealthChangeEvent preMaxHealthChangeEvent;
-    preMaxHealthChangeEvent.target = target;
-    preMaxHealthChangeEvent.oldValue = _state.players[target].maxHealth;
-    preMaxHealthChangeEvent.newValue = &value;
-    _events.RaiseEvent(preMaxHealthChangeEvent);
+    int newMaxHealthValue = value;
 
-    _state.players[target].maxHealth = value;
+    PreMaxHealthChangeEvent preMaxHealthChange;
+    preMaxHealthChange.target = target;
+    preMaxHealthChange.oldValue = _state.players[target].maxHealth;
+    preMaxHealthChange.newValue = &newMaxHealthValue;
+    _events.RaiseEvent(preMaxHealthChange);
+
+    _state.players[target].health = newMaxHealthValue;
+
+    PostMaxHealthChangeEvent postMaxHealthChange;
+    postMaxHealthChange.target = target;
+    postMaxHealthChange.oldValue = preMaxHealthChange.oldValue;
+    postMaxHealthChange.newValue = newMaxHealthValue;
+    _events.RaiseEvent(postMaxHealthChange);
 }
+
+void Core::AddExtraActions(int target, int amount)
+{
+    _state.players[target].actionsLeft += amount;
+}
+
+void Core::AddExtraPlays(int target, int amount)
+{
+    _state.players[target].extraPlays += amount;
+}
+
+void Core::AddExtraDraws(int target, int amount)
+{
+    _state.players[target].extraDraws += amount;
+}
+
+void Core::AddExtraDiscards(int target, int amount)
+{
+    _state.players[target].extraDiscards += amount;
+}
+
 
 void Core::AddCardToHand(std::unique_ptr<cards::Card> card, int playerIndex)
 {

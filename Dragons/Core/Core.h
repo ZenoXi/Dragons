@@ -28,8 +28,8 @@ public:
     bool CanPlayCard(cards::Card* card, std::optional<ActionProperties> actionProps, cards::PlayProperties* playProps);
     cards::PlayResult PlayCard(cards::Card* card);
     cards::PlayResult PlayCard(cards::Card* card, std::optional<ActionProperties> actionProps, cards::PlayProperties* playProps);
-    bool DrawCard(cards::CardType type, int playerIndex);
-    bool DiscardCard(cards::Card* card, int playerIndex);
+    cards::Card* DrawCard(cards::CardType type, int playerIndex);
+    cards::Card* DiscardCard(cards::Card* card, int playerIndex);
 
     // Stat manipulation
     DamageResult Damage(DamageProperties props);
@@ -37,6 +37,11 @@ public:
     void AddArmor(int target, int amount);
     void DestroyArmor(int target);
     void SetMaxHealth(int target, int amount);
+
+    void AddExtraActions(int target, int amount);
+    void AddExtraPlays(int target, int amount);
+    void AddExtraDraws(int target, int amount);
+    void AddExtraDiscards(int target, int amount);
 
     // Card moving functions
     void AddCardToHand(std::unique_ptr<cards::Card> card, int playerIndex);

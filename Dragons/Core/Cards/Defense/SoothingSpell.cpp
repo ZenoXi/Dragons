@@ -1,25 +1,27 @@
-#include "DivineProtection.h"
+#include "SoothingSpell.h"
 
 #include "../../Core.h"
 
-cards::PlayResult cards::DivineProtection::Play(Core* core, ActionProperties actionProps, PlayProperties* playProps)
+cards::PlayResult cards::SoothingSpell::Play(Core* core, ActionProperties actionProps, PlayProperties* playProps)
 {
     // Move card to active
     auto cardPtr = core->RemoveCardFromHand(this, actionProps.player);
     core->AddCardToActiveCards(std::move(cardPtr), actionProps.player);
 
+    core->AddExtraPlays(actionProps.player, 1);
+
     return PlayResult::DontDiscard();
 }
 
-void cards::DivineProtection::_OnEnterHand(Core* core, int playerIndex)
+void cards::SoothingSpell::_OnEnterHand(Core* core, int playerIndex)
 {
     _turnBeginHandler.reset();
     _turnEndHandler.reset();
-    _healthChangeHandler.reset();
+    _canPlayHandler.reset();
     _activated = false;
 }
 
-void cards::DivineProtection::_OnEnterActiveCards(Core* core, int playerIndex)
+void cards::SoothingSpell::_OnEnterActiveCards(Core* core, int playerIndex)
 {
     _activated = false;
 
@@ -38,30 +40,30 @@ void cards::DivineProtection::_OnEnterActiveCards(Core* core, int playerIndex)
         auto cardPtr = core->RemoveCardFromActiveCards(this, event.opponentIndex);
         core->AddCardToGraveyard(std::move(cardPtr));
     });
-    _healthChangeHandler = std::make_unique<EventHandler<PreHealthChangeEvent>>(&core->Events(), [=](PreHealthChangeEvent event)
+    _canPlayHandler = std::make_unique<EventHandler<CanPlayEvent>>(&core->Events(), [=](CanPlayEvent event)
     {
         if (!_activated)
             return;
-        if (event.target != GetPosition().playerIndex)
+        if (event.actionProps->opponent != GetPosition().playerIndex)
             return;
 
-        if (*event.newValue < 1)
-            *event.newValue = 1;
+        if (event.card->GetCardType() == CardType::OFFENSE)
+            *event.canPlay = false;
     });
 }
 
-void cards::DivineProtection::_OnEnterDeck(Core* core)
+void cards::SoothingSpell::_OnEnterDeck(Core* core)
 {
     _turnBeginHandler.reset();
     _turnEndHandler.reset();
-    _healthChangeHandler.reset();
+    _canPlayHandler.reset();
     _activated = false;
 }
 
-void cards::DivineProtection::_OnEnterGraveyard(Core* core)
+void cards::SoothingSpell::_OnEnterGraveyard(Core* core)
 {
     _turnBeginHandler.reset();
     _turnEndHandler.reset();
-    _healthChangeHandler.reset();
+    _canPlayHandler.reset();
     _activated = false;
 }
