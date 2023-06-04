@@ -1,3 +1,4 @@
+Wait
 Choose number +(bounds)
 Continue button
 Choose card(s) from hand +(amount of cards, type limiting)
