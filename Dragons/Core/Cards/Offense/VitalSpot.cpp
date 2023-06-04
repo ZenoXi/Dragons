@@ -21,7 +21,7 @@ void cards::VitalSpot::_OnEnterActiveCards(Core* core, int playerIndex)
     if (_preDamageHandler)
         return;
 
-    _preDamageHandler = std::make_unique<EventHandler<PreDamageEvent>>(core->Events(), [=](PreDamageEvent event)
+    _preDamageHandler = std::make_unique<EventHandler<PreDamageEvent_BuffPass>>(&core->Events(), [=](PreDamageEvent_BuffPass event)
     {
         if (GetPosition().playerIndex != event.props->source)
             return;

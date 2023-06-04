@@ -140,6 +140,9 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Core\Cards\Defense\DivineProtection.cpp" />
+    <ClCompile Include="Core\Cards\Defense\ShieldingNet.cpp" />
+    <ClCompile Include="Core\Cards\Defense\SpiritShelter.cpp" />
     <ClCompile Include="Core\Cards\Offense\BloodDonation.cpp" />
     <ClCompile Include="Core\Cards\Offense\DeathPoison.cpp" />
     <ClCompile Include="Core\Cards\Offense\DesperateStrike.cpp" />
@@ -161,6 +164,9 @@
     <ClInclude Include="Core\ActionProperties.h" />
     <ClInclude Include="Core\Cards\Card.h" />
     <ClInclude Include="Core\Cards\CardType.h" />
+    <ClInclude Include="Core\Cards\Defense\DivineProtection.h" />
+    <ClInclude Include="Core\Cards\Defense\ShieldingNet.h" />
+    <ClInclude Include="Core\Cards\Defense\SpiritShelter.h" />
     <ClInclude Include="Core\Cards\Offense\BloodDonation.h" />
     <ClInclude Include="Core\Cards\Offense\DeathPoison.h" />
     <ClInclude Include="Core\Cards\Offense\DesperateStrike.h" />

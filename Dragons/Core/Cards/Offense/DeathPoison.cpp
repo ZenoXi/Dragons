@@ -19,12 +19,12 @@ void cards::DeathPoison::_OnEnterHand(Core* core, int playerIndex)
 
 void cards::DeathPoison::_OnEnterActiveCards(Core* core, int playerIndex)
 {
-    _turnEndHandler = std::make_unique<EventHandler<TurnEndEvent>>(core->Events(), [=](TurnEndEvent event)
+    _turnEndHandler = std::make_unique<EventHandler<TurnEndEvent>>(&core->Events(), [=](TurnEndEvent event)
     {
         auto cardPtr = core->RemoveCardFromActiveCards(this, GetPosition().playerIndex);
         core->AddCardToGraveyard(std::move(cardPtr));
     });
-    _damageHandler = std::make_unique<EventHandler<PreDamageEvent>>(core->Events(), [=](PreDamageEvent event)
+    _damageHandler = std::make_unique<EventHandler<PreDamageEvent_BuffPass>>(&core->Events(), [=](PreDamageEvent_BuffPass event)
     {
         event.props->amount++;
     });

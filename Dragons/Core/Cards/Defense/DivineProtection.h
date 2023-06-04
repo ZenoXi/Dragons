@@ -11,19 +11,21 @@ class Core;
 
 namespace cards
 {
-    class DeathPoison : public Card
+    class DivineProtection : public Card
     {
+        std::unique_ptr<EventHandler<TurnBeginEvent>> _turnBeginHandler = nullptr;
         std::unique_ptr<EventHandler<TurnEndEvent>> _turnEndHandler = nullptr;
-        std::unique_ptr<EventHandler<PreDamageEvent_BuffPass>> _damageHandler = nullptr;
+        std::unique_ptr<EventHandler<CanPlayEvent>> _canPlayHandler = nullptr;
+        bool _activated = false;
 
     public:
-        DeathPoison() {}
+        DivineProtection() {}
 
         PlayResult Play(Core* core, ActionProperties actionProps, PlayProperties* playProps);
         bool IsActive() { return true; }
 
         CardType GetCardType() const { return CardType::OFFENSE; }
-        std::wstring GetCardName() const { return L"Death Poison"; }
+        std::wstring GetCardName() const { return L"Divine Protection"; }
         std::wstring GetCardDescription() const { return L""; }
 
     private:

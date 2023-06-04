@@ -5,6 +5,14 @@
 #include "Events/ActionEvents.h"
 #include "Events/StatsEvents.h"
 
+#include <algorithm>
+
+Core::Core()
+{
+    std::random_device dev;
+    _rng = std::mt19937(dev());
+}
+
 void Core::InitState()
 {
     ClearState();
@@ -69,6 +77,8 @@ bool Core::CanPlayCard(cards::Card* card, std::optional<ActionProperties> action
     canPlayEvent.playProps = playProps;
     canPlayEvent.canPlay = &canPlay;
     _events.RaiseEvent(canPlayEvent);
+
+    return canPlay;
 }
 
 cards::PlayResult Core::PlayCard(cards::Card* card)
@@ -125,9 +135,13 @@ cards::PlayResult Core::PlayCard(cards::Card* card, std::optional<ActionProperti
 
 DamageResult Core::Damage(DamageProperties props)
 {
-    PreDamageEvent preDamageEvent;
-    preDamageEvent.props = &props;
-    _events.RaiseEvent(preDamageEvent);
+    PreDamageEvent_BuffPass preDamageEventBuff;
+    preDamageEventBuff.props = &props;
+    _events.RaiseEvent(preDamageEventBuff);
+
+    PreDamageEvent_NerfPass preDamageEventNerf;
+    preDamageEventNerf.props = &props;
+    _events.RaiseEvent(preDamageEventNerf);
 
     DamageResult result;
 
@@ -208,15 +222,13 @@ void Core::DestroyArmor(int target)
 
 void Core::SetMaxHealth(int target, int value)
 {
-    PreSetMaxHealthEvent preSetMaxHealthEvent;
-    preSetMaxHealthEvent.target = &target;
-    preSetMaxHealthEvent.value = &value;
-    _events.RaiseEvent(preSetMaxHealthEvent);
+    PreMaxHealthChangeEvent preMaxHealthChangeEvent;
+    preMaxHealthChangeEvent.target = target;
+    preMaxHealthChangeEvent.oldValue = _state.players[target].maxHealth;
+    preMaxHealthChangeEvent.newValue = &value;
+    _events.RaiseEvent(preMaxHealthChangeEvent);
 
-    if (value != _state.players[target].maxHealth)
-    {
-        _state.players[target].maxHealth = value;
-    }
+    _state.players[target].maxHealth = value;
 }
 
 void Core::AddCardToHand(std::unique_ptr<cards::Card> card, int playerIndex)
@@ -261,25 +273,7 @@ std::unique_ptr<cards::Card> Core::RemoveCardFromActiveCards(cards::Card* card, 
 
 bool Core::AddCardToDeck(std::unique_ptr<cards::Card> card)
 {
-    std::vector<std::unique_ptr<cards::Card>>& deckRef = _state.offenseDeck;
-    switch (card->GetCardType())
-    {
-    case cards::CardType::OFFENSE:
-        deckRef = _state.offenseDeck;
-        break;
-    case cards::CardType::DEFENSE:
-        deckRef = _state.defenseDeck;
-        break;
-    case cards::CardType::UTILITY:
-        deckRef = _state.utilityDeck;
-        break;
-    case cards::CardType::COMBO:
-        deckRef = _state.comboDeck;
-        break;
-    default:
-        return false;
-    }
-
+    auto& deckRef = _ResolveDeckFromType(card->GetCardType());
     card->OnEnterDeck(this);
     deckRef.push_back(std::move(card));
     return true;
@@ -287,25 +281,7 @@ bool Core::AddCardToDeck(std::unique_ptr<cards::Card> card)
 
 std::unique_ptr<cards::Card> Core::RemoveCardFromDeck(cards::Card* card)
 {
-    std::vector<std::unique_ptr<cards::Card>>& deckRef = _state.offenseDeck;
-    switch (card->GetCardType())
-    {
-    case cards::CardType::OFFENSE:
-        deckRef = _state.offenseDeck;
-        break;
-    case cards::CardType::DEFENSE:
-        deckRef = _state.defenseDeck;
-        break;
-    case cards::CardType::UTILITY:
-        deckRef = _state.utilityDeck;
-        break;
-    case cards::CardType::COMBO:
-        deckRef = _state.comboDeck;
-        break;
-    default:
-        return nullptr;
-    }
-
+    auto& deckRef = _ResolveDeckFromType(card->GetCardType());
     for (int i = 0; i < deckRef.size(); i++)
     {
         if (deckRef[i].get() == card)
@@ -336,4 +312,25 @@ std::unique_ptr<cards::Card> Core::RemoveCardFromGraveyard(cards::Card* card)
         }
     }
     return nullptr;
+}
+
+void Core::ShuffleDeck(cards::CardType type)
+{
+    auto& deckRef = _ResolveDeckFromType(type);
+    std::shuffle(deckRef.begin(), deckRef.end(), _rng);
+}
+
+std::vector<std::unique_ptr<cards::Card>>& Core::_ResolveDeckFromType(cards::CardType type)
+{
+    switch (type)
+    {
+    case cards::CardType::OFFENSE:
+        return _state.offenseDeck;
+    case cards::CardType::DEFENSE:
+        return _state.defenseDeck;
+    case cards::CardType::UTILITY:
+        return _state.utilityDeck;
+    case cards::CardType::COMBO:
+        return _state.comboDeck;
+    }
 }

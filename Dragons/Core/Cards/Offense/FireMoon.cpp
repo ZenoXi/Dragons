@@ -49,14 +49,14 @@ void cards::FireMoon::_OnEnterActiveCards(Core* core, int playerIndex)
 {
     _activated = false;
 
-    _turnBeginHandler = std::make_unique<EventHandler<TurnBeginEvent>>(core->Events(), [=](TurnBeginEvent event)
+    _turnBeginHandler = std::make_unique<EventHandler<TurnBeginEvent>>(&core->Events(), [=](TurnBeginEvent event)
     {
         if (event.opponentIndex != GetPosition().playerIndex)
             return;
 
         _activated = true;
     });
-    _turnEndHandler = std::make_unique<EventHandler<TurnEndEvent>>(core->Events(), [=](TurnEndEvent event)
+    _turnEndHandler = std::make_unique<EventHandler<TurnEndEvent>>(&core->Events(), [=](TurnEndEvent event)
     {
         if (!_activated)
             return;
@@ -64,7 +64,7 @@ void cards::FireMoon::_OnEnterActiveCards(Core* core, int playerIndex)
         auto cardPtr = core->RemoveCardFromActiveCards(this, event.opponentIndex);
         core->AddCardToGraveyard(std::move(cardPtr));
     });
-    _canPlayHandler = std::make_unique<EventHandler<CanPlayEvent>>(core->Events(), [=](CanPlayEvent event)
+    _canPlayHandler = std::make_unique<EventHandler<CanPlayEvent>>(&core->Events(), [=](CanPlayEvent event)
     {
         if (!_activated)
             return;
@@ -72,7 +72,7 @@ void cards::FireMoon::_OnEnterActiveCards(Core* core, int playerIndex)
             return;
 
         if (event.card->GetCardType() == CardType::DEFENSE)
-            event.canPlay = false;
+            *event.canPlay = false;
     });
 }
 

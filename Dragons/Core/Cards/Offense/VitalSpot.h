@@ -12,7 +12,7 @@ namespace cards
 {
     class VitalSpot : public Card
     {
-        std::unique_ptr<EventHandler<PreDamageEvent>> _preDamageHandler = nullptr;
+        std::unique_ptr<EventHandler<PreDamageEvent_BuffPass>> _preDamageHandler = nullptr;
 
     public:
         VitalSpot() {}

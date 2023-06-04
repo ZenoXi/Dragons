@@ -2,9 +2,15 @@
 
 #include "../DamageProperties.h"
 
-struct PreDamageEvent
+struct PreDamageEvent_BuffPass
 {
-    static const char* _NAME_() { return "pre_damage"; }
+    static const char* _NAME_() { return "pre_damage_buff"; }
+    DamageProperties* props;
+};
+
+struct PreDamageEvent_NerfPass
+{
+    static const char* _NAME_() { return "pre_damage_nerf"; }
     DamageProperties* props;
 };
 
@@ -49,14 +55,50 @@ struct PostDestroyArmorEvent
     static const char* _NAME_() { return "post_destroy_armor"; }
 };
 
-struct PreSetMaxHealthEvent
+struct PreHealthChangeEvent
 {
-    static const char* _NAME_() { return "pre_set_max_health"; }
-    int* target;
-    int* value;
+    static const char* _NAME_() { return "pre_health_change"; }
+    int target;
+    int oldValue;
+    int* newValue;
 };
 
-struct PostSetMaxHealthEvent
+struct PostHealthChangeEvent
 {
-    static const char* _NAME_() { return "post_set_max_health"; }
+    static const char* _NAME_() { return "post_health_change"; }
+    int target;
+    int oldValue;
+    int newValue;
+};
+
+struct PreArmorChangeEvent
+{
+    static const char* _NAME_() { return "pre_armor_change"; }
+    int target;
+    int oldValue;
+    int* newValue;
+};
+
+struct PostArmorChangeEvent
+{
+    static const char* _NAME_() { return "post_armor_change"; }
+    int target;
+    int oldValue;
+    int newValue;
+};
+
+struct PreMaxHealthChangeEvent
+{
+    static const char* _NAME_() { return "pre_max_health_change"; }
+    int target;
+    int oldValue;
+    int* newValue;
+};
+
+struct PostMaxHealthChangeEvent
+{
+    static const char* _NAME_() { return "post_max_health_change"; }
+    int target;
+    int oldValue;
+    int newValue;
 };

@@ -11,30 +11,6 @@ cards::PlayResult cards::FairFight::Play(Core* core, ActionProperties actionProp
     auto cardPtr = core->RemoveCardFromHand(this, actionProps.player);
     core->AddCardToActiveCards(std::move(cardPtr), actionProps.player);
 
-    // Deal 4 damage at the end of your turn
-    _turnEndHandler = std::make_unique<EventHandler<TurnEndEvent>>(core->Events(), [=](TurnEndEvent event)
-    {
-        if (GetPosition().set != CardPosition::Set::ACTIVE_CARDS)
-        {
-            _turnEndHandler.reset();
-            return;
-        }
-        if (event.playerIndex != GetPosition().playerIndex)
-            return;
-
-        DamageProperties damageProps;
-        damageProps.target = actionProps.opponent;
-        damageProps.amount = 4;
-        core->Damage(damageProps);
-
-        // Move card to graveyard
-        auto cardPtr = core->RemoveCardFromActiveCards(this, actionProps.player);
-        core->AddCardToGraveyard(std::move(cardPtr));
-
-        // Disable further handling
-        _turnEndHandler.reset();
-    });
-
     return PlayResult::DontDiscard();
 }
 
@@ -48,7 +24,7 @@ void cards::FairFight::_OnEnterActiveCards(Core* core, int playerIndex)
     if (_turnEndHandler)
         return;
 
-    _turnEndHandler = std::make_unique<EventHandler<TurnEndEvent>>(core->Events(), [=](TurnEndEvent event)
+    _turnEndHandler = std::make_unique<EventHandler<TurnEndEvent>>(&core->Events(), [=](TurnEndEvent event)
     {
         if (event.playerIndex != GetPosition().playerIndex)
             return;

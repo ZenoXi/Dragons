@@ -28,7 +28,7 @@ cards::PlayResult cards::RapidAttack::Play(Core* core, ActionProperties actionPr
     _playedBy = actionProps.player;
 
     // At the end of the turn reset play flag
-    _turnEndHandler = std::make_unique<EventHandler<TurnEndEvent>>(core->Events(), [=](TurnEndEvent event)
+    _turnEndHandler = std::make_unique<EventHandler<TurnEndEvent>>(&core->Events(), [=](TurnEndEvent event)
     {
         _playedThisTurn = false;
     });

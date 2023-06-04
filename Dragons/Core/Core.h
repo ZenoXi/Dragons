@@ -6,14 +6,17 @@
 #include "Events/GameEvents.h"
 
 #include <optional>
+#include <random>
 
 class Core
 {
     GameState _state;
     GameEvents _events;
 
+    std::mt19937 _rng;
+
 public:
-    Core() {}
+    Core();
 
     void InitState();
     void ClearState();
@@ -44,4 +47,10 @@ public:
     std::unique_ptr<cards::Card> RemoveCardFromDeck(cards::Card* card);
     void AddCardToGraveyard(std::unique_ptr<cards::Card> card);
     std::unique_ptr<cards::Card> RemoveCardFromGraveyard(cards::Card* card);
+
+    // Other
+    void ShuffleDeck(cards::CardType type);
+
+private:
+    std::vector<std::unique_ptr<cards::Card>>& _ResolveDeckFromType(cards::CardType type);
 };

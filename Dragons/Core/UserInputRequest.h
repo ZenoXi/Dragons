@@ -1,6 +1,10 @@
 #pragma once
 
-#include "Cards/Card.h"
+namespace cards
+{
+    class Card;
+}
+
 #include "Cards/CardType.h"
 
 #include <string>
