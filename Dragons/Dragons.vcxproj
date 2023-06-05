@@ -169,6 +169,8 @@
     <ClCompile Include="Core\Cards\Offense\StarCurse.cpp" />
     <ClCompile Include="Core\Cards\Offense\VitalSpot.cpp" />
     <ClCompile Include="Core\Cards\Offense\WeaponScroll.cpp" />
+    <ClCompile Include="Core\Cards\Utility\Cheating.cpp" />
+    <ClCompile Include="Core\Cards\Utility\DragonFlame.cpp" />
     <ClCompile Include="Core\Cards\Utility\DragonSight.cpp" />
     <ClCompile Include="Core\Cards\Utility\FrostFire.cpp" />
     <ClCompile Include="Core\Core.cpp" />
@@ -182,6 +184,8 @@
     <ClInclude Include="Core\Cards\Defense\Barrier.h" />
     <ClInclude Include="Core\Cards\Defense\Cure.h" />
     <ClInclude Include="Core\Cards\Defense\DivineProtection.h" />
+    <ClInclude Include="Core\Cards\Utility\Cheating.h" />
+    <ClInclude Include="Core\Cards\Utility\DragonFlame.h" />
     <ClInclude Include="Core\Cards\Defense\Healer.h" />
     <ClInclude Include="Core\Cards\Defense\HelpingHand.h" />
     <ClInclude Include="Core\Cards\Defense\LifeFlower.h" />
