@@ -67,3 +67,11 @@ void cards::SoothingSpell::_OnEnterGraveyard(Core* core)
     _canPlayHandler.reset();
     _activated = false;
 }
+
+void cards::SoothingSpell::_OnEnterDestroyedCards(Core* core)
+{
+    _turnBeginHandler.reset();
+    _turnEndHandler.reset();
+    _canPlayHandler.reset();
+    _activated = false;
+}

@@ -18,7 +18,7 @@ void cards::ShieldingNet::_OnEnterHand(Core* core, int playerIndex)
 
 void cards::ShieldingNet::_OnEnterActiveCards(Core* core, int playerIndex)
 {
-    _damageHandler = std::make_unique<EventHandler<PreDamageEvent_NerfPass>>(core->Events(), [=](PreDamageEvent_NerfPass event)
+    _damageHandler = std::make_unique<EventHandler<PreDamageEvent_NerfPass>>(&core->Events(), [=](PreDamageEvent_NerfPass event)
     {
         if (event.props->target != GetPosition().playerIndex)
             return;
@@ -36,6 +36,11 @@ void cards::ShieldingNet::_OnEnterDeck(Core* core)
 }
 
 void cards::ShieldingNet::_OnEnterGraveyard(Core* core)
+{
+    _damageHandler.reset();
+}
+
+void cards::ShieldingNet::_OnEnterDestroyedCards(Core* core)
 {
     _damageHandler.reset();
 }

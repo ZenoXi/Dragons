@@ -52,9 +52,16 @@ public:
     std::unique_ptr<cards::Card> RemoveCardFromDeck(cards::Card* card);
     void AddCardToGraveyard(std::unique_ptr<cards::Card> card);
     std::unique_ptr<cards::Card> RemoveCardFromGraveyard(cards::Card* card);
+    void AddCardToDestroyedCards(std::unique_ptr<cards::Card> card);
+    std::unique_ptr<cards::Card> RemoveCardFromDestroyedCards(cards::Card* card);
+    void AddCardToDisplayedCards(DisplayInfo displayInfo);
+    bool RemoveCardFromDisplayedCards(cards::Card* card);
+    bool ModifyDisplayedCard(DisplayInfo newDisplayInfo);
 
     // Other
     void ShuffleDeck(cards::CardType type);
+    void RevealHand(int target);
+    void HideHand(int target);
 
 private:
     std::vector<std::unique_ptr<cards::Card>>& _ResolveDeckFromType(cards::CardType type);

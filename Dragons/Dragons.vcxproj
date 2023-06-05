@@ -169,6 +169,8 @@
     <ClCompile Include="Core\Cards\Offense\StarCurse.cpp" />
     <ClCompile Include="Core\Cards\Offense\VitalSpot.cpp" />
     <ClCompile Include="Core\Cards\Offense\WeaponScroll.cpp" />
+    <ClCompile Include="Core\Cards\Utility\DragonSight.cpp" />
+    <ClCompile Include="Core\Cards\Utility\FrostFire.cpp" />
     <ClCompile Include="Core\Core.cpp" />
     <ClCompile Include="Dragons.cpp" />
   </ItemGroup>
@@ -205,10 +207,12 @@
     <ClInclude Include="Core\Cards\Offense\StarCurse.h" />
     <ClInclude Include="Core\Cards\Offense\VitalSpot.h" />
     <ClInclude Include="Core\Cards\Offense\WeaponScroll.h" />
+    <ClInclude Include="Core\Cards\Utility\DragonSight.h" />
+    <ClInclude Include="Core\Cards\Utility\FrostFire.h" />
     <ClInclude Include="Core\Core.h" />
     <ClInclude Include="Core\DamageProperties.h" />
     <ClInclude Include="Core\Events\ActionEvents.h" />
-    <ClInclude Include="Core\Events\CardMoveEvents.h" />
+    <ClInclude Include="Core\Events\CardStateEvents.h" />
     <ClInclude Include="Core\Events\EventSubscriber.h" />
     <ClInclude Include="Core\Events\GameEvents.h" />
     <ClInclude Include="Core\Events\StatsEvents.h" />

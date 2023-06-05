@@ -33,5 +33,6 @@ namespace cards
         void _OnEnterActiveCards(Core* core, int playerIndex);
         void _OnEnterDeck(Core* core);
         void _OnEnterGraveyard(Core* core);
+        void _OnEnterDestroyedCards(Core* core);
     };
 }

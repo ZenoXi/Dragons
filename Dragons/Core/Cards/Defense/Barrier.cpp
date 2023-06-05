@@ -44,3 +44,8 @@ void cards::Barrier::_OnEnterGraveyard(Core* core)
 {
     _preDamageHandler.reset();
 }
+
+void cards::Barrier::_OnEnterDestroyedCards(Core* core)
+{
+    _preDamageHandler.reset();
+}

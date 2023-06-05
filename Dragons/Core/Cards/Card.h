@@ -45,7 +45,8 @@ namespace cards
             HAND,
             ACTIVE_CARDS,
             DECK,
-            GRAVEYARD
+            GRAVEYARD,
+            DESTROYED
         };
 
         Set set;
@@ -96,11 +97,18 @@ namespace cards
             _position.set = CardPosition::Set::GRAVEYARD;
             _position.playerIndex = -1;
         }
+        void OnEnterDestroyedCards(Core* core)
+        {
+            _OnEnterDestroyedCards(core);
+            _position.set = CardPosition::Set::DESTROYED;
+            _position.playerIndex = -1;
+        }
 
     private:
         virtual void _OnEnterHand(Core* core, int playerIndex) {}
         virtual void _OnEnterActiveCards(Core* core, int playerIndex) {}
         virtual void _OnEnterDeck(Core* core) {}
         virtual void _OnEnterGraveyard(Core* core) {}
+        virtual void _OnEnterDestroyedCards(Core* core) {}
     };
 }

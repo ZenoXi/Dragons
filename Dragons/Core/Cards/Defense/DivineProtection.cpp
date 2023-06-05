@@ -65,3 +65,11 @@ void cards::DivineProtection::_OnEnterGraveyard(Core* core)
     _healthChangeHandler.reset();
     _activated = false;
 }
+
+void cards::DivineProtection::_OnEnterDestroyedCards(Core* core)
+{
+    _turnBeginHandler.reset();
+    _turnEndHandler.reset();
+    _healthChangeHandler.reset();
+    _activated = false;
+}

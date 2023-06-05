@@ -18,7 +18,7 @@ void cards::SpiritShelter::_OnEnterHand(Core* core, int playerIndex)
 
 void cards::SpiritShelter::_OnEnterActiveCards(Core* core, int playerIndex)
 {
-    _damageHandler = std::make_unique<EventHandler<PreDamageEvent_NerfPass>>(core->Events(), [=](PreDamageEvent_NerfPass event)
+    _damageHandler = std::make_unique<EventHandler<PreDamageEvent_NerfPass>>(&core->Events(), [=](PreDamageEvent_NerfPass event)
     {
         if (event.props->target != GetPosition().playerIndex)
             return;
@@ -34,6 +34,11 @@ void cards::SpiritShelter::_OnEnterDeck(Core* core)
 }
 
 void cards::SpiritShelter::_OnEnterGraveyard(Core* core)
+{
+    _damageHandler.reset();
+}
+
+void cards::SpiritShelter::_OnEnterDestroyedCards(Core* core)
 {
     _damageHandler.reset();
 }

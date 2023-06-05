@@ -45,3 +45,8 @@ void cards::VitalSpot::_OnEnterGraveyard(Core* core)
 {
     _preDamageHandler.reset();
 }
+
+void cards::VitalSpot::_OnEnterDestroyedCards(Core* core)
+{
+    _preDamageHandler.reset();
+}

@@ -41,3 +41,9 @@ void cards::DeathPoison::_OnEnterGraveyard(Core* core)
     _turnEndHandler.reset();
     _damageHandler.reset();
 }
+
+void cards::DeathPoison::_OnEnterDestroyedCards(Core* core)
+{
+    _turnEndHandler.reset();
+    _damageHandler.reset();
+}

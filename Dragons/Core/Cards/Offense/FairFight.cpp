@@ -48,3 +48,8 @@ void cards::FairFight::_OnEnterGraveyard(Core* core)
 {
     _turnEndHandler.reset();
 }
+
+void cards::FairFight::_OnEnterDestroyedCards(Core* core)
+{
+    _turnEndHandler.reset();
+}

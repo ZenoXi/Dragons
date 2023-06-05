@@ -91,3 +91,11 @@ void cards::FireMoon::_OnEnterGraveyard(Core* core)
     _canPlayHandler.reset();
     _activated = false;
 }
+
+void cards::FireMoon::_OnEnterDestroyedCards(Core* core)
+{
+    _turnBeginHandler.reset();
+    _turnEndHandler.reset();
+    _canPlayHandler.reset();
+    _activated = false;
+}

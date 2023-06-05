@@ -31,6 +31,7 @@ void Core::InitState()
     _state.players[0].actionsLeft = 0;
     _state.players[0].extraPlays = 0;
     _state.players[0].extraDraws = 0;
+    _state.players[0].handRevealed = false;
     _state.players[0].index = 0;
 
     _state.players.push_back(Player{});
@@ -40,6 +41,7 @@ void Core::InitState()
     _state.players[1].actionsLeft = 0;
     _state.players[1].extraPlays = 0;
     _state.players[1].extraDraws = 0;
+    _state.players[1].handRevealed = false;
     _state.players[1].index = 1;
 
     _state.currentPlayer = 0;
@@ -131,6 +133,16 @@ cards::PlayResult Core::PlayCard(cards::Card* card, std::optional<ActionProperti
     }
 
     return result;
+}
+
+cards::Card* Core::DrawCard(cards::CardType type, int playerIndex)
+{
+    return nullptr;
+}
+
+cards::Card* Core::DiscardCard(cards::Card* card, int playerIndex)
+{
+    return nullptr;
 }
 
 DamageResult Core::Damage(DamageProperties props)
@@ -420,10 +432,71 @@ std::unique_ptr<cards::Card> Core::RemoveCardFromGraveyard(cards::Card* card)
     return nullptr;
 }
 
+void Core::AddCardToDestroyedCards(std::unique_ptr<cards::Card> card)
+{
+    card->OnEnterGraveyard(this);
+    _state.destroyedCards.push_back(std::move(card));
+}
+
+std::unique_ptr<cards::Card> Core::RemoveCardFromDestroyedCards(cards::Card* card)
+{
+    for (int i = 0; i < _state.destroyedCards.size(); i++)
+    {
+        if (_state.destroyedCards[i].get() == card)
+        {
+            std::unique_ptr<cards::Card> movedCard = std::move(_state.destroyedCards[i]);
+            _state.destroyedCards.erase(_state.destroyedCards.begin() + i);
+            return movedCard;
+        }
+    }
+    return nullptr;
+}
+
+void Core::AddCardToDisplayedCards(DisplayInfo displayInfo)
+{
+    _state.displayedCards.push_back(displayInfo);
+}
+
+bool Core::RemoveCardFromDisplayedCards(cards::Card* card)
+{
+    for (int i = 0; i < _state.displayedCards.size(); i++)
+    {
+        if (_state.displayedCards[i].card == card)
+        {
+            _state.displayedCards.erase(_state.displayedCards.begin() + i);
+            return true;
+        }
+    }
+    return false;
+}
+
+bool Core::ModifyDisplayedCard(DisplayInfo newDisplayInfo)
+{
+    for (int i = 0; i < _state.displayedCards.size(); i++)
+    {
+        if (_state.displayedCards[i].card == newDisplayInfo.card)
+        {
+            _state.displayedCards[i] = newDisplayInfo;
+            return true;
+        }
+    }
+    return false;
+}
+
 void Core::ShuffleDeck(cards::CardType type)
 {
     auto& deckRef = _ResolveDeckFromType(type);
     std::shuffle(deckRef.begin(), deckRef.end(), _rng);
+}
+
+void Core::RevealHand(int target)
+{
+    _state.players[target].handRevealed = true;
+}
+
+void Core::HideHand(int target)
+{
+    _state.players[target].handRevealed = false;
 }
 
 std::vector<std::unique_ptr<cards::Card>>& Core::_ResolveDeckFromType(cards::CardType type)
