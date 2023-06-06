@@ -46,20 +46,28 @@ public:
     // Card moving functions
     void AddCardToHand(std::unique_ptr<cards::Card> card, int playerIndex);
     std::unique_ptr<cards::Card> RemoveCardFromHand(cards::Card* card, int playerIndex);
+    std::unique_ptr<cards::Card> RemoveCardFromHand(int cardIndex, int playerIndex);
     void AddCardToActiveCards(std::unique_ptr<cards::Card> card, int playerIndex);
     std::unique_ptr<cards::Card> RemoveCardFromActiveCards(cards::Card* card, int playerIndex);
+    std::unique_ptr<cards::Card> RemoveCardFromActiveCards(int cardIndex, int playerIndex);
     bool AddCardToDeck(std::unique_ptr<cards::Card> card);
     std::unique_ptr<cards::Card> RemoveCardFromDeck(cards::Card* card);
+    std::unique_ptr<cards::Card> RemoveCardFromDeck(cards::CardType deck, int cardIndex);
     void AddCardToGraveyard(std::unique_ptr<cards::Card> card);
     std::unique_ptr<cards::Card> RemoveCardFromGraveyard(cards::Card* card);
+    std::unique_ptr<cards::Card> RemoveCardFromGraveyard(int cardIndex);
     void AddCardToDestroyedCards(std::unique_ptr<cards::Card> card);
     std::unique_ptr<cards::Card> RemoveCardFromDestroyedCards(cards::Card* card);
+    std::unique_ptr<cards::Card> RemoveCardFromDestroyedCards(int cardIndex);
     void AddCardToDisplayedCards(DisplayInfo displayInfo);
     bool RemoveCardFromDisplayedCards(cards::Card* card);
+    void RemoveCardFromDisplayedCards(int cardIndex);
     bool ModifyDisplayedCard(DisplayInfo newDisplayInfo);
+    void ClearDisplayedCards();
 
     // Other
     void ShuffleDeck(cards::CardType type);
+    int GenerateRandomNumber(int fromInclusive, int toExclusive);
     void RevealHand(int target);
     void HideHand(int target);
 

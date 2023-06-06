@@ -170,9 +170,16 @@
     <ClCompile Include="Core\Cards\Offense\VitalSpot.cpp" />
     <ClCompile Include="Core\Cards\Offense\WeaponScroll.cpp" />
     <ClCompile Include="Core\Cards\Utility\Cheating.cpp" />
+    <ClCompile Include="Core\Cards\Utility\DragonEquation.cpp" />
     <ClCompile Include="Core\Cards\Utility\DragonFlame.cpp" />
+    <ClCompile Include="Core\Cards\Utility\DragonPower.cpp" />
     <ClCompile Include="Core\Cards\Utility\DragonSight.cpp" />
     <ClCompile Include="Core\Cards\Utility\FrostFire.cpp" />
+    <ClCompile Include="Core\Cards\Utility\HiddenTreasures.cpp" />
+    <ClCompile Include="Core\Cards\Utility\MindSteal.cpp" />
+    <ClCompile Include="Core\Cards\Utility\SummonDead.cpp" />
+    <ClCompile Include="Core\Cards\Utility\TheThief.cpp" />
+    <ClCompile Include="Core\Cards\Utility\WeaponOfChoice.cpp" />
     <ClCompile Include="Core\Core.cpp" />
     <ClCompile Include="Dragons.cpp" />
   </ItemGroup>
@@ -185,6 +192,7 @@
     <ClInclude Include="Core\Cards\Defense\Cure.h" />
     <ClInclude Include="Core\Cards\Defense\DivineProtection.h" />
     <ClInclude Include="Core\Cards\Utility\Cheating.h" />
+    <ClInclude Include="Core\Cards\Utility\DragonEquation.h" />
     <ClInclude Include="Core\Cards\Utility\DragonFlame.h" />
     <ClInclude Include="Core\Cards\Defense\Healer.h" />
     <ClInclude Include="Core\Cards\Defense\HelpingHand.h" />
@@ -211,8 +219,14 @@
     <ClInclude Include="Core\Cards\Offense\StarCurse.h" />
     <ClInclude Include="Core\Cards\Offense\VitalSpot.h" />
     <ClInclude Include="Core\Cards\Offense\WeaponScroll.h" />
+    <ClInclude Include="Core\Cards\Utility\DragonPower.h" />
     <ClInclude Include="Core\Cards\Utility\DragonSight.h" />
     <ClInclude Include="Core\Cards\Utility\FrostFire.h" />
+    <ClInclude Include="Core\Cards\Utility\HiddenTreasures.h" />
+    <ClInclude Include="Core\Cards\Utility\MindSteal.h" />
+    <ClInclude Include="Core\Cards\Utility\SummonDead.h" />
+    <ClInclude Include="Core\Cards\Utility\TheThief.h" />
+    <ClInclude Include="Core\Cards\Utility\WeaponOfChoice.h" />
     <ClInclude Include="Core\Core.h" />
     <ClInclude Include="Core\DamageProperties.h" />
     <ClInclude Include="Core\Events\ActionEvents.h" />
