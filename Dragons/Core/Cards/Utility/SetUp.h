@@ -20,6 +20,9 @@ namespace cards
         PlayResult Play(Core* core, ActionProperties actionProps, PlayProperties* playProps);
         bool IsActive() { return true; }
 
+        static CardId CARD_ID() { return { "set_up" }; }
+        CardId GetCardId() const { return CARD_ID(); }
+
         CardType GetCardType() const { return CardType::UTILITY; }
         std::wstring GetCardName() const { return L"Set Up"; }
         std::wstring GetCardDescription() const { return L""; }

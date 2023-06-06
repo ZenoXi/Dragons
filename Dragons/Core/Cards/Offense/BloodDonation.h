@@ -18,6 +18,9 @@ namespace cards
         PlayResult Play(Core* core, ActionProperties actionProps, PlayProperties* playProps);
         PlayResult Resume(UserInputResponse response, Core* core, ActionProperties actionProps, PlayProperties* playProps);
 
+        static CardId CARD_ID() { return { "blood_donation" }; }
+        CardId GetCardId() const { return CARD_ID(); }
+
         CardType GetCardType() const { return CardType::OFFENSE; }
         std::wstring GetCardName() const { return L"Blood Donation"; }
         std::wstring GetCardDescription() const { return L""; }

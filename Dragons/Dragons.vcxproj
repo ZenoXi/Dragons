@@ -189,6 +189,7 @@
   <ItemGroup>
     <ClInclude Include="Core\ActionProperties.h" />
     <ClInclude Include="Core\Cards\Card.h" />
+    <ClInclude Include="Core\Cards\CardId.h" />
     <ClInclude Include="Core\Cards\CardType.h" />
     <ClInclude Include="Core\Cards\Defense\ArmorUp.h" />
     <ClInclude Include="Core\Cards\Defense\Barrier.h" />

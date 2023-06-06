@@ -1,5 +1,6 @@
 #pragma once
 
+#include "CardId.h"
 #include "CardType.h"
 #include "../ActionProperties.h"
 #include "../UserInputRequest.h"
@@ -67,6 +68,8 @@ namespace cards
         virtual int GetActionCost() { return 1; }
 
         // Metadata
+        virtual CardId GetCardId() const = 0;
+
         virtual CardType GetCardType() const = 0;
         virtual std::wstring GetCardName() const = 0;
         virtual std::wstring GetCardDescription() const = 0;

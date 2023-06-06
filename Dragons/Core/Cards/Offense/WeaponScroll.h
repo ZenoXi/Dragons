@@ -17,6 +17,9 @@ namespace cards
         PlayResult Play(Core* core, ActionProperties actionProps, PlayProperties* playProps);
         PlayResult Resume(UserInputResponse response, Core* core, ActionProperties actionProps, PlayProperties* playProps);
 
+        static CardId CARD_ID() { return { "weapon_scroll" }; }
+        CardId GetCardId() const { return CARD_ID(); }
+
         CardType GetCardType() const { return CardType::OFFENSE; }
         std::wstring GetCardName() const { return L"Weapon Scroll"; }
         std::wstring GetCardDescription() const { return L""; }

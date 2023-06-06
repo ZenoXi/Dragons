@@ -21,8 +21,10 @@ namespace cards
 
         bool CanPlay(Core* core, ActionProperties actionProps, PlayProperties* playProps);
         PlayResult Play(Core* core, ActionProperties actionProps, PlayProperties* playProps);
-        //void Draw(Core* core, ActionProperties actionProps);
         bool IsActive() { return true; }
+
+        static CardId CARD_ID() { return { "rapid_attack" }; }
+        CardId GetCardId() const { return CARD_ID(); }
 
         CardType GetCardType() const { return CardType::OFFENSE; }
         std::wstring GetCardName() const { return L"Rapid Attack"; }
