@@ -23,6 +23,8 @@ public:
     const GameState& GetState() { return _state; }
     GameEvents& Events() { return _events; }
 
+    void EndTurn();
+
     // Main game actions
     bool CanPlayCard(cards::Card* card);
     bool CanPlayCard(cards::Card* card, std::optional<ActionProperties> actionProps, cards::PlayProperties* playProps);
@@ -38,6 +40,7 @@ public:
     void DestroyArmor(int target);
     void SetMaxHealth(int target, int amount);
 
+    void SetActionCount(int target, int amount);
     void AddExtraActions(int target, int amount);
     void AddExtraPlays(int target, int amount);
     void AddExtraDraws(int target, int amount);

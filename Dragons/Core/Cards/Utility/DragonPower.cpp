@@ -73,10 +73,6 @@ cards::PlayResult cards::DragonPower::Resume(UserInputResponse response, Core* c
 {
     if (_waitingForCardDraw)
     {
-        UserInputParams_DrawCard* responseParams = reinterpret_cast<UserInputParams_DrawCard*>(response.inputParams.get());
-        if (!responseParams)
-            return PlayResult::Default();
-
         _waitingForCardDraw = false;
         return PlayResult::Default();
     }

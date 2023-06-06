@@ -48,3 +48,8 @@ void cards::HeavySlash::_OnEnterGraveyard(Core* core)
 {
     _turnBeginHandler.reset();
 }
+
+void cards::HeavySlash::_OnEnterDestroyedCards(Core* core)
+{
+    _turnBeginHandler.reset();
+}

@@ -53,6 +53,11 @@ void Core::ClearState()
 
 }
 
+void Core::EndTurn()
+{
+
+}
+
 bool Core::CanPlayCard(cards::Card* card)
 {
     return CanPlayCard(card, std::nullopt, nullptr);
@@ -326,6 +331,11 @@ void Core::SetMaxHealth(int target, int value)
     postMaxHealthChange.oldValue = preMaxHealthChange.oldValue;
     postMaxHealthChange.newValue = newMaxHealthValue;
     _events.RaiseEvent(postMaxHealthChange);
+}
+
+void Core::SetActionCount(int target, int amount)
+{
+    _state.players[target].actionsLeft = amount;
 }
 
 void Core::AddExtraActions(int target, int amount)

@@ -10,18 +10,18 @@ class Core;
 
 namespace cards
 {
-    class HeavySlash : public Card
+    class SetUp : public Card
     {
         std::unique_ptr<EventHandler<TurnBeginEvent>> _turnBeginHandler = nullptr;
 
     public:
-        HeavySlash() {}
+        SetUp() {}
 
         PlayResult Play(Core* core, ActionProperties actionProps, PlayProperties* playProps);
         bool IsActive() { return true; }
 
-        CardType GetCardType() const { return CardType::OFFENSE; }
-        std::wstring GetCardName() const { return L"Heavy Slash"; }
+        CardType GetCardType() const { return CardType::UTILITY; }
+        std::wstring GetCardName() const { return L"Set Up"; }
         std::wstring GetCardDescription() const { return L""; }
 
     private:
