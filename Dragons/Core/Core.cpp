@@ -108,11 +108,7 @@ cards::PlayResult Core::PlayCard(cards::Card* card, std::optional<ActionProperti
     auto& hand = _state.players[actionPropsLocal.player].hand;
     auto foundCardIt = std::find_if(hand.begin(), hand.end(), [&](std::unique_ptr<cards::Card>& cardPtr) { return cardPtr.get() == card; });
     if (foundCardIt == hand.end())
-    {
-        cards::PlayResult result;
-        result.notPlayed = true;
-        return result;
-    }
+        return cards::PlayResult::NotPlayed();
 
     // Emit pre play event
     PreCardPlayedEvent preCardPlayedEvent;
@@ -149,6 +145,87 @@ cards::Card* Core::DiscardCard(cards::Card* card, int playerIndex)
 {
     return nullptr;
 }
+
+bool Core::CanPlayComboCard(ComboProperties comboProps)
+{
+    return CanPlayComboCard(comboProps, std::nullopt, nullptr);
+}
+
+bool Core::CanPlayComboCard(ComboProperties comboProps, std::optional<ActionProperties> actionProps, cards::PlayProperties* playProps)
+{
+    ActionProperties actionPropsLocal;
+    if (actionProps)
+        actionPropsLocal = actionProps.value();
+
+    // Populate default player/opponent values
+    if (actionPropsLocal.player == DEFAULT_PLAYER)
+        actionPropsLocal.player = _state.currentPlayer;
+    if (actionPropsLocal.opponent == DEFAULT_OPPONENT)
+        actionPropsLocal.opponent = _state.opposingPlayer;
+
+    bool canPlay = true;
+    for (auto& requiredCardId : comboProps.requiredCards)
+    {
+        bool cardFound = false;
+        for (auto& card : _state.players[comboProps.player].hand)
+        {
+            if (card->GetCardId() == requiredCardId)
+            {
+                cardFound = true;
+                break;
+            }
+        }
+        if (!cardFound)
+        {
+            canPlay = false;
+            break;
+        }
+    }
+
+    CanPlayComboEvent canPlayComboEvent;
+    canPlayComboEvent.comboProps = comboProps;
+    canPlayComboEvent.actionProps = &actionPropsLocal;
+    canPlayComboEvent.playProps = playProps;
+    canPlayComboEvent.canPlay = &canPlay;
+    _events.RaiseEvent(canPlayComboEvent);
+
+    return canPlay;
+}
+
+std::vector<std::unique_ptr<cards::Card>> Core::GetCardsForCombo(ComboProperties comboProps)
+{
+    std::vector<std::unique_ptr<cards::Card>> requiredCardPtrs;
+    bool processed = false;
+    PreGetComboCardsEvent preGetComboCardsEvent;
+    preGetComboCardsEvent.comboProps = comboProps;
+    preGetComboCardsEvent.retrievedCards = &requiredCardPtrs;
+    preGetComboCardsEvent.processed = &processed;
+    _events.RaiseEvent(preGetComboCardsEvent);
+
+    if (processed)
+        return requiredCardPtrs;
+
+    for (auto& requiredCardId : comboProps.requiredCards)
+    {
+        auto& hand = _state.players[comboProps.player].hand;
+        for (int i = 0; i < hand.size(); i++)
+        {
+            if (hand[i]->GetCardId() == requiredCardId)
+            {
+                requiredCardPtrs.push_back(RemoveCardFromHand(i, comboProps.player));
+                break;
+            }
+        }
+    }
+
+    PostGetComboCardsEvent postGetComboCardsEvent;
+    postGetComboCardsEvent.comboProps = comboProps;
+    postGetComboCardsEvent.retrievedCards = &requiredCardPtrs;
+    _events.RaiseEvent(postGetComboCardsEvent);
+
+    return requiredCardPtrs;
+}
+
 
 DamageResult Core::Damage(DamageProperties props)
 {

@@ -26,3 +26,27 @@ struct PostCardPlayedEvent
     ActionProperties* actionProps;
     cards::PlayProperties* playProps;
 };
+
+struct CanPlayComboEvent
+{
+    static const char* _NAME_() { return "can_play_combo"; }
+    ComboProperties comboProps;
+    ActionProperties* actionProps;
+    cards::PlayProperties* playProps;
+    bool* canPlay;
+};
+
+struct PreGetComboCardsEvent
+{
+    static const char* _NAME_() { return "pre_get_combo_cards"; }
+    ComboProperties comboProps;
+    std::vector<std::unique_ptr<cards::Card>>* retrievedCards;
+    bool* processed;
+};
+
+struct PostGetComboCardsEvent
+{
+    static const char* _NAME_() { return "post_get_combo_cards"; }
+    ComboProperties comboProps;
+    std::vector<std::unique_ptr<cards::Card>>* retrievedCards;
+};

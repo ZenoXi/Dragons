@@ -140,6 +140,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Core\Cards\Combo\DeathFee.cpp" />
     <ClCompile Include="Core\Cards\Defense\ArmorUp.cpp" />
     <ClCompile Include="Core\Cards\Defense\Barrier.cpp" />
     <ClCompile Include="Core\Cards\Defense\Cure.cpp" />
@@ -171,6 +172,7 @@
     <ClCompile Include="Core\Cards\Offense\WeaponScroll.cpp" />
     <ClCompile Include="Core\Cards\Utility\AbsoluteZero.cpp" />
     <ClCompile Include="Core\Cards\Utility\Cheating.cpp" />
+    <ClCompile Include="Core\Cards\Utility\CorpsePuppet.cpp" />
     <ClCompile Include="Core\Cards\Utility\DragonEquation.cpp" />
     <ClCompile Include="Core\Cards\Utility\DragonFlame.cpp" />
     <ClCompile Include="Core\Cards\Utility\DragonPower.cpp" />
@@ -188,6 +190,9 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Core\ActionProperties.h" />
+    <ClInclude Include="Core\Cards\Combo\DeathFee.h" />
+    <ClInclude Include="Core\Cards\Utility\CorpsePuppet.h" />
+    <ClInclude Include="Core\ComboProperties.h" />
     <ClInclude Include="Core\Cards\Card.h" />
     <ClInclude Include="Core\Cards\CardId.h" />
     <ClInclude Include="Core\Cards\CardType.h" />

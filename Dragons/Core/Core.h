@@ -3,6 +3,7 @@
 #include "GameState.h"
 #include "ActionProperties.h"
 #include "DamageProperties.h"
+#include "ComboProperties.h"
 #include "Events/GameEvents.h"
 
 #include <optional>
@@ -32,6 +33,10 @@ public:
     cards::PlayResult PlayCard(cards::Card* card, std::optional<ActionProperties> actionProps, cards::PlayProperties* playProps);
     cards::Card* DrawCard(cards::CardType type, int playerIndex);
     cards::Card* DiscardCard(cards::Card* card, int playerIndex);
+
+    bool CanPlayComboCard(ComboProperties comboProps);
+    bool CanPlayComboCard(ComboProperties comboProps, std::optional<ActionProperties> actionProps, cards::PlayProperties* playProps);
+    std::vector<std::unique_ptr<cards::Card>> GetCardsForCombo(ComboProperties comboProps);
 
     // Stat manipulation
     DamageResult Damage(DamageProperties props);
