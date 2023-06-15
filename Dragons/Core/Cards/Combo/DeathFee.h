@@ -13,6 +13,8 @@ namespace cards
     {
         bool _waitingToPickCardFromGraveyard = false;
         bool _waitingToSelectCard = false;
+        bool _resumeSummonDead = false;
+        bool _resumeToHelpingHand = false;
 
         const std::vector<CardId> _requiredCardIds
         {
@@ -20,6 +22,9 @@ namespace cards
             HelpingHand::CARD_ID(),
             SummonDead::CARD_ID()
         };
+        std::unique_ptr<cards::Card> _cardDeathPoison = nullptr;
+        std::unique_ptr<cards::Card> _cardHelpingHand = nullptr;
+        std::unique_ptr<cards::Card> _cardSummonDead = nullptr;
 
     public:
         DeathFee() {}

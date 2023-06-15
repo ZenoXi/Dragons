@@ -2,6 +2,7 @@
 
 #include "CardId.h"
 #include "CardType.h"
+#include "CardPosition.h"
 #include "../ActionProperties.h"
 #include "../UserInputRequest.h"
 
@@ -20,6 +21,7 @@ namespace cards
         bool notPlayed = false;
         bool waitForInput = false;
         UserInputRequest inputRequest{};
+        bool resume = false;
 
         static PlayResult Default()
         {
@@ -37,21 +39,12 @@ namespace cards
             result.discard = false;
             return result;
         }
-    };
-
-    struct CardPosition
-    {
-        enum class Set
+        static PlayResult Resume()
         {
-            HAND,
-            ACTIVE_CARDS,
-            DECK,
-            GRAVEYARD,
-            DESTROYED
-        };
-
-        Set set;
-        int playerIndex;
+            PlayResult result;
+            result.resume = true;
+            return result;
+        }
     };
 
     class Card

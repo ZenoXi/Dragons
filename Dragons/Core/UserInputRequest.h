@@ -6,6 +6,7 @@ namespace cards
 }
 
 #include "Cards/CardType.h"
+#include "Cards/CardPosition.h"
 
 #include <string>
 #include <vector>
@@ -13,13 +14,15 @@ namespace cards
 
 enum class UserInputType
 {
+    RESUME, // Resume card play immediatelly, without any parameters
     WAIT,
-    CHOOSE_NUMBER,
     WAIT_FOR_CONFIRMATION,
+    CHOOSE_NUMBER,
     CHOOSE_CARD_FROM_HAND,
     CHOOSE_CARD_FROM_GRAVEYARD,
     CHOOSE_CARD_FROM_ACTIVE_CARDS,
     CHOOSE_CARD_FROM_DISPLAYED_CARDS,
+    CHOOSE_CARD_FROM_SET,
     CHOOSE_DECK,
     PLAY_CARD,
     DRAW_CARD,
@@ -32,7 +35,7 @@ struct UserInputParams {};
 
 struct UserInputRequest
 {
-    UserInputType inputType = UserInputType::WAIT;
+    UserInputType inputType = UserInputType::RESUME;
     std::wstring inputPrompt = L"";
     std::unique_ptr<UserInputParams> inputParams = nullptr;
 };
@@ -108,6 +111,19 @@ struct UserInputParams_ChooseCardFromDisplayedCards : public UserInputParams
     int playerIndex;
     int minCardCount;
     int maxCardCount;
+    std::vector<cards::CardType> allowedTypes; // Empty list means no restriction
+
+    // Response
+    std::vector<cards::Card*> chosenCards;
+};
+
+struct UserInputParams_ChooseCardFromSet : public UserInputParams
+{
+    // Request
+    int playerIndex;
+    int minCardCount;
+    int maxCardCount;
+    std::vector<cards::CardPosition> sets;
     std::vector<cards::CardType> allowedTypes; // Empty list means no restriction
 
     // Response

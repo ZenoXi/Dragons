@@ -10,30 +10,43 @@ bool cards::DeathFee::CanPlay(Core* core, ActionProperties actionProps, PlayProp
 
 cards::PlayResult cards::DeathFee::Play(Core* core, ActionProperties actionProps, PlayProperties* playProps)
 {
-    Card* drawnCard = core->DrawCard(CardType::DEFENSE, actionProps.player);
+    auto cardsForCombo = core->GetCardsForCombo(ComboProperties{ _requiredCardIds, actionProps.player });
+    for (auto& card : cardsForCombo)
+    {
+        if (card->GetCardId() == DeathPoison::CARD_ID())
+            _cardDeathPoison = std::move(card);
+        else if (card->GetCardId() == HelpingHand::CARD_ID())
+            _cardHelpingHand = std::move(card);
+        else if (card->GetCardId() == SummonDead::CARD_ID())
+            _cardSummonDead = std::move(card);
+    }
+    cardsForCombo.clear();
 
-    if (core->GetState().players[actionProps.player].CardsInHand(CardType::DEFENSE) == 0)
-        return PlayResult::Default();
+    // Play Death Poison
+    _cardDeathPoison->Play(core, actionProps, playProps);
 
-    // Request user input
-    auto params = std::make_unique<UserInputParams_ChooseCardFromHand>();
-    params->playerIndex = actionProps.player;
-    params->minCardCount = 1;
-    params->maxCardCount = 1;
-    params->allowedTypes.push_back(CardType::DEFENSE);
+    // Play Summon Dead
+    if (_cardSummonDead->CanPlay(core, actionProps, playProps))
+    {
+        PlayResult result = _cardSummonDead->Play(core, actionProps, playProps);
+        if (result.waitForInput)
+        {
+            _resumeSummonDead = true;
+            return result;
+        }
+    }
 
-    _waitingToSelectCard = true;
-
-    PlayResult result;
-    result.waitForInput = true;
-    result.inputRequest.inputType = UserInputType::CHOOSE_CARD_FROM_HAND;
-    result.inputRequest.inputPrompt = L"Choose a defense card to give your opponent";
-    result.inputRequest.inputParams = std::unique_ptr<UserInputParams>(params.release());
-    return result;
+    _resumeToHelpingHand = true;
+    return PlayResult::Resume();
 }
 
 cards::PlayResult cards::DeathFee::Resume(UserInputResponse response, Core* core, ActionProperties actionProps, PlayProperties* playProps)
 {
+    if (_resumeSummonDead)
+    {
+        _cardSummonDead->Resume(std::move(response), core, actionProps, playProps);
+    }
+
     if (_waitingToSelectCard)
     {
         _waitingToSelectCard = false;

@@ -13,7 +13,7 @@ cards::PlayResult cards::SummonDead::Play(Core* core, ActionProperties actionPro
     if (core->GetState().graveyard.empty() || core->GetState().players[actionProps.player].hand.size() >= GAME_HAND_SIZE)
         return PlayResult::Default();
 
-    auto params = std::make_unique<UserInputParams_ChooseCardFromHand>();
+    auto params = std::make_unique<UserInputParams_ChooseCardFromGraveyard>();
     params->playerIndex = actionProps.player;
     params->minCardCount = 1;
     params->maxCardCount = 1;
@@ -34,7 +34,7 @@ cards::PlayResult cards::SummonDead::Resume(UserInputResponse response, Core* co
     {
         _waitingForCardChoice = false;
 
-        UserInputParams_ChooseCardFromHand* responseParams = reinterpret_cast<UserInputParams_ChooseCardFromHand*>(response.inputParams.get());
+        UserInputParams_ChooseCardFromGraveyard* responseParams = reinterpret_cast<UserInputParams_ChooseCardFromGraveyard*>(response.inputParams.get());
         if (!responseParams)
             return PlayResult::Default();
         if (responseParams->chosenCards.size() != 1)

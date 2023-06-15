@@ -25,6 +25,7 @@ void cards::CorpsePuppet::_OnEnterActiveCards(Core* core, int playerIndex)
             return;
 
         bool canPlay = true;
+        bool graveyardUsed = false;
         for (auto& requiredCardId : event.comboProps.requiredCards)
         {
             bool cardFound = false;
@@ -39,13 +40,14 @@ void cards::CorpsePuppet::_OnEnterActiveCards(Core* core, int playerIndex)
                     }
                 }
             }
-            if (!cardFound)
+            if (!cardFound && !graveyardUsed)
             {
                 for (auto& card : core->GetState().graveyard)
                 {
                     if (card->GetCardId() == requiredCardId)
                     {
                         cardFound = true;
+                        graveyardUsed = true;
                         break;
                     }
                 }
@@ -64,6 +66,7 @@ void cards::CorpsePuppet::_OnEnterActiveCards(Core* core, int playerIndex)
         if (GetPosition().playerIndex != event.comboProps.player)
             return;
 
+        bool graveyardUsed = false;
         for (auto& requiredCardId : event.comboProps.requiredCards)
         {
             bool cardFound = false;
@@ -80,7 +83,7 @@ void cards::CorpsePuppet::_OnEnterActiveCards(Core* core, int playerIndex)
                     }
                 }
             }
-            if (!cardFound)
+            if (!cardFound && !graveyardUsed)
             {
                 auto& graveyard = core->GetState().graveyard;
                 for (int i = 0; i < graveyard.size(); i++)
@@ -89,14 +92,18 @@ void cards::CorpsePuppet::_OnEnterActiveCards(Core* core, int playerIndex)
                     {
                         event.retrievedCards->push_back(core->RemoveCardFromGraveyard(i));
                         cardFound = true;
+                        graveyardUsed = true;
                         break;
                     }
                 }
             }
         }
 
-        auto cardPtr = core->RemoveCardFromActiveCards(this, GetPosition().playerIndex);
-        core->AddCardToGraveyard(std::move(cardPtr));
+        if (graveyardUsed)
+        {
+            auto cardPtr = core->RemoveCardFromActiveCards(this, GetPosition().playerIndex);
+            core->AddCardToGraveyard(std::move(cardPtr));
+        }
     });
 }
 
