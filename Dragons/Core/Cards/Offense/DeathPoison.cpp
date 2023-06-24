@@ -4,11 +4,7 @@
 
 cards::PlayResult cards::DeathPoison::Play(Core* core, ActionProperties actionProps, PlayProperties* playProps)
 {
-    // Move card to active
-    auto cardPtr = core->RemoveCardFromHand(this, actionProps.player);
-    core->AddCardToActiveCards(std::move(cardPtr), actionProps.player);
-
-    return PlayResult::DontDiscard();
+    return PlayResult::AddToActives();
 }
 
 void cards::DeathPoison::_OnEnterHand(Core* core, int playerIndex)

@@ -4,10 +4,6 @@
 
 cards::PlayResult cards::FireMoon::Play(Core* core, ActionProperties actionProps, PlayProperties* playProps)
 {
-    // Move card to active
-    auto cardPtr = core->RemoveCardFromHand(this, actionProps.player);
-    core->AddCardToActiveCards(std::move(cardPtr), actionProps.player);
-
     // Request user input
     auto params = std::make_unique<UserInputParams_DrawCard>();
     params->minCardCount = 1;
@@ -29,7 +25,7 @@ cards::PlayResult cards::FireMoon::Resume(UserInputResponse response, Core* core
     if (_waitingForCardDraw)
     {
         _waitingForCardDraw = false;
-        return PlayResult::Default();
+        return PlayResult::AddToActives();
     }
 
     PlayResult result;

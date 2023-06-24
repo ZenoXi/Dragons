@@ -30,9 +30,5 @@ cards::PlayResult cards::DragonEquation::Play(Core* core, ActionProperties actio
         temp.erase(temp.begin());
     }
 
-    int cardIndex = core->GenerateRandomNumber(0, core->GetState().players[actionProps.opponent].hand.size());
-    auto cardPtr = core->RemoveCardFromHand(cardIndex, actionProps.opponent);
-    core->AddCardToHand(std::move(cardPtr), actionProps.player);
-
     return PlayResult::Default();
 }

@@ -10,6 +10,11 @@ class Core;
 
 namespace cards
 {
+    struct FairFightPlayProperties : public PlayProperties
+    {
+        bool giveOpponentArmor = true;
+    };
+
     class FairFight : public Card
     {
         std::unique_ptr<EventHandler<TurnEndEvent>> _turnEndHandler = nullptr;

@@ -123,11 +123,12 @@ struct UserInputParams_ChooseCardFromSet : public UserInputParams
     int playerIndex;
     int minCardCount;
     int maxCardCount;
-    std::vector<cards::CardPosition> sets;
+    std::vector<cards::CardSet> allowedSets;
     std::vector<cards::CardType> allowedTypes; // Empty list means no restriction
 
     // Response
     std::vector<cards::Card*> chosenCards;
+    std::vector<cards::CardSet> chosenCardSet;
 };
 
 struct UserInputParams_ChooseDeck : public UserInputParams

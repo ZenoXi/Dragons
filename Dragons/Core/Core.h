@@ -16,6 +16,11 @@ class Core
 
     std::mt19937 _rng;
 
+    // Info necessary to resume after user input
+    cards::Card* currentlyPlayingCard = nullptr;
+    ActionProperties currentActionProperties;
+    cards::PlayProperties* currentPlayProperties = nullptr;
+
 public:
     Core();
 
@@ -31,6 +36,10 @@ public:
     bool CanPlayCard(cards::Card* card, std::optional<ActionProperties> actionProps, cards::PlayProperties* playProps);
     cards::PlayResult PlayCard(cards::Card* card);
     cards::PlayResult PlayCard(cards::Card* card, std::optional<ActionProperties> actionProps, cards::PlayProperties* playProps);
+    cards::PlayResult ResumePlay(UserInputResponse&& response);
+private:
+    cards::PlayResult _HandlePlayResult(cards::PlayResult result, cards::Card* playedCard, ActionProperties actionProps, cards::PlayProperties* playProps);
+public:
     cards::Card* DrawCard(cards::CardType type, int playerIndex);
     cards::Card* DiscardCard(cards::Card* card, int playerIndex);
 
@@ -64,6 +73,9 @@ public:
     void AddCardToGraveyard(std::unique_ptr<cards::Card> card);
     std::unique_ptr<cards::Card> RemoveCardFromGraveyard(cards::Card* card);
     std::unique_ptr<cards::Card> RemoveCardFromGraveyard(int cardIndex);
+    void AddCardToInPlayCards(std::unique_ptr<cards::Card> card);
+    std::unique_ptr<cards::Card> RemoveCardFromInPlayCards(cards::Card* card);
+    std::unique_ptr<cards::Card> RemoveCardFromInPlayCards(int cardIndex);
     void AddCardToDestroyedCards(std::unique_ptr<cards::Card> card);
     std::unique_ptr<cards::Card> RemoveCardFromDestroyedCards(cards::Card* card);
     std::unique_ptr<cards::Card> RemoveCardFromDestroyedCards(int cardIndex);
@@ -72,6 +84,7 @@ public:
     void RemoveCardFromDisplayedCards(int cardIndex);
     bool ModifyDisplayedCard(DisplayInfo newDisplayInfo);
     void ClearDisplayedCards();
+    cards::CardSet GetCardSet(cards::Card* card);
 
     // Other
     void ShuffleDeck(cards::CardType type);

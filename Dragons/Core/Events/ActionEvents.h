@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../Cards/Card.h"
+#include "../ComboProperties.h"
 
 struct CanPlayEvent
 {

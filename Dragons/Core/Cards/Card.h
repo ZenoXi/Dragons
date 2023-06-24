@@ -15,13 +15,27 @@ namespace cards
     // Used to pass customization data to played card
     struct PlayProperties {};
 
+    template<class T>
+    T GetPlayProperties(PlayProperties* playProps)
+    {
+        if (playProps)
+        {
+            T* playPropsCastPtr = reinterpret_cast<T*>(playProps);
+            if (playPropsCastPtr)
+            {
+                return *playPropsCastPtr;
+            }
+        }
+        return T{};
+    }
+
     struct PlayResult
     {
         bool discard = true;
+        bool addToActives = false;
         bool notPlayed = false;
         bool waitForInput = false;
         UserInputRequest inputRequest{};
-        bool resume = false;
 
         static PlayResult Default()
         {
@@ -39,17 +53,24 @@ namespace cards
             result.discard = false;
             return result;
         }
+        static PlayResult AddToActives()
+        {
+            PlayResult result;
+            result.discard = false;
+            result.addToActives = true;
+            return result;
+        }
         static PlayResult Resume()
         {
             PlayResult result;
-            result.resume = true;
+            result.waitForInput = true;
             return result;
         }
     };
 
     class Card
     {
-        CardPosition _position;
+        CardSet _position;
 
     public:
         virtual bool CanPlay(Core* core, ActionProperties actionProps, PlayProperties* playProps) { return true; }
@@ -68,35 +89,35 @@ namespace cards
         virtual std::wstring GetCardDescription() const = 0;
 
         // Card position
-        CardPosition GetPosition() const { return _position; }
+        CardSet GetPosition() const { return _position; }
         void OnEnterHand(Core* core, int playerIndex)
         {
             _OnEnterHand(core, playerIndex);
-            _position.set = CardPosition::Set::HAND;
+            _position.set = CardSets::HAND;
             _position.playerIndex = playerIndex;
         }
         void OnEnterActiveCards(Core* core, int playerIndex)
         {
             _OnEnterActiveCards(core, playerIndex);
-            _position.set = CardPosition::Set::ACTIVE_CARDS;
+            _position.set = CardSets::ACTIVE_CARDS;
             _position.playerIndex = playerIndex;
         }
         void OnEnterDeck(Core* core)
         {
             _OnEnterDeck(core);
-            _position.set = CardPosition::Set::DECK;
+            _position.set = CardSets::DECK;
             _position.playerIndex = -1;
         }
         void OnEnterGraveyard(Core* core)
         {
             _OnEnterGraveyard(core);
-            _position.set = CardPosition::Set::GRAVEYARD;
+            _position.set = CardSets::GRAVEYARD;
             _position.playerIndex = -1;
         }
         void OnEnterDestroyedCards(Core* core)
         {
             _OnEnterDestroyedCards(core);
-            _position.set = CardPosition::Set::DESTROYED;
+            _position.set = CardSets::DESTROYED;
             _position.playerIndex = -1;
         }
 

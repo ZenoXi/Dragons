@@ -24,6 +24,7 @@ struct GameState
     std::vector<std::unique_ptr<cards::Card>> utilityDeck;
     std::vector<std::unique_ptr<cards::Card>> comboDeck;
     std::vector<std::unique_ptr<cards::Card>> graveyard;
+    std::vector<std::unique_ptr<cards::Card>> inPlayCards;
     std::vector<std::unique_ptr<cards::Card>> destroyedCards;
 
     std::vector<DisplayInfo> displayedCards;

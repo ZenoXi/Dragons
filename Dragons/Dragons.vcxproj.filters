@@ -156,6 +156,9 @@
     <ClCompile Include="Core\Cards\Combo\DeathFee.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Core\Cards\Combo\AstroInfluence.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Core\Core.h">
@@ -342,6 +345,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Core\Cards\Combo\DeathFee.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\Cards\CardPosition.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\Cards\Combo\AstroInfluence.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

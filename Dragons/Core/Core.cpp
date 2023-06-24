@@ -117,18 +117,51 @@ cards::PlayResult Core::PlayCard(cards::Card* card, std::optional<ActionProperti
     preCardPlayedEvent.playProps = playProps;
     _events.RaiseEvent(preCardPlayedEvent);
 
-    cards::PlayResult result = card->Play(this, actionPropsLocal, playProps);
+    // Remove card from hand and move it to currently in play card set
+    auto cardPtr = RemoveCardFromHand(card, actionPropsLocal.player);
+    AddCardToInPlayCards(std::move(cardPtr));
+
+    return _HandlePlayResult(card->Play(this, actionPropsLocal, playProps), card, actionPropsLocal, playProps);
+}
+
+cards::PlayResult Core::ResumePlay(UserInputResponse&& response)
+{
+    return _HandlePlayResult(currentlyPlayingCard->Resume(std::move(response), this, currentActionProperties, currentPlayProperties), currentlyPlayingCard, currentActionProperties, currentPlayProperties);
+}
+
+cards::PlayResult Core::_HandlePlayResult(cards::PlayResult result, cards::Card* playedCard, ActionProperties actionProps, cards::PlayProperties* playProps)
+{
+    if (result.waitForInput)
+    {
+        currentlyPlayingCard = playedCard;
+        currentActionProperties = actionProps;
+        currentPlayProperties = playProps;
+        return result;
+    }
     if (result.discard)
     {
-        _state.graveyard.push_back(std::move(*foundCardIt));
-        hand.erase(foundCardIt);
+        // Move to graveyard
+        auto cardPtr = RemoveCardFromInPlayCards(playedCard);
+        AddCardToGraveyard(std::move(cardPtr));
+    }
+    else if (result.addToActives)
+    {
+        // Add to active cards
+        auto cardPtr = RemoveCardFromInPlayCards(playedCard);
+        AddCardToActiveCards(std::move(cardPtr), actionProps.player);
+    }
+    else
+    {
+        // Return to hand
+        auto cardPtr = RemoveCardFromInPlayCards(playedCard);
+        AddCardToHand(std::move(cardPtr), actionProps.player);
     }
     if (!result.notPlayed)
     {
         // Emit post play event
         PostCardPlayedEvent postCardPlayedEvent;
-        postCardPlayedEvent.card = card;
-        postCardPlayedEvent.actionProps = &actionPropsLocal;
+        postCardPlayedEvent.card = playedCard;
+        postCardPlayedEvent.actionProps = &actionProps;
         postCardPlayedEvent.playProps = playProps;
         _events.RaiseEvent(postCardPlayedEvent);
     }
@@ -548,6 +581,33 @@ std::unique_ptr<cards::Card> Core::RemoveCardFromGraveyard(int cardIndex)
     return movedCard;
 }
 
+void Core::AddCardToInPlayCards(std::unique_ptr<cards::Card> card)
+{
+    card->OnEnterGraveyard(this);
+    _state.inPlayCards.push_back(std::move(card));
+}
+
+std::unique_ptr<cards::Card> Core::RemoveCardFromInPlayCards(cards::Card* card)
+{
+    for (int i = 0; i < _state.inPlayCards.size(); i++)
+    {
+        if (_state.inPlayCards[i].get() == card)
+        {
+            std::unique_ptr<cards::Card> movedCard = std::move(_state.inPlayCards[i]);
+            _state.inPlayCards.erase(_state.inPlayCards.begin() + i);
+            return movedCard;
+        }
+    }
+    return nullptr;
+}
+
+std::unique_ptr<cards::Card> Core::RemoveCardFromInPlayCards(int cardIndex)
+{
+    std::unique_ptr<cards::Card> movedCard = std::move(_state.inPlayCards[cardIndex]);
+    _state.inPlayCards.erase(_state.inPlayCards.begin() + cardIndex);
+    return movedCard;
+}
+
 void Core::AddCardToDestroyedCards(std::unique_ptr<cards::Card> card)
 {
     card->OnEnterGraveyard(this);
@@ -618,6 +678,61 @@ void Core::ClearDisplayedCards()
         _state.displayedCards.erase(_state.displayedCards.begin());
         // Add event invoke on each erase
     }
+}
+
+cards::CardSet Core::GetCardSet(cards::Card* cardToFind)
+{
+    for (int i = 0; i < _state.players.size(); i++)
+    {
+        // Player hand
+        for (auto& card : _state.players[i].hand)
+        {
+            if (card.get() == cardToFind)
+            {
+                return cards::CardSet{ cards::CardSets::HAND, i };
+            }
+        }
+
+        // Player active cards
+        for (auto& card : _state.players[i].activeCards)
+        {
+            if (card.get() == cardToFind)
+            {
+                return cards::CardSet{ cards::CardSets::ACTIVE_CARDS, i };
+            }
+        }
+
+    }
+
+    // Deck
+    auto& deckRef = _ResolveDeckFromType(cardToFind->GetCardType());
+    for (auto& card : deckRef)
+    {
+        if (card.get() == cardToFind)
+        {
+            return cards::CardSet{ cards::CardSets::DECK, -1 };
+        }
+    }
+
+    // Graveyard
+    for (auto& card : _state.graveyard)
+    {
+        if (card.get() == cardToFind)
+        {
+            return cards::CardSet{ cards::CardSets::GRAVEYARD, -1 };
+        }
+    }
+
+    // Destroyed
+    for (auto& card : _state.destroyedCards)
+    {
+        if (card.get() == cardToFind)
+        {
+            return cards::CardSet{ cards::CardSets::DESTROYED, -1 };
+        }
+    }
+
+    return cards::CardSet{ cards::CardSets::NONE, -1 };
 }
 
 void Core::ShuffleDeck(cards::CardType type)

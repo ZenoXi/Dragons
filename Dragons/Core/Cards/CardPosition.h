@@ -2,18 +2,19 @@
 
 namespace cards
 {
-    struct CardPosition
+    enum class CardSets
     {
-        enum class Set
-        {
-            HAND,
-            ACTIVE_CARDS,
-            DECK,
-            GRAVEYARD,
-            DESTROYED
-        };
+        HAND,
+        ACTIVE_CARDS,
+        DECK,
+        GRAVEYARD,
+        DESTROYED,
+        NONE
+    };
 
-        Set set;
-        int playerIndex;
+    struct CardSet
+    {
+        CardSets set;
+        int playerIndex = -1;
     };
 }

@@ -140,6 +140,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Core\Cards\Combo\AstroInfluence.cpp" />
     <ClCompile Include="Core\Cards\Combo\DeathFee.cpp" />
     <ClCompile Include="Core\Cards\Defense\ArmorUp.cpp" />
     <ClCompile Include="Core\Cards\Defense\Barrier.cpp" />
@@ -191,6 +192,7 @@
   <ItemGroup>
     <ClInclude Include="Core\ActionProperties.h" />
     <ClInclude Include="Core\Cards\CardPosition.h" />
+    <ClInclude Include="Core\Cards\Combo\AstroInfluence.h" />
     <ClInclude Include="Core\Cards\Combo\DeathFee.h" />
     <ClInclude Include="Core\Cards\Utility\CorpsePuppet.h" />
     <ClInclude Include="Core\ComboProperties.h" />

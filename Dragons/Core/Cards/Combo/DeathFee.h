@@ -11,10 +11,10 @@ namespace cards
 {
     class DeathFee : public Card
     {
-        bool _waitingToPickCardFromGraveyard = false;
-        bool _waitingToSelectCard = false;
         bool _resumeSummonDead = false;
         bool _resumeToHelpingHand = false;
+        bool _waitingToSelectCards = false;
+        bool _resumeToCleanUp = false;
 
         const std::vector<CardId> _requiredCardIds
         {

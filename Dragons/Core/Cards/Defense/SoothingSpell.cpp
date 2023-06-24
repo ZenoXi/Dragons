@@ -4,13 +4,9 @@
 
 cards::PlayResult cards::SoothingSpell::Play(Core* core, ActionProperties actionProps, PlayProperties* playProps)
 {
-    // Move card to active
-    auto cardPtr = core->RemoveCardFromHand(this, actionProps.player);
-    core->AddCardToActiveCards(std::move(cardPtr), actionProps.player);
-
     core->AddExtraPlays(actionProps.player, 1);
 
-    return PlayResult::DontDiscard();
+    return PlayResult::AddToActives();
 }
 
 void cards::SoothingSpell::_OnEnterHand(Core* core, int playerIndex)

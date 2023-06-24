@@ -6,6 +6,11 @@ class Core;
 
 namespace cards
 {
+    struct TreeOfLifePlayProperties : public PlayProperties
+    {
+        bool healOpponent = true;
+    };
+
     class TreeOfLife : public Card
     {
     public:
