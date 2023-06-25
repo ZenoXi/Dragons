@@ -5,7 +5,8 @@
 
 bool cards::LastBreath::CanPlay(Core* core, ActionProperties actionProps, PlayProperties* playProps)
 {
-    return core->GetState().players[actionProps.player].hand.size() < core->GetState().players[actionProps.opponent].hand.size();
+    return core->GetState().players[actionProps.player].hand.size() < core->GetState().players[actionProps.opponent].hand.size()
+        && core->GetState().players[actionProps.player].CardsInHand(CardType::OFFENSE) > 0;
 }
 
 cards::PlayResult cards::LastBreath::Play(Core* core, ActionProperties actionProps, PlayProperties* playProps)
@@ -31,10 +32,14 @@ cards::PlayResult cards::LastBreath::Resume(UserInputResponse response, Core* co
     {
         _waitingToPlayCards = false;
 
-        // Discard remaining cards
-        auto& handRef = core->GetState().players[actionProps.player].hand;
-        while (!handRef.empty())
-            core->DiscardCard(handRef.front().get(), actionProps.player);
+        auto playPropsValue = GetPlayProperties<LastBreathPlayProperties>(playProps);
+        if (playPropsValue.discardHand)
+        {
+            // Discard remaining cards
+            auto& handRef = core->GetState().players[actionProps.player].hand;
+            while (!handRef.empty())
+                core->DiscardCard(handRef.front().get(), actionProps.player);
+        }
 
         return PlayResult::Default();
     }

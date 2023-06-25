@@ -1,9 +1,13 @@
 #include "FireMoon.h"
 
 #include "../../Core.h"
+#include "../../GameConstants.h"
 
 cards::PlayResult cards::FireMoon::Play(Core* core, ActionProperties actionProps, PlayProperties* playProps)
 {
+    if (core->GetState().players[actionProps.player].hand.size() >= GAME_HAND_SIZE)
+        return PlayResult::AddToActives();
+
     // Request user input
     auto params = std::make_unique<UserInputParams_DrawCard>();
     params->minCardCount = 1;

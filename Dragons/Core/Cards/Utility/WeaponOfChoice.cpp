@@ -4,13 +4,15 @@
 
 cards::PlayResult cards::WeaponOfChoice::Play(Core* core, ActionProperties actionProps, PlayProperties* playProps)
 {
+    auto playPropsValue = GetPlayProperties<WeaponOfChoicePlayProperties>(playProps);
+    auto& deckRef = core->GetState().GetDeck(playPropsValue.deck);
+
     std::array<bool, 2> displayedTo;
     displayedTo[actionProps.player] = true;
     displayedTo[actionProps.opponent] = false;
-    for (int i = 0; i < 3; i++)
+    for (int i = 0; i < 3 && i < deckRef.size(); i++)
     {
-        if (!core->GetState().comboDeck.empty())
-            core->AddCardToDisplayedCards({ core->GetState().comboDeck.back().get(), displayedTo });
+        core->AddCardToDisplayedCards({ deckRef[deckRef.size() - 1 - i].get(), displayedTo });
     }
 
     auto params = std::make_unique<UserInputParams_ChooseCardFromDisplayedCards>();
@@ -40,9 +42,12 @@ cards::PlayResult cards::WeaponOfChoice::Resume(UserInputResponse response, Core
 
         Card* chosenCard = responseParams->chosenCards[0];
 
+        core->RemoveCardFromDisplayedCards(chosenCard);
+        core->AddCardToHand(core->RemoveCardFromDeck(chosenCard), actionProps.player);
+
+        for (auto& displayInfo : core->GetState().displayedCards)
+            core->AddCardToGraveyard(core->RemoveCardFromDeck(displayInfo.card));
         core->ClearDisplayedCards();
-        auto cardPtr = core->RemoveCardFromDeck(chosenCard);
-        core->AddCardToHand(std::move(cardPtr), actionProps.player);
 
         _waitingForCardChoice = false;
         return PlayResult::Default();

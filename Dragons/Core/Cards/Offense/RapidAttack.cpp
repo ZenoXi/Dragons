@@ -4,7 +4,11 @@
 
 bool cards::RapidAttack::CanPlay(Core* core, ActionProperties actionProps, PlayProperties* playProps)
 {
-    return !_playedThisTurn || _playedBy != actionProps.player;
+    auto playPropsValue = GetPlayProperties<RapidAttackPlayProperties>(playProps);
+    if (playPropsValue.ignoreRepeatPlayRestriction)
+        return true;
+    else
+        return !_playedThisTurn || _playedBy != actionProps.player;
 }
 
 cards::PlayResult cards::RapidAttack::Play(Core* core, ActionProperties actionProps, PlayProperties* playProps)

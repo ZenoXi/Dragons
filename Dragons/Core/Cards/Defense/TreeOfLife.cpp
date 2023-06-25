@@ -6,8 +6,15 @@ cards::PlayResult cards::TreeOfLife::Play(Core* core, ActionProperties actionPro
 {
     auto playPropsValue = GetPlayProperties<TreeOfLifePlayProperties>(playProps);
 
-    core->Heal(actionProps.player, 4);
+    HealProperties healProps;
+    healProps.target = actionProps.player;
+    healProps.amount = 4;
+    healProps.sourceCard = this;
+    core->Heal(healProps);
     if (playPropsValue.healOpponent)
-        core->Heal(actionProps.opponent, 4);
+    {
+        healProps.target = actionProps.opponent;
+        core->Heal(healProps);
+    }
     return PlayResult::Default();
 }

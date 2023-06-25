@@ -17,6 +17,7 @@ enum class UserInputType
     RESUME, // Resume card play immediatelly, without any parameters
     WAIT,
     WAIT_FOR_CONFIRMATION,
+    YES_OR_NO,
     CHOOSE_NUMBER,
     CHOOSE_CARD_FROM_HAND,
     CHOOSE_CARD_FROM_GRAVEYARD,
@@ -56,6 +57,17 @@ struct UserInputParams_WaitForConfirmation : public UserInputParams
     int playerIndex;
 
     // Response
+};
+
+struct UserInputParams_YesOrNo : public UserInputParams
+{
+    // Request
+    int playerIndex;
+    std::wstring yesText = L"Yes";
+    std::wstring noText = L"No";
+
+    // Response
+    bool yes;
 };
 
 struct UserInputParams_ChooseNumber : public UserInputParams

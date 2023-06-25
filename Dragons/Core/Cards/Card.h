@@ -72,6 +72,9 @@ namespace cards
     {
         CardSet _position;
 
+        bool _virtual;
+        std::vector<CardSet> _allowedSets;
+
     public:
         virtual bool CanPlay(Core* core, ActionProperties actionProps, PlayProperties* playProps) { return true; }
         virtual PlayResult Play(Core* core, ActionProperties actionProps, PlayProperties* playProps) = 0;
@@ -81,8 +84,26 @@ namespace cards
         virtual bool IsActive() { return false; }
         virtual int GetActionCost() { return 1; }
 
+        // Virtual cards get erased when moved to non allowed sets
+        bool IsVirtual() const { return _virtual; }
+        void SetVirtual(bool value) { _virtual = value; }
+        std::vector<CardSet> GetAllowedSets() const { return _allowedSets; }
+        void SetAllowedSets(std::vector<CardSet> sets) { _allowedSets = sets; }
+        bool IsAllowedSet(CardSet set) const
+        {
+            for (auto& allowedSet : _allowedSets)
+            {
+                if (allowedSet.set == set.set && allowedSet.playerIndex == set.playerIndex)
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
         // Metadata
         virtual CardId GetCardId() const = 0;
+        virtual std::unique_ptr<Card> CreateInstance() = 0;
 
         virtual CardType GetCardType() const = 0;
         virtual std::wstring GetCardName() const = 0;

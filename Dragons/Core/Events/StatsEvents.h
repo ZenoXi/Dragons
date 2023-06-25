@@ -1,6 +1,8 @@
 #pragma once
 
 #include "../DamageProperties.h"
+#include "../HealProperties.h"
+#include "../AddArmorProperties.h"
 
 struct PreDamageEvent_BuffPass
 {
@@ -22,8 +24,7 @@ struct PostDamageEvent
 struct PreHealEvent
 {
     static const char* _NAME_() { return "pre_heal"; }
-    int* target;
-    int* amount;
+    HealProperties* props;
 };
 
 struct PostHealEvent
@@ -34,8 +35,7 @@ struct PostHealEvent
 struct PreAddArmorEvent
 {
     static const char* _NAME_() { return "pre_add_armor"; }
-    int* target;
-    int* amount;
+    AddArmorProperties* props;
 };
 
 struct PostAddArmorEvent
@@ -61,6 +61,7 @@ struct PreHealthChangeEvent
     int target;
     int oldValue;
     int* newValue;
+    cards::Card* sourceCard;
 };
 
 struct PostHealthChangeEvent
@@ -69,6 +70,7 @@ struct PostHealthChangeEvent
     int target;
     int oldValue;
     int newValue;
+    cards::Card* sourceCard;
 };
 
 struct PreArmorChangeEvent
@@ -77,6 +79,7 @@ struct PreArmorChangeEvent
     int target;
     int oldValue;
     int* newValue;
+    cards::Card* sourceCard;
 };
 
 struct PostArmorChangeEvent
@@ -85,6 +88,7 @@ struct PostArmorChangeEvent
     int target;
     int oldValue;
     int newValue;
+    cards::Card* sourceCard;
 };
 
 struct PreMaxHealthChangeEvent
@@ -93,6 +97,7 @@ struct PreMaxHealthChangeEvent
     int target;
     int oldValue;
     int* newValue;
+    cards::Card* sourceCard;
 };
 
 struct PostMaxHealthChangeEvent
@@ -101,4 +106,5 @@ struct PostMaxHealthChangeEvent
     int target;
     int oldValue;
     int newValue;
+    cards::Card* sourceCard;
 };

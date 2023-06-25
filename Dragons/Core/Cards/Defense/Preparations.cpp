@@ -6,7 +6,13 @@ cards::PlayResult cards::Preparations::Play(Core* core, ActionProperties actionP
 {
     int offenseCards = core->GetState().players[actionProps.opponent].CardsInHand(CardType::OFFENSE);
     if (offenseCards > 0)
-        core->AddArmor(actionProps.player, offenseCards);
+    {
+        AddArmorProperties addArmorProps;
+        addArmorProps.target = actionProps.player;
+        addArmorProps.amount = offenseCards;
+        addArmorProps.sourceCard = this;
+        core->AddArmor(addArmorProps);
+    }
 
     return PlayResult::Default();
 }

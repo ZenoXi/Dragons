@@ -4,6 +4,12 @@
 
 cards::PlayResult cards::Healer::Play(Core* core, ActionProperties actionProps, PlayProperties* playProps)
 {
-    core->Heal(actionProps.player, 2);
+    auto playPropsValue = GetPlayProperties<HealerPlayProperties>(playProps);
+
+    HealProperties healProps;
+    healProps.target = actionProps.player;
+    healProps.amount = playPropsValue.healAmount;
+    healProps.sourceCard = this;
+    core->Heal(healProps);
     return PlayResult::Default();
 }

@@ -24,6 +24,7 @@ namespace cards
 
         static CardId CARD_ID() { return { "death_poison" }; }
         CardId GetCardId() const { return CARD_ID(); }
+        std::unique_ptr<Card> CreateInstance() { return std::unique_ptr<Card>(new DeathPoison()); }
 
         CardType GetCardType() const { return CardType::OFFENSE; }
         std::wstring GetCardName() const { return L"Death Poison"; }

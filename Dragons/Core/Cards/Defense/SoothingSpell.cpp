@@ -4,7 +4,7 @@
 
 cards::PlayResult cards::SoothingSpell::Play(Core* core, ActionProperties actionProps, PlayProperties* playProps)
 {
-    core->AddExtraPlays(actionProps.player, 1);
+    core->AddExtraAction(actionProps.player, ExtraAction(true, false, false));
 
     return PlayResult::AddToActives();
 }

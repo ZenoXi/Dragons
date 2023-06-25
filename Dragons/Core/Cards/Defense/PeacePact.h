@@ -6,6 +6,11 @@ class Core;
 
 namespace cards
 {
+    struct PeacePactPlayProperties : public PlayProperties
+    {
+        bool discardSelf = true;
+    };
+
     class PeacePact : public Card
     {
     public:
@@ -15,6 +20,7 @@ namespace cards
 
         static CardId CARD_ID() { return { "peace_pact" }; }
         CardId GetCardId() const { return CARD_ID(); }
+        std::unique_ptr<Card> CreateInstance() { return std::unique_ptr<Card>(new PeacePact()); }
 
         CardType GetCardType() const { return CardType::DEFENSE; }
         std::wstring GetCardName() const { return L"Peace Pact"; }

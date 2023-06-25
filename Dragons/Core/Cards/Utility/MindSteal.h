@@ -19,6 +19,7 @@ namespace cards
 
         static CardId CARD_ID() { return { "mind_steal" }; }
         CardId GetCardId() const { return CARD_ID(); }
+        std::unique_ptr<Card> CreateInstance() { return std::unique_ptr<Card>(new MindSteal()); }
 
         CardType GetCardType() const { return CardType::UTILITY; }
         std::wstring GetCardName() const { return L"Mind Steal"; }

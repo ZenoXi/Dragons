@@ -8,6 +8,7 @@ namespace cards
         ACTIVE_CARDS,
         DECK,
         GRAVEYARD,
+        IN_PLAY,
         DESTROYED,
         NONE
     };

@@ -45,7 +45,11 @@ cards::PlayResult cards::DragonPower::Play(Core* core, ActionProperties actionPr
     }
     if (healAmount > 0)
     {
-        core->Heal(actionProps.player, healAmount);
+        HealProperties healProps;
+        healProps.target = actionProps.player;
+        healProps.amount = healAmount;
+        healProps.sourceCard = this;
+        core->Heal(healProps);
     }
     if (cardsToDraw > 0)
     {

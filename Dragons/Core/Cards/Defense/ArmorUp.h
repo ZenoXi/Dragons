@@ -6,6 +6,11 @@ class Core;
 
 namespace cards
 {
+    struct ArmorUpPlayProperties : public PlayProperties
+    {
+        int armorAmount = 2;
+    };
+
     class ArmorUp : public Card
     {
     public:
@@ -15,6 +20,7 @@ namespace cards
 
         static CardId CARD_ID() { return { "armor_up" }; }
         CardId GetCardId() const { return CARD_ID(); }
+        std::unique_ptr<Card> CreateInstance() { return std::unique_ptr<Card>(new ArmorUp()); }
 
         CardType GetCardType() const { return CardType::DEFENSE; }
         std::wstring GetCardName() const { return L"Armor Up"; }

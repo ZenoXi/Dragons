@@ -11,7 +11,7 @@ cards::PlayResult cards::DragonFlame::Play(Core* core, ActionProperties actionPr
 {
     while (!core->GetState().players[actionProps.opponent].activeCards.empty())
     {
-        auto cardPtr = core->RemoveCardFromActiveCards(core->GetState().players[actionProps.opponent].activeCards.front().get(), actionProps.opponent);
+        auto cardPtr = core->RemoveCardFromActiveCards(0, actionProps.opponent);
         core->AddCardToDestroyedCards(std::move(cardPtr));
     }
     return PlayResult::Default();

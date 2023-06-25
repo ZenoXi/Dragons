@@ -141,7 +141,20 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Core\Cards\Combo\AstroInfluence.cpp" />
+    <ClCompile Include="Core\Cards\Combo\CounterScale.cpp" />
     <ClCompile Include="Core\Cards\Combo\DeathFee.cpp" />
+    <ClCompile Include="Core\Cards\Combo\DifferentSides.cpp" />
+    <ClCompile Include="Core\Cards\Combo\DoubleStrike.cpp" />
+    <ClCompile Include="Core\Cards\Combo\DragonWeapons.cpp" />
+    <ClCompile Include="Core\Cards\Combo\ElementalDragon.cpp" />
+    <ClCompile Include="Core\Cards\Combo\FakeOut.cpp" />
+    <ClCompile Include="Core\Cards\Combo\Omniclaustra.cpp" />
+    <ClCompile Include="Core\Cards\Combo\PowerUp.cpp" />
+    <ClCompile Include="Core\Cards\Combo\Ritual.cpp" />
+    <ClCompile Include="Core\Cards\Combo\Superiority.cpp" />
+    <ClCompile Include="Core\Cards\Combo\TotalEntanglement.cpp" />
+    <ClCompile Include="Core\Cards\Combo\UltimateDefense.cpp" />
+    <ClCompile Include="Core\Cards\Combo\Underworld.cpp" />
     <ClCompile Include="Core\Cards\Defense\ArmorUp.cpp" />
     <ClCompile Include="Core\Cards\Defense\Barrier.cpp" />
     <ClCompile Include="Core\Cards\Defense\Cure.cpp" />
@@ -191,9 +204,23 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Core\ActionProperties.h" />
+    <ClInclude Include="Core\AddArmorProperties.h" />
     <ClInclude Include="Core\Cards\CardPosition.h" />
     <ClInclude Include="Core\Cards\Combo\AstroInfluence.h" />
+    <ClInclude Include="Core\Cards\Combo\CounterScale.h" />
     <ClInclude Include="Core\Cards\Combo\DeathFee.h" />
+    <ClInclude Include="Core\Cards\Combo\DifferentSides.h" />
+    <ClInclude Include="Core\Cards\Combo\DoubleStrike.h" />
+    <ClInclude Include="Core\Cards\Combo\DragonWeapons.h" />
+    <ClInclude Include="Core\Cards\Combo\ElementalDragon.h" />
+    <ClInclude Include="Core\Cards\Combo\FakeOut.h" />
+    <ClInclude Include="Core\Cards\Combo\Omniclaustra.h" />
+    <ClInclude Include="Core\Cards\Combo\PowerUp.h" />
+    <ClInclude Include="Core\Cards\Combo\Ritual.h" />
+    <ClInclude Include="Core\Cards\Combo\Superiority.h" />
+    <ClInclude Include="Core\Cards\Combo\TotalEntanglement.h" />
+    <ClInclude Include="Core\Cards\Combo\UltimateDefense.h" />
+    <ClInclude Include="Core\Cards\Combo\Underworld.h" />
     <ClInclude Include="Core\Cards\Utility\CorpsePuppet.h" />
     <ClInclude Include="Core\ComboProperties.h" />
     <ClInclude Include="Core\Cards\Card.h" />
@@ -252,6 +279,7 @@
     <ClInclude Include="Core\Events\TurnEvents.h" />
     <ClInclude Include="Core\GameConstants.h" />
     <ClInclude Include="Core\GameState.h" />
+    <ClInclude Include="Core\HealProperties.h" />
     <ClInclude Include="Core\Player.h" />
     <ClInclude Include="Core\UserInputRequest.h" />
   </ItemGroup>

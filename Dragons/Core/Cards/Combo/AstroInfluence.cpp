@@ -14,13 +14,12 @@ cards::PlayResult cards::AstroInfluence::Play(Core* core, ActionProperties actio
     for (auto& card : cardsForCombo)
     {
         if (card->GetCardId() == FairFight::CARD_ID())
-            _cardFairFight = std::move(card);
+            _cardFairFight = card;
         else if (card->GetCardId() == TreeOfLife::CARD_ID())
-            _cardTreeOfLife = std::move(card);
+            _cardTreeOfLife = card;
         else if (card->GetCardId() == DragonEquation::CARD_ID())
-            _cardDragonEquation = std::move(card);
+            _cardDragonEquation = card;
     }
-    cardsForCombo.clear();
 
     // Play Dragon Equation
     _cardDragonEquation->Play(core, actionProps, nullptr);
@@ -29,18 +28,14 @@ cards::PlayResult cards::AstroInfluence::Play(Core* core, ActionProperties actio
     cards::FairFightPlayProperties fairFightPlayProps;
     fairFightPlayProps.giveOpponentArmor = false;
     _cardFairFight->Play(core, actionProps, &fairFightPlayProps);
+    core->AddCardToActiveCards(core->RemoveCardFromInPlayCards(_cardFairFight), actionProps.player);
 
     // Play Tree of Life
     cards::TreeOfLifePlayProperties treeOfLifePlayProperties;
     treeOfLifePlayProperties.healOpponent = false;
     _cardTreeOfLife->Play(core, actionProps, &treeOfLifePlayProperties);
 
-    return PlayResult::Resume();
-
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    // TODO: move fair fight to active cards and rework combo card retrieval to move cards to the in play set when playing combos
+    core->AddCardToGraveyard(core->RemoveCardFromInPlayCards(_cardTreeOfLife));
+    core->AddCardToGraveyard(core->RemoveCardFromInPlayCards(_cardDragonEquation));
+    return PlayResult::Default();
 }

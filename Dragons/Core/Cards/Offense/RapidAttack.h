@@ -10,6 +10,11 @@ class Core;
 
 namespace cards
 {
+    struct RapidAttackPlayProperties : public PlayProperties
+    {
+        bool ignoreRepeatPlayRestriction = false;
+    };
+
     class RapidAttack : public Card
     {
         std::unique_ptr<EventHandler<TurnEndEvent>> _turnEndHandler = nullptr;
@@ -25,6 +30,7 @@ namespace cards
 
         static CardId CARD_ID() { return { "rapid_attack" }; }
         CardId GetCardId() const { return CARD_ID(); }
+        std::unique_ptr<Card> CreateInstance() { return std::unique_ptr<Card>(new RapidAttack()); }
 
         CardType GetCardType() const { return CardType::OFFENSE; }
         std::wstring GetCardName() const { return L"Rapid Attack"; }

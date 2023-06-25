@@ -22,6 +22,7 @@ namespace cards
 
         static CardId CARD_ID() { return { "heavy_slash" }; }
         CardId GetCardId() const { return CARD_ID(); }
+        std::unique_ptr<Card> CreateInstance() { return std::unique_ptr<Card>(new HeavySlash()); }
 
         CardType GetCardType() const { return CardType::OFFENSE; }
         std::wstring GetCardName() const { return L"Heavy Slash"; }

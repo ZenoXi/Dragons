@@ -7,7 +7,13 @@ cards::PlayResult cards::FairFight::Play(Core* core, ActionProperties actionProp
     auto playPropsValue = GetPlayProperties<FairFightPlayProperties>(playProps);
 
     if (playPropsValue.giveOpponentArmor)
-        core->AddArmor(actionProps.opponent, 4);
+    {
+        AddArmorProperties addArmorProps;
+        addArmorProps.target = actionProps.player;
+        addArmorProps.amount = 4;
+        addArmorProps.sourceCard = this;
+        core->AddArmor(addArmorProps);
+    }
 
     return PlayResult::AddToActives();
 }

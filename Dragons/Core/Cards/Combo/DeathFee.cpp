@@ -14,13 +14,12 @@ cards::PlayResult cards::DeathFee::Play(Core* core, ActionProperties actionProps
     for (auto& card : cardsForCombo)
     {
         if (card->GetCardId() == DeathPoison::CARD_ID())
-            _cardDeathPoison = std::move(card);
+            _cardDeathPoison = card;
         else if (card->GetCardId() == HelpingHand::CARD_ID())
-            _cardHelpingHand = std::move(card);
+            _cardHelpingHand = card;
         else if (card->GetCardId() == SummonDead::CARD_ID())
-            _cardSummonDead = std::move(card);
+            _cardSummonDead = card;
     }
-    cardsForCombo.clear();
 
     // Play Death Poison
     _cardDeathPoison->Play(core, actionProps, nullptr);
@@ -62,7 +61,7 @@ cards::PlayResult cards::DeathFee::Resume(UserInputResponse response, Core* core
         }
         int defenseCardsInHand = core->GetState().players[actionProps.player].CardsInHand(CardType::DEFENSE);
         auto& graveyard = core->GetState().graveyard;
-        int defenseCardsInGraveyard = std::count_if(graveyard.begin(), graveyard.end(), [](std::unique_ptr<Card>& card) { return card->GetCardType() == CardType::DEFENSE; });
+        int defenseCardsInGraveyard = std::count_if(graveyard.begin(), graveyard.end(), [](const std::unique_ptr<Card>& card) { return card->GetCardType() == CardType::DEFENSE; });
         int defenseCardsAvailable = defenseCardsInHand + defenseCardsInGraveyard;
 
         int maxCardsToPick = cardsToFullOpponentHand;
@@ -101,6 +100,11 @@ cards::PlayResult cards::DeathFee::Resume(UserInputResponse response, Core* core
             return PlayResult::Resume();
         }
 
+        DamageProperties damageProps;
+        damageProps.amount = 1;
+        damageProps.source = actionProps.player;
+        damageProps.target = actionProps.opponent;
+
         for (int i = 0; i < params->chosenCards.size(); i++)
         {
             if (params->chosenCardSet[i].set == CardSets::HAND)
@@ -113,13 +117,8 @@ cards::PlayResult cards::DeathFee::Resume(UserInputResponse response, Core* core
                 auto cardPtr = core->RemoveCardFromGraveyard(params->chosenCards[i]);
                 core->AddCardToHand(std::move(cardPtr), actionProps.opponent);
             }
+            core->Damage(damageProps);
         }
-
-        DamageProperties damageProps;
-        damageProps.amount = params->chosenCards.size();
-        damageProps.source = actionProps.player;
-        damageProps.target = actionProps.opponent;
-        core->Damage(damageProps);
 
         _resumeToCleanUp = true;
         return PlayResult::Resume();
@@ -128,9 +127,9 @@ cards::PlayResult cards::DeathFee::Resume(UserInputResponse response, Core* core
     {
         _resumeToCleanUp = false;
 
-        core->AddCardToGraveyard(std::move(_cardDeathPoison));
-        core->AddCardToGraveyard(std::move(_cardSummonDead));
-        core->AddCardToGraveyard(std::move(_cardHelpingHand));
+        core->AddCardToGraveyard(core->RemoveCardFromInPlayCards(_cardDeathPoison));
+        core->AddCardToGraveyard(core->RemoveCardFromInPlayCards(_cardSummonDead));
+        core->AddCardToGraveyard(core->RemoveCardFromInPlayCards(_cardHelpingHand));
 
         return PlayResult::Default();
     }

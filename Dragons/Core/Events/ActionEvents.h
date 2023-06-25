@@ -41,7 +41,7 @@ struct PreGetComboCardsEvent
 {
     static const char* _NAME_() { return "pre_get_combo_cards"; }
     ComboProperties comboProps;
-    std::vector<std::unique_ptr<cards::Card>>* retrievedCards;
+    std::vector<cards::Card*>* retrievedCards;
     bool* processed;
 };
 
@@ -49,5 +49,13 @@ struct PostGetComboCardsEvent
 {
     static const char* _NAME_() { return "post_get_combo_cards"; }
     ComboProperties comboProps;
-    std::vector<std::unique_ptr<cards::Card>>* retrievedCards;
+    std::vector<cards::Card*>* retrievedCards;
+};
+
+struct CanDrawEvent
+{
+    static const char* _NAME_() { return "can_draw"; }
+    int playerIndex;
+    cards::CardType deck;
+    bool* canDraw;
 };

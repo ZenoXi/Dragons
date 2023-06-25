@@ -3,6 +3,8 @@
 #include "GameState.h"
 #include "ActionProperties.h"
 #include "DamageProperties.h"
+#include "HealProperties.h"
+#include "AddArmorProperties.h"
 #include "ComboProperties.h"
 #include "Events/GameEvents.h"
 
@@ -13,6 +15,8 @@ class Core
 {
     GameState _state;
     GameEvents _events;
+
+    std::vector<std::unique_ptr<cards::Card>> _registeredCards;
 
     std::mt19937 _rng;
 
@@ -40,25 +44,26 @@ public:
 private:
     cards::PlayResult _HandlePlayResult(cards::PlayResult result, cards::Card* playedCard, ActionProperties actionProps, cards::PlayProperties* playProps);
 public:
+    bool CanDrawCard(cards::CardType deck, int playerIndex);
     cards::Card* DrawCard(cards::CardType type, int playerIndex);
     cards::Card* DiscardCard(cards::Card* card, int playerIndex);
 
     bool CanPlayComboCard(ComboProperties comboProps);
     bool CanPlayComboCard(ComboProperties comboProps, std::optional<ActionProperties> actionProps, cards::PlayProperties* playProps);
-    std::vector<std::unique_ptr<cards::Card>> GetCardsForCombo(ComboProperties comboProps);
+    std::vector<cards::Card*> GetCardsForCombo(ComboProperties comboProps);
 
     // Stat manipulation
     DamageResult Damage(DamageProperties props);
-    void Heal(int target, int amount);
-    void AddArmor(int target, int amount);
+    void Heal(HealProperties props);
+    void AddArmor(AddArmorProperties props);
     void DestroyArmor(int target);
-    void SetMaxHealth(int target, int amount);
+    void SetMaxHealth(int target, int value, bool force = false);
+    void SetHealth(int target, int value, bool force = false);
+    void SetArmor(int target, int value, bool force = false);
 
     void SetActionCount(int target, int amount);
-    void AddExtraActions(int target, int amount);
-    void AddExtraPlays(int target, int amount);
-    void AddExtraDraws(int target, int amount);
-    void AddExtraDiscards(int target, int amount);
+    void AddActions(int target, int amount);
+    void AddExtraAction(int target, ExtraAction action);
 
     // Card moving functions
     void AddCardToHand(std::unique_ptr<cards::Card> card, int playerIndex);
@@ -89,8 +94,9 @@ public:
     // Other
     void ShuffleDeck(cards::CardType type);
     int GenerateRandomNumber(int fromInclusive, int toExclusive);
-    void RevealHand(int target);
-    void HideHand(int target);
+    void RevealHand(int target, std::string revealSource = "-");
+    void HideHand(int target, std::string revealSource = "-");
+    std::unique_ptr<cards::Card> CreateCard(CardId cardId);
 
 private:
     std::vector<std::unique_ptr<cards::Card>>& _ResolveDeckFromType(cards::CardType type);

@@ -29,6 +29,7 @@ cards::PlayResult cards::BloodDonation::Resume(UserInputResponse response, Core*
 {
     if (_waitingForDamageInput)
     {
+        _waitingForDamageInput = false;
         UserInputParams_ChooseNumber* params = reinterpret_cast<UserInputParams_ChooseNumber*>(response.inputParams.get());
         if (!params)
             return PlayResult::Default();
@@ -50,7 +51,6 @@ cards::PlayResult cards::BloodDonation::Resume(UserInputResponse response, Core*
         drawCardParams->minCardCount = cardsToDraw;
         drawCardParams->maxCardCount = cardsToDraw;
 
-        _waitingForDamageInput = false;
         _waitingToDrawCards = true;
 
         PlayResult result;

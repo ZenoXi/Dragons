@@ -164,6 +164,9 @@ Superiority: [Cheating, Hellfire sword, Armor up] Combo effect - you steal enemy
 Double strike: [Sacrificial attack, Stab] Combo effect - you don't receive 3 damage
 	Customize card effect
 
+Ritual: [Life exchange, Last breath, Life flower] You don't have to discard anything. Life Flower effect for each offensive card played
+	Customize card effect
+
 Omniclaustra: [Soothing spell, Divine protection] You can also not be reduced below 1 health by offensive cards
 	Active card
 

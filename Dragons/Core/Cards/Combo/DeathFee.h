@@ -22,9 +22,9 @@ namespace cards
             HelpingHand::CARD_ID(),
             SummonDead::CARD_ID()
         };
-        std::unique_ptr<cards::Card> _cardDeathPoison = nullptr;
-        std::unique_ptr<cards::Card> _cardHelpingHand = nullptr;
-        std::unique_ptr<cards::Card> _cardSummonDead = nullptr;
+        cards::Card* _cardDeathPoison = nullptr;
+        cards::Card* _cardHelpingHand = nullptr;
+        cards::Card* _cardSummonDead = nullptr;
 
     public:
         DeathFee() {}
@@ -35,6 +35,7 @@ namespace cards
 
         static CardId CARD_ID() { return { "death_fee" }; }
         CardId GetCardId() const { return CARD_ID(); }
+        std::unique_ptr<Card> CreateInstance() { return std::unique_ptr<Card>(new DeathFee()); }
 
         CardType GetCardType() const { return CardType::COMBO; }
         std::wstring GetCardName() const { return L"Death Fee"; }

@@ -4,6 +4,12 @@
 
 cards::PlayResult cards::ArmorUp::Play(Core* core, ActionProperties actionProps, PlayProperties* playProps)
 {
-    core->AddArmor(actionProps.player, 2);
+    auto playPropsValue = GetPlayProperties<ArmorUpPlayProperties>(playProps);
+
+    AddArmorProperties addArmorProps;
+    addArmorProps.target = actionProps.player;
+    addArmorProps.amount = playPropsValue.armorAmount;
+    addArmorProps.sourceCard = this;
+    core->AddArmor(addArmorProps);
     return PlayResult::Default();
 }

@@ -26,6 +26,7 @@ namespace cards
 
         static CardId CARD_ID() { return { "divine_protection" }; }
         CardId GetCardId() const { return CARD_ID(); }
+        std::unique_ptr<Card> CreateInstance() { return std::unique_ptr<Card>(new DivineProtection()); }
 
         CardType GetCardType() const { return CardType::OFFENSE; }
         std::wstring GetCardName() const { return L"Divine Protection"; }

@@ -1,5 +1,10 @@
 #pragma once
 
+namespace cards
+{
+    class Card;
+}
+
 struct DamageProperties
 {
     int source = -1;
@@ -8,6 +13,7 @@ struct DamageProperties
     bool ignoreArmor = false;
     bool trueDamage = false;
     bool fatigue = false;
+    cards::Card* sourceCard = nullptr;
 };
 
 struct DamageResult

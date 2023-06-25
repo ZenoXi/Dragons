@@ -6,6 +6,10 @@ cards::PlayResult cards::Cure::Play(Core* core, ActionProperties actionProps, Pl
 {
     int curHealth = core->GetState().players[actionProps.player].health;
     int maxHealth = core->GetState().players[actionProps.player].maxHealth;
-    core->Heal(actionProps.player, (maxHealth - curHealth) / 2);
+    HealProperties healProps;
+    healProps.target = actionProps.player;
+    healProps.amount = (maxHealth - curHealth) / 2;
+    healProps.sourceCard = this;
+    core->Heal(healProps);
     return PlayResult::Default();
 }

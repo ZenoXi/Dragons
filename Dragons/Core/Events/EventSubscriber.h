@@ -11,7 +11,7 @@ class EventSubscriber
 
     virtual void _OnEvent(_Event) = 0;
 public:
-    EventSubscriber(GameEvents* eventClass);
+    EventSubscriber(GameEvents* eventClass, bool maxPriority = false);
     EventSubscriber(const EventSubscriber<_Event>&) = delete;
     virtual ~EventSubscriber();
 };
@@ -19,9 +19,9 @@ public:
 #include "GameEvents.h"
 
 template<class _Event>
-EventSubscriber<_Event>::EventSubscriber(GameEvents* eventClass) : _eventClass(eventClass)
+EventSubscriber<_Event>::EventSubscriber(GameEvents* eventClass, bool maxPriority) : _eventClass(eventClass)
 {
-    _eventClass->_Subscribe<_Event>(this);
+    _eventClass->_Subscribe<_Event>(this, maxPriority);
 }
 
 template<class _Event>
@@ -43,8 +43,8 @@ private:
         _handler(ev);
     }
 public:
-    EventHandler(GameEvents* eventClass, std::function<void(_Event)> handler)
-        : EventSubscriber<_Event>(eventClass)
+    EventHandler(GameEvents* eventClass, std::function<void(_Event)> handler, bool maxPriority = false)
+        : EventSubscriber<_Event>(eventClass, maxPriority)
         , _handler(handler)
     {}
 

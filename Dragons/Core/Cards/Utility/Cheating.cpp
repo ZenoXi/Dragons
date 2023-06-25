@@ -4,7 +4,7 @@
 
 cards::PlayResult cards::Cheating::Play(Core* core, ActionProperties actionProps, PlayProperties* playProps)
 {
-    core->RevealHand(actionProps.opponent);
+    core->RevealHand(actionProps.opponent, "cheating");
 
     auto params = std::make_unique<UserInputParams_WaitForConfirmation>();
     params->playerIndex = actionProps.player;
@@ -23,7 +23,7 @@ cards::PlayResult cards::Cheating::Resume(UserInputResponse response, Core* core
 {
     if (_waitingForConfirmation)
     {
-        core->HideHand(actionProps.opponent);
+        core->HideHand(actionProps.opponent, "cheating");
 
         _waitingForConfirmation = false;
         return PlayResult::Default();

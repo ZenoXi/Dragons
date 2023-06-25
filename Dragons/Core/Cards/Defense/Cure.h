@@ -15,6 +15,7 @@ namespace cards
 
         static CardId CARD_ID() { return { "cure" }; }
         CardId GetCardId() const { return CARD_ID(); }
+        std::unique_ptr<Card> CreateInstance() { return std::unique_ptr<Card>(new Cure()); }
 
         CardType GetCardType() const { return CardType::DEFENSE; }
         std::wstring GetCardName() const { return L"Cure"; }

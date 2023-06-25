@@ -22,9 +22,9 @@ namespace cards
             TreeOfLife::CARD_ID(),
             DragonEquation::CARD_ID()
         };
-        std::unique_ptr<cards::Card> _cardFairFight = nullptr;
-        std::unique_ptr<cards::Card> _cardTreeOfLife = nullptr;
-        std::unique_ptr<cards::Card> _cardDragonEquation = nullptr;
+        cards::Card* _cardFairFight = nullptr;
+        cards::Card* _cardTreeOfLife = nullptr;
+        cards::Card* _cardDragonEquation = nullptr;
 
     public:
         AstroInfluence() {}
@@ -34,6 +34,7 @@ namespace cards
 
         static CardId CARD_ID() { return { "astro_influence" }; }
         CardId GetCardId() const { return CARD_ID(); }
+        std::unique_ptr<Card> CreateInstance() { return std::unique_ptr<Card>(new AstroInfluence()); }
 
         CardType GetCardType() const { return CardType::COMBO; }
         std::wstring GetCardName() const { return L"Astro Influence"; }

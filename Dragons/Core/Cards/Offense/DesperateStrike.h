@@ -6,6 +6,11 @@ class Core;
 
 namespace cards
 {
+    struct DesperateStrikePlayProperties : public PlayProperties
+    {
+        int damageAmount = 3;
+    };
+
     class DesperateStrike : public Card
     {
     public:
@@ -16,6 +21,7 @@ namespace cards
 
         static CardId CARD_ID() { return { "desperate_strike" }; }
         CardId GetCardId() const { return CARD_ID(); }
+        std::unique_ptr<Card> CreateInstance() { return std::unique_ptr<Card>(new DesperateStrike()); }
 
         CardType GetCardType() const { return CardType::OFFENSE; }
         std::wstring GetCardName() const { return L"Desperate Strike"; }
