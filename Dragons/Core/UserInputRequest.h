@@ -83,7 +83,8 @@ struct UserInputParams_ChooseNumber : public UserInputParams
 struct UserInputParams_ChooseCardFromHand : public UserInputParams
 {
     // Request
-    int playerIndex;
+    int choosingPlayerIndex;
+    int handPlayerIndex;
     int minCardCount;
     int maxCardCount;
     std::vector<cards::CardType> allowedTypes; // Empty list means no restriction

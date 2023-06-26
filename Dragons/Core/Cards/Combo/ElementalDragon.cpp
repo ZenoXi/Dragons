@@ -73,7 +73,8 @@ cards::PlayResult cards::ElementalDragon::Resume(UserInputResponse response, Cor
 
         // Choose combo to activate
         auto params = std::make_unique<UserInputParams_ChooseCardFromHand>();
-        params->playerIndex = actionProps.player;
+        params->choosingPlayerIndex = actionProps.player;
+        params->handPlayerIndex = actionProps.player;
         params->minCardCount = 1;
         params->maxCardCount = 1;
         params->allowedTypes.push_back(CardType::COMBO);

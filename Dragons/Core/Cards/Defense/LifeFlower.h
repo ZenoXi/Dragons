@@ -6,6 +6,13 @@ class Core;
 
 namespace cards
 {
+    struct LifeFlowerPlayProperties : public PlayProperties
+    {
+        int maxHealthIncrease = 1;
+        int healAmount = 1;
+        int armorAmount = 1;
+    };
+
     class LifeFlower : public Card
     {
     public:

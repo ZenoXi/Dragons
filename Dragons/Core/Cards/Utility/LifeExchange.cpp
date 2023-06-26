@@ -39,9 +39,10 @@ cards::PlayResult cards::LifeExchange::Resume(UserInputResponse response, Core* 
             return PlayResult::Default();
 
         auto params = std::make_unique<UserInputParams_ChooseCardFromHand>();
+        params->choosingPlayerIndex = actionProps.player;
+        params->handPlayerIndex = actionProps.player;
         params->minCardCount = 2;
         params->maxCardCount = 2;
-        params->playerIndex = actionProps.player;
 
         _waitingForCardChoice = true;
 

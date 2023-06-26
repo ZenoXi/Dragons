@@ -10,9 +10,15 @@ class Core;
 
 namespace cards
 {
+    struct SetUpPlayProperties : public PlayProperties
+    {
+        int actionCount = 4;
+    };
+
     class SetUp : public Card
     {
         std::unique_ptr<EventHandler<TurnBeginEvent>> _turnBeginHandler = nullptr;
+        int _actionCount;
 
     public:
         SetUp() {}

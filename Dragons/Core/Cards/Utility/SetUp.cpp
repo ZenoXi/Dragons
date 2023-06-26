@@ -4,6 +4,9 @@
 
 cards::PlayResult cards::SetUp::Play(Core* core, ActionProperties actionProps, PlayProperties* playProps)
 {
+    auto playPropsValue = GetPlayProperties<SetUpPlayProperties>(playProps);
+    _actionCount = playPropsValue.actionCount;
+
     return PlayResult::AddToActives();
 }
 
@@ -22,7 +25,7 @@ void cards::SetUp::_OnEnterActiveCards(Core* core, int playerIndex)
         if (event.playerIndex != GetPosition().playerIndex)
             return;
 
-        core->SetActionCount(event.playerIndex, 4);
+        core->SetActionCount(event.playerIndex, _actionCount);
     });
 }
 

@@ -19,6 +19,7 @@ struct PreDamageEvent_NerfPass
 struct PostDamageEvent
 {
     static const char* _NAME_() { return "post_damage"; }
+    DamageProperties props;
 };
 
 struct PreHealEvent
@@ -30,6 +31,7 @@ struct PreHealEvent
 struct PostHealEvent
 {
     static const char* _NAME_() { return "post_heal"; }
+    HealProperties props;
 };
 
 struct PreAddArmorEvent
@@ -41,6 +43,7 @@ struct PreAddArmorEvent
 struct PostAddArmorEvent
 {
     static const char* _NAME_() { return "post_add_armor"; }
+    AddArmorProperties props;
 };
 
 struct PreDestroyArmorEvent

@@ -372,6 +372,9 @@ DamageResult Core::Damage(DamageProperties props)
     preDamageEventNerf.props = &props;
     _events.RaiseEvent(preDamageEventNerf);
 
+    PostDamageEvent postDamageEvent;
+    postDamageEvent.props = props;
+
     DamageResult result;
 
     Player& targetPlayer = _state.players[props.target];
@@ -443,6 +446,7 @@ DamageResult Core::Damage(DamageProperties props)
         _events.RaiseEvent(postHealthChange);
     }
 
+    _events.RaiseEvent(postDamageEvent);
     return result;
 }
 
@@ -474,6 +478,10 @@ void Core::Heal(HealProperties props)
     postHealthChange.newValue = newHealthValue;
     postHealthChange.sourceCard = props.sourceCard;
     _events.RaiseEvent(postHealthChange);
+
+    PostHealEvent postHealEvent;
+    postHealEvent.props = props;
+    _events.RaiseEvent(postHealEvent);
 }
 
 void Core::AddArmor(AddArmorProperties props)
@@ -502,6 +510,10 @@ void Core::AddArmor(AddArmorProperties props)
     postArmorChange.newValue = newArmorValue;
     postArmorChange.sourceCard = props.sourceCard;
     _events.RaiseEvent(postArmorChange);
+
+    PostAddArmorEvent postAddArmorEvent;
+    postAddArmorEvent.props = props;
+    _events.RaiseEvent(postAddArmorEvent);
 }
 
 void Core::DestroyArmor(int target)

@@ -17,7 +17,8 @@ cards::PlayResult cards::HelpingHand::Play(Core* core, ActionProperties actionPr
 
     // Request user input
     auto params = std::make_unique<UserInputParams_ChooseCardFromHand>();
-    params->playerIndex = actionProps.player;
+    params->choosingPlayerIndex = actionProps.player;
+    params->handPlayerIndex = actionProps.player;
     params->minCardCount = 1;
     params->maxCardCount = 1;
     params->allowedTypes.push_back(CardType::DEFENSE);
