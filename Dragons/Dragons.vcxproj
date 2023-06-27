@@ -140,15 +140,18 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Core\Cards\Combo\Apocalypse.cpp" />
     <ClCompile Include="Core\Cards\Combo\AstroInfluence.cpp" />
     <ClCompile Include="Core\Cards\Combo\CounterScale.cpp" />
     <ClCompile Include="Core\Cards\Combo\DeathFee.cpp" />
     <ClCompile Include="Core\Cards\Combo\DifferentSides.cpp" />
     <ClCompile Include="Core\Cards\Combo\DoubleStrike.cpp" />
+    <ClCompile Include="Core\Cards\Combo\DragonSword.cpp" />
     <ClCompile Include="Core\Cards\Combo\DragonWeapons.cpp" />
     <ClCompile Include="Core\Cards\Combo\DreamLand.cpp" />
     <ClCompile Include="Core\Cards\Combo\ElementalDragon.cpp" />
     <ClCompile Include="Core\Cards\Combo\FakeOut.cpp" />
+    <ClCompile Include="Core\Cards\Combo\FinalHour.cpp" />
     <ClCompile Include="Core\Cards\Combo\InfernoLifeline.cpp" />
     <ClCompile Include="Core\Cards\Combo\MagicTrick.cpp" />
     <ClCompile Include="Core\Cards\Combo\NatureSpell.cpp" />
@@ -212,11 +215,13 @@
     <ClInclude Include="Core\ActionProperties.h" />
     <ClInclude Include="Core\AddArmorProperties.h" />
     <ClInclude Include="Core\Cards\CardPosition.h" />
+    <ClInclude Include="Core\Cards\Combo\Apocalypse.h" />
     <ClInclude Include="Core\Cards\Combo\AstroInfluence.h" />
     <ClInclude Include="Core\Cards\Combo\CounterScale.h" />
     <ClInclude Include="Core\Cards\Combo\DeathFee.h" />
     <ClInclude Include="Core\Cards\Combo\DifferentSides.h" />
     <ClInclude Include="Core\Cards\Combo\DoubleStrike.h" />
+    <ClInclude Include="Core\Cards\Combo\DragonSword.h" />
     <ClInclude Include="Core\Cards\Combo\DragonWeapons.h" />
     <ClInclude Include="Core\Cards\Combo\DreamLand.h" />
     <ClInclude Include="Core\Cards\Combo\ElementalDragon.h" />
@@ -233,6 +238,7 @@
     <ClInclude Include="Core\Cards\Combo\UltimateDefense.h" />
     <ClInclude Include="Core\Cards\Combo\UltimateExchange.h" />
     <ClInclude Include="Core\Cards\Combo\Underworld.h" />
+    <ClInclude Include="Core\Cards\Combo\FinalHour.h" />
     <ClInclude Include="Core\Cards\Utility\CorpsePuppet.h" />
     <ClInclude Include="Core\ComboProperties.h" />
     <ClInclude Include="Core\Cards\Card.h" />

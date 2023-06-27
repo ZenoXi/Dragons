@@ -176,7 +176,20 @@ struct UserInputParams_DrawCard : public UserInputParams
     int minCardCount;
     int maxCardCount;
     std::vector<cards::CardType> allowedTypes; // Empty list means no restriction
+    bool ignoreHandSize = false;
 
     // Response
     std::vector<cards::Card*> drawnCards;
+};
+
+struct UserInputParams_DiscardCard : public UserInputParams
+{
+    // Request
+    int playerIndex;
+    int minCardCount;
+    int maxCardCount;
+    std::vector<cards::CardType> allowedTypes; // Empty list means no restriction
+
+    // Response
+    std::vector<cards::Card*> discardedCards;
 };
