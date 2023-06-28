@@ -558,13 +558,16 @@ void Core::SetMaxHealth(int target, int value, bool force)
 
     if (force)
         newMaxHealthValue = value;
-    _state.players[target].health = newMaxHealthValue;
+    _state.players[target].maxHealth = newMaxHealthValue;
 
     PostMaxHealthChangeEvent postMaxHealthChange;
     postMaxHealthChange.target = target;
     postMaxHealthChange.oldValue = preMaxHealthChange.oldValue;
     postMaxHealthChange.newValue = newMaxHealthValue;
     _events.RaiseEvent(postMaxHealthChange);
+
+    if (_state.players[target].health > _state.players[target].maxHealth)
+        SetHealth(target, _state.players[target].maxHealth, true);
 }
 
 void Core::SetHealth(int target, int value, bool force)
