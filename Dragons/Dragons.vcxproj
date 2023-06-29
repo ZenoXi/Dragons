@@ -159,9 +159,11 @@
     <ClCompile Include="Core\Cards\Combo\PowerUp.cpp" />
     <ClCompile Include="Core\Cards\Combo\ReEquip.cpp" />
     <ClCompile Include="Core\Cards\Combo\Ritual.cpp" />
+    <ClCompile Include="Core\Cards\Combo\ShadowAssassin.cpp" />
     <ClCompile Include="Core\Cards\Combo\Soulstealer.cpp" />
     <ClCompile Include="Core\Cards\Combo\Superiority.cpp" />
     <ClCompile Include="Core\Cards\Combo\SwapPact.cpp" />
+    <ClCompile Include="Core\Cards\Combo\ThreeGodsStrike.cpp" />
     <ClCompile Include="Core\Cards\Combo\TotalEntanglement.cpp" />
     <ClCompile Include="Core\Cards\Combo\UltimateDefense.cpp" />
     <ClCompile Include="Core\Cards\Combo\UltimateExchange.cpp" />
@@ -235,9 +237,11 @@
     <ClInclude Include="Core\Cards\Combo\PowerUp.h" />
     <ClInclude Include="Core\Cards\Combo\ReEquip.h" />
     <ClInclude Include="Core\Cards\Combo\Ritual.h" />
+    <ClInclude Include="Core\Cards\Combo\ShadowAssassin.h" />
     <ClInclude Include="Core\Cards\Combo\Soulstealer.h" />
     <ClInclude Include="Core\Cards\Combo\Superiority.h" />
     <ClInclude Include="Core\Cards\Combo\SwapPact.h" />
+    <ClInclude Include="Core\Cards\Combo\ThreeGodsStrike.h" />
     <ClInclude Include="Core\Cards\Combo\TotalEntanglement.h" />
     <ClInclude Include="Core\Cards\Combo\UltimateDefense.h" />
     <ClInclude Include="Core\Cards\Combo\UltimateExchange.h" />

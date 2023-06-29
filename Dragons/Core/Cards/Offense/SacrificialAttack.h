@@ -9,6 +9,7 @@ namespace cards
     struct SacrificialAttackPlayProperties : public PlayProperties
     {
         bool damageSelf = true;
+        bool stealHealth = false;
     };
 
     class SacrificialAttack : public Card

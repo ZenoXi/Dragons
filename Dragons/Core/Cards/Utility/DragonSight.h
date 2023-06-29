@@ -6,10 +6,19 @@ class Core;
 
 namespace cards
 {
+    struct DragonSightPlayProperties : public PlayProperties
+    {
+        int cardRevealMultiplier = 1;
+    };
+
     class DragonSight : public Card
     {
         bool _waitingForDeckChoice = false;
+        bool _resumeToConfirmation = false;
         bool _waitingForConfirmation = false;
+
+        int _decksRevealed;
+        std::vector<std::vector<Card*>> _deckCopies;
 
     public:
         DragonSight() {}

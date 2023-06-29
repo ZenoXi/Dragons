@@ -19,6 +19,7 @@ enum class UserInputType
     WAIT_FOR_CONFIRMATION,
     YES_OR_NO,
     CHOOSE_NUMBER,
+    CHOOSE_OPTION,
     CHOOSE_CARD_FROM_HAND,
     CHOOSE_CARD_FROM_GRAVEYARD,
     CHOOSE_CARD_FROM_ACTIVE_CARDS,
@@ -78,6 +79,16 @@ struct UserInputParams_ChooseNumber : public UserInputParams
 
     // Response
     int chosenNumber;
+};
+
+struct UserInputParams_ChooseOption : public UserInputParams
+{
+    // Request
+    int playerIndex;
+    std::vector<std::wstring> options;
+
+    // Response
+    int chosenOptionIndex;
 };
 
 struct UserInputParams_ChooseCardFromHand : public UserInputParams

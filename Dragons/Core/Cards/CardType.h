@@ -4,9 +4,10 @@ namespace cards
 {
     enum class CardType
     {
-        OFFENSE,
-        DEFENSE,
-        UTILITY,
-        COMBO
+        OFFENSE = 0,
+        DEFENSE = 1,
+        UTILITY = 2,
+        COMBO = 3,
+        NONE = -1
     };
 }

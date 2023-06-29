@@ -4,26 +4,48 @@
 
 cards::PlayResult cards::DragonSight::Play(Core* core, ActionProperties actionProps, PlayProperties* playProps)
 {
+    auto playPropsValue = GetPlayProperties<DragonSightPlayProperties>(playProps);
+
+    // Create deck copies to allow easier revealed/non-revealed card checking
+    _deckCopies = { {}, {}, {}, {} };
+    for (auto& card : core->GetState().offenseDeck)
+        _deckCopies[(int)CardType::OFFENSE].push_back(card.get());
+    for (auto& card : core->GetState().defenseDeck)
+        _deckCopies[(int)CardType::DEFENSE].push_back(card.get());
+    for (auto& card : core->GetState().utilityDeck)
+        _deckCopies[(int)CardType::UTILITY].push_back(card.get());
+    for (auto& card : core->GetState().comboDeck)
+        _deckCopies[(int)CardType::COMBO].push_back(card.get());
+
     std::array<bool, 2> displayedTo;
     displayedTo[actionProps.player] = true;
     displayedTo[actionProps.opponent] = false;
-    if (!core->GetState().offenseDeck.empty())
-        core->AddCardToDisplayedCards({ core->GetState().offenseDeck.back().get(), displayedTo });
-    if (!core->GetState().defenseDeck.empty())
-        core->AddCardToDisplayedCards({ core->GetState().defenseDeck.back().get(), displayedTo });
-    if (!core->GetState().utilityDeck.empty())
-        core->AddCardToDisplayedCards({ core->GetState().utilityDeck.back().get(), displayedTo });
-    if (!core->GetState().comboDeck.empty())
-        core->AddCardToDisplayedCards({ core->GetState().comboDeck.back().get(), displayedTo });
-    int cardsRevealed = core->GetState().displayedCards.size();
+    _decksRevealed = 0;
+    for (auto& deck : _deckCopies)
+    {
+        if (deck.empty())
+            continue;
+
+        for (int i = 0; i < playPropsValue.cardRevealMultiplier; i++)
+        {
+            core->AddCardToDisplayedCards({ deck.back(), displayedTo });
+            deck.pop_back();
+            if (deck.empty())
+                break;
+        }
+        _decksRevealed++;
+    }
     
-    if (cardsRevealed < 4)
+    if (_decksRevealed < 4)
     {
         auto params = std::make_unique<UserInputParams_ChooseDeck>();
         params->playerIndex = actionProps.player;
         params->minDeckCount = 1;
         params->maxDeckCount = 1;
         params->allowEmptyDecks = false;
+        for (int i = 0; i < 4; i++)
+            if (!_deckCopies[i].empty())
+                params->allowedDecks.push_back((CardType)i);
 
         _waitingForDeckChoice = true;
 
@@ -52,29 +74,45 @@ cards::PlayResult cards::DragonSight::Play(Core* core, ActionProperties actionPr
 
 cards::PlayResult cards::DragonSight::Resume(UserInputResponse response, Core* core, ActionProperties actionProps, PlayProperties* playProps)
 {
+    auto playPropsValue = GetPlayProperties<DragonSightPlayProperties>(playProps);
+
     if (_waitingForDeckChoice)
     {
         UserInputParams_ChooseDeck* responseParams = reinterpret_cast<UserInputParams_ChooseDeck*>(response.inputParams.get());
         if (!responseParams)
             return PlayResult::Default();
         if (responseParams->chosenDecks.size() != 1)
-            return PlayResult::Default();
+        {
+            _resumeToConfirmation = true;
+            return PlayResult::Resume();
+        }
 
         CardType chosenDeck = responseParams->chosenDecks[0];
 
         std::array<bool, 2> displayedTo;
         displayedTo[actionProps.player] = true;
         displayedTo[actionProps.opponent] = false;
-        core->AddCardToDisplayedCards({ core->GetState().GetDeck(chosenDeck).back().get(), displayedTo });
-        int cardsRevealed = core->GetState().displayedCards.size();
 
-        if (cardsRevealed < 4)
+        auto& deck = _deckCopies[(int)chosenDeck];
+        for (int i = 0; i < playPropsValue.cardRevealMultiplier; i++)
+        {
+            core->AddCardToDisplayedCards({ deck.back(), displayedTo });
+            deck.pop_back();
+            if (deck.empty())
+                break;
+        }
+        _decksRevealed++;
+
+        if (_decksRevealed < 4)
         {
             auto params = std::make_unique<UserInputParams_ChooseDeck>();
             params->playerIndex = actionProps.player;
             params->minDeckCount = 1;
             params->maxDeckCount = 1;
             params->allowEmptyDecks = false;
+            for (int i = 0; i < 4; i++)
+                if (!_deckCopies[i].empty())
+                    params->allowedDecks.push_back((CardType)i);
 
             _waitingForDeckChoice = true;
 
@@ -87,23 +125,32 @@ cards::PlayResult cards::DragonSight::Resume(UserInputResponse response, Core* c
         }
         else
         {
-            auto params = std::make_unique<UserInputParams_WaitForConfirmation>();
-            params->playerIndex = actionProps.player;
-
-            _waitingForDeckChoice = false;
-            _waitingForConfirmation = true;
-
-            PlayResult result;
-            result.waitForInput = true;
-            result.inputRequest.inputType = UserInputType::WAIT_FOR_CONFIRMATION;
-            result.inputRequest.inputPrompt = L"Done";
-            result.inputRequest.inputParams = std::unique_ptr<UserInputParams>(params.release());
-            return result;
+            _resumeToConfirmation = true;
+            return PlayResult::Resume();
         }
+    }
+    else if (_resumeToConfirmation)
+    {
+        _resumeToConfirmation = false;
+
+        auto params = std::make_unique<UserInputParams_WaitForConfirmation>();
+        params->playerIndex = actionProps.player;
+
+        _waitingForDeckChoice = false;
+        _waitingForConfirmation = true;
+
+        PlayResult result;
+        result.waitForInput = true;
+        result.inputRequest.inputType = UserInputType::WAIT_FOR_CONFIRMATION;
+        result.inputRequest.inputPrompt = L"Done";
+        result.inputRequest.inputParams = std::unique_ptr<UserInputParams>(params.release());
+        return result;
     }
     else if (_waitingForConfirmation)
     {
         _waitingForConfirmation = false;
+
+        core->ClearDisplayedCards();
         return PlayResult::Default();
     }
 
