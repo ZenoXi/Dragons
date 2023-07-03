@@ -115,7 +115,7 @@ cards::PlayResult cards::ThreeGodsStrike::Resume(UserInputResponse response, Cor
         _resumeToBarrier = false;
 
         BarrierPlayProperties barrierPlayProperties;
-        barrierPlayProperties.blockedAttacks = 2;
+        barrierPlayProperties.attacksToBlock = 2;
         barrierPlayProperties.blockDragonFlame = true;
         BarrierPlayProperties* barrierPlayPropertiesPtr = nullptr;
         if (_buffBarrier)

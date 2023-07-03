@@ -29,6 +29,15 @@ namespace cards
         return T{};
     }
 
+    template<class T>
+    T* GetPlayPropertiesPtr(PlayProperties* playProps)
+    {
+        if (playProps)
+            return reinterpret_cast<T*>(playProps);
+
+        return nullptr;
+    }
+
     struct PlayResult
     {
         bool discard = true;

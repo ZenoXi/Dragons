@@ -6,6 +6,11 @@ class Core;
 
 namespace cards
 {
+    struct DragonFlamePlayProps : public PlayProperties
+    {
+        bool blocked = false;
+    };
+
     class DragonFlame : public Card
     {
     public:

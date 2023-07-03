@@ -12,13 +12,13 @@ namespace cards
 {
     struct VitalSpotPlayProperties : public PlayProperties
     {
-        int blockedAttacks = 1;
+        int attacksToEnhance = 1;
     };
 
     class VitalSpot : public Card
     {
         std::unique_ptr<EventHandler<PreDamageEvent_BuffPass>> _preDamageHandler = nullptr;
-        int _attacksToBlock;
+        int _attacksToEnhance;
 
     public:
         VitalSpot() {}

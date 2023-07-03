@@ -3,6 +3,9 @@
 #include "../Card.h"
 #include "../../Events/EventSubscriber.h"
 #include "../../Events/StatsEvents.h"
+#include "../../Events/ActionEvents.h"
+
+#include "../Utility/DragonFlame.h"
 
 #include <memory>
 
@@ -10,9 +13,19 @@ class Core;
 
 namespace cards
 {
+    struct BarrierPlayProperties : public PlayProperties
+    {
+        int attacksToBlock = 1;
+        bool blockDragonFlame = false;
+    };
+
     class Barrier : public Card
     {
         std::unique_ptr<EventHandler<PreDamageEvent_NerfPass>> _preDamageHandler = nullptr;
+        std::unique_ptr<EventHandler<PreCardPlayedEvent>> _preCardPlayedHandler = nullptr;
+        int _attacksToBlock;
+        bool _blockDragonFlame;
+        DragonFlamePlayProps _dragonFlameBlockPlayProps;
 
     public:
         Barrier() {}

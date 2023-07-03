@@ -9,6 +9,10 @@ bool cards::DragonFlame::CanPlay(Core* core, ActionProperties actionProps, PlayP
 
 cards::PlayResult cards::DragonFlame::Play(Core* core, ActionProperties actionProps, PlayProperties* playProps)
 {
+    auto playPropsValue = GetPlayProperties<DragonFlamePlayProps>(playProps);
+    if (playPropsValue.blocked)
+        return PlayResult::Default();
+
     while (!core->GetState().players[actionProps.opponent].activeCards.empty())
     {
         auto cardPtr = core->RemoveCardFromActiveCards(0, actionProps.opponent);

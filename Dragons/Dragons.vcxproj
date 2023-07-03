@@ -186,6 +186,7 @@
     <ClCompile Include="Core\Cards\Offense\BloodDonation.cpp" />
     <ClCompile Include="Core\Cards\Offense\DeathPoison.cpp" />
     <ClCompile Include="Core\Cards\Offense\DesperateStrike.cpp" />
+    <ClCompile Include="Core\Cards\Offense\DevilsDeal.cpp" />
     <ClCompile Include="Core\Cards\Offense\FairFight.cpp" />
     <ClCompile Include="Core\Cards\Offense\FireMoon.cpp" />
     <ClCompile Include="Core\Cards\Offense\HeavySlash.cpp" />
@@ -247,6 +248,7 @@
     <ClInclude Include="Core\Cards\Combo\UltimateExchange.h" />
     <ClInclude Include="Core\Cards\Combo\Underworld.h" />
     <ClInclude Include="Core\Cards\Combo\FinalHour.h" />
+    <ClInclude Include="Core\Cards\Offense\DevilsDeal.h" />
     <ClInclude Include="Core\Cards\Utility\CorpsePuppet.h" />
     <ClInclude Include="Core\ComboProperties.h" />
     <ClInclude Include="Core\Cards\Card.h" />

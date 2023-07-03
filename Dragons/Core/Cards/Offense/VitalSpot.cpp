@@ -5,7 +5,7 @@
 cards::PlayResult cards::VitalSpot::Play(Core* core, ActionProperties actionProps, PlayProperties* playProps)
 {
     auto playPropsValue = GetPlayProperties<VitalSpotPlayProperties>(playProps);
-    _attacksToBlock = playPropsValue.blockedAttacks;
+    _attacksToEnhance = playPropsValue.attacksToEnchance;
 
     return PlayResult::AddToActives();
 }
@@ -27,7 +27,7 @@ void cards::VitalSpot::_OnEnterActiveCards(Core* core, int playerIndex)
         event.props->trueDamage = true;
         event.props->ignoreArmor = true;
 
-        if (--_attacksToBlock <= 0)
+        if (--_attacksToEnhance <= 0)
         {
             auto cardPtr = core->RemoveCardFromActiveCards(this, GetPosition().playerIndex);
             core->AddCardToGraveyard(std::move(cardPtr));
