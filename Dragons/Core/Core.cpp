@@ -277,12 +277,24 @@ bool Core::CanDrawCard(cards::CardType deck, int playerIndex)
 
 cards::Card* Core::DrawCard(cards::CardType type, int playerIndex)
 {
-    return nullptr;
+    auto& deckRef = _ResolveDeckFromType(type);
+    if (deckRef.empty())
+        return nullptr;
+
+    auto cardPtr = RemoveCardFromDeck(type, deckRef.size() - 1);
+    cards::Card* card = cardPtr.get();
+    AddCardToHand(std::move(cardPtr), playerIndex);
+
+    return card;
 }
 
 cards::Card* Core::DiscardCard(cards::Card* card, int playerIndex)
 {
-    return nullptr;
+    auto cardPtr = RemoveCardFromHand(card, playerIndex);
+    cards::Card* card = cardPtr.get();
+    AddCardToGraveyard(std::move(cardPtr));
+
+    return card;
 }
 
 bool Core::CanPlayComboCard(ComboProperties comboProps)

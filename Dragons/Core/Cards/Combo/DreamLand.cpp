@@ -29,7 +29,7 @@ cards::PlayResult cards::DreamLand::Play(Core* core, ActionProperties actionProp
 
     // Play Vital Spot
     VitalSpotPlayProperties vitalSpotPlayProperties;
-    vitalSpotPlayProperties.attacksToEnchance = 2;
+    vitalSpotPlayProperties.attacksToEnhance = 2;
     _cardVitalSpot->Play(core, actionProps, &vitalSpotPlayProperties);
     core->AddCardToActiveCards(core->RemoveCardFromInPlayCards(_cardVitalSpot), actionProps.player);
 
