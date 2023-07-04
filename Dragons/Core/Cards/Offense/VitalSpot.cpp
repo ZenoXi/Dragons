@@ -5,7 +5,7 @@
 cards::PlayResult cards::VitalSpot::Play(Core* core, ActionProperties actionProps, PlayProperties* playProps)
 {
     auto playPropsValue = GetPlayProperties<VitalSpotPlayProperties>(playProps);
-    _attacksToEnhance = playPropsValue.attacksToEnchance;
+    _attacksToEnhance = playPropsValue.attacksToEnhance;
 
     return PlayResult::AddToActives();
 }

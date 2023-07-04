@@ -6,27 +6,34 @@ cards::PlayResult cards::SacrificialAttack::Play(Core* core, ActionProperties ac
 {
     auto playPropsValue = GetPlayProperties<SacrificialAttackPlayProperties>(playProps);
 
-    DamageProperties damageProps;
-    damageProps.source = actionProps.player;
-    damageProps.target = actionProps.opponent;
-    damageProps.amount = 3;
-    damageProps.sourceCard = this;
-    if (playPropsValue.stealHealth)
-        damageProps.ignoreArmor = true;
-    DamageResult result = core->Damage(damageProps);
-
-    if (playPropsValue.damageSelf)
+    int removedHealthFromSelf = 0;
+    int removedHealthFromOpponent = 0;
+    for (auto& player : core->GetState().players)
     {
-        damageProps.source = -1;
-        damageProps.target = actionProps.player;
-        core->Damage(damageProps);
+        if (!playPropsValue.damageSelf && player.index == actionProps.player)
+            continue;
+
+        DamageProperties damageProps;
+        damageProps.source = actionProps.player;
+        damageProps.amount = 3;
+        damageProps.sourceCard = this;
+
+        damageProps.target = player.index;
+        if (playPropsValue.stealHealth && player.index == actionProps.opponent)
+            damageProps.ignoreArmor = true;
+        DamageResult result = core->Damage(damageProps);
+
+        if (player.index == actionProps.player)
+            removedHealthFromSelf = result.removedHealthAmount;
+        else if (player.index == actionProps.opponent)
+            removedHealthFromOpponent = result.removedHealthAmount;
     }
 
-    if (playPropsValue.stealHealth && result.removedHealthAmount > 0)
+    if (playPropsValue.stealHealth && removedHealthFromOpponent > 0)
     {
         HealProperties healProps;
         healProps.target = actionProps.player;
-        healProps.amount = result.removedHealthAmount;
+        healProps.amount = removedHealthFromOpponent;
         healProps.sourceCard = this;
         core->Heal(healProps);
     }

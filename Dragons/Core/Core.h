@@ -41,6 +41,7 @@ public:
     cards::PlayResult PlayCard(cards::Card* card);
     cards::PlayResult PlayCard(cards::Card* card, std::optional<ActionProperties> actionProps, cards::PlayProperties* playProps);
     cards::PlayResult ResumePlay(UserInputResponse&& response);
+    void MoveCardAfterPlay(const cards::PlayResult& result, cards::Card* playedCard, ActionProperties actionProps, cards::PlayProperties* playProps);
 private:
     cards::PlayResult _HandlePlayResult(cards::PlayResult result, cards::Card* playedCard, ActionProperties actionProps, cards::PlayProperties* playProps);
 public:

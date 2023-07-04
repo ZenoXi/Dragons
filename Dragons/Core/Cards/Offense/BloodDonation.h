@@ -6,6 +6,11 @@ class Core;
 
 namespace cards
 {
+    struct BloodDonationPlayProperties : public PlayProperties
+    {
+        int healthForOneCard = 2;
+    };
+
     class BloodDonation : public Card
     {
         bool _waitingForDamageInput = false;

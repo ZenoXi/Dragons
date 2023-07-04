@@ -5,14 +5,21 @@
 
 cards::PlayResult cards::DevilsDeal::Play(Core* core, ActionProperties actionProps, PlayProperties* playProps)
 {
-    int offenseCardsInHand = core->GetState().players[actionProps.player].CardsInHand(CardType::OFFENSE);
-    if (offenseCardsInHand == 0)
-        return PlayResult::Default();
+    int offenseCardsInOpponentHand = core->GetState().players[actionProps.opponent].CardsInHand(CardType::OFFENSE);
+    if (offenseCardsInOpponentHand == 0)
+    {
+        _chosenCard = core->DrawCard(CardType::OFFENSE, actionProps.opponent);
+        if (!_chosenCard)
+            return PlayResult::Default();
+
+        _resumeToCardPlay = true;
+        return PlayResult::Resume();
+    }
 
     // Request user input
     auto params = std::make_unique<UserInputParams_ChooseCardFromHand>();
-    params->choosingPlayerIndex = actionProps.player;
-    params->handPlayerIndex = actionProps.player;
+    params->choosingPlayerIndex = actionProps.opponent;
+    params->handPlayerIndex = actionProps.opponent;
     params->minCardCount = 1;
     params->maxCardCount = 1;
     params->allowedTypes.push_back(CardType::OFFENSE);
@@ -32,29 +39,42 @@ cards::PlayResult cards::DevilsDeal::Resume(UserInputResponse response, Core* co
     if (_waitingForCardChoice)
     {
         UserInputParams_ChooseCardFromHand* responseParams = reinterpret_cast<UserInputParams_ChooseCardFromHand*>(response.inputParams.get());
-        Card* chosenCard = responseParams->chosenCards[0];
+        _chosenCard = responseParams->chosenCards[0];
 
-        core->AddCardToInPlayCards(core->RemoveCardFromHand(chosenCard, actionProps.opponent));
+        _resumeToCardPlay = true;
+        return PlayResult::Resume();
+    }
+    else if (_resumeToCardPlay)
+    {
+        core->AddCardToInPlayCards(core->RemoveCardFromHand(_chosenCard, actionProps.opponent));
         ActionProperties customActionProps = actionProps;
         customActionProps.player = actionProps.opponent;
         customActionProps.opponent = actionProps.player;
-        PlayResult result = chosenCard->Play(core, customActionProps, nullptr);
-
-        // Discard cards
-        int discardedCount = 0;
-        for (auto& card : params->chosenCards)
+        PlayResult result = _chosenCard->Play(core, customActionProps, nullptr);
+        if (result.waitForInput)
         {
-            if (core->DiscardCard(card, actionProps.player))
-                discardedCount++;
+            _resumeCardPlay = true;
+            return result;
         }
 
-        // Draw cards
-        for (int i = 0; i < discardedCount; i++)
+        core->MoveCardAfterPlay(result, _chosenCard, customActionProps, playProps);
+        return PlayResult::Default();
+    }
+    else if (_resumeCardPlay)
+    {
+        _resumeCardPlay = false;
+
+        ActionProperties customActionProps = actionProps;
+        customActionProps.player = actionProps.opponent;
+        customActionProps.opponent = actionProps.player;
+        PlayResult result = _chosenCard->Resume(std::move(response), core, customActionProps, nullptr);
+        if (result.waitForInput)
         {
-            core->DrawCard(CardType::OFFENSE, actionProps.player);
+            _resumeCardPlay = true;
+            return result;
         }
 
-        _waitingForCardChoice = false;
+        core->MoveCardAfterPlay(result, _chosenCard, customActionProps, playProps);
         return PlayResult::Default();
     }
 

@@ -9,6 +9,9 @@ namespace cards
     class DevilsDeal : public Card
     {
         bool _waitingForCardChoice = false;
+        Card* _chosenCard = nullptr;
+        bool _resumeToCardPlay = false;
+        bool _resumeCardPlay = false;
 
     public:
         DevilsDeal() {}

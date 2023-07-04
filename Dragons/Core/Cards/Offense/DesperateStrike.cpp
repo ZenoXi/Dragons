@@ -10,6 +10,9 @@ bool cards::DesperateStrike::CanPlay(Core* core, ActionProperties actionProps, P
 
 cards::PlayResult cards::DesperateStrike::Play(Core* core, ActionProperties actionProps, PlayProperties* playProps)
 {
+    if (!CanPlay(core, actionProps, playProps))
+        return PlayResult::Default();
+
     auto playPropsValue = GetPlayProperties<DesperateStrikePlayProperties>(playProps);
 
     const GameState& state = core->GetState();

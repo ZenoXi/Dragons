@@ -13,6 +13,8 @@ namespace cards
     class HeavySlash : public Card
     {
         std::unique_ptr<EventHandler<TurnBeginEvent>> _turnBeginHandler = nullptr;
+        int _playerIndex = -1;
+        int _opponentIndex = -1;
 
     public:
         HeavySlash() {}

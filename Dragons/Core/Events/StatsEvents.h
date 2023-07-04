@@ -20,6 +20,7 @@ struct PostDamageEvent
 {
     static const char* _NAME_() { return "post_damage"; }
     DamageProperties props;
+    DamageResult result;
 };
 
 struct PreHealEvent

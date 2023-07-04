@@ -11,10 +11,15 @@ bool cards::LastBreath::CanPlay(Core* core, ActionProperties actionProps, PlayPr
 
 cards::PlayResult cards::LastBreath::Play(Core* core, ActionProperties actionProps, PlayProperties* playProps)
 {
+    if (!CanPlay(core, actionProps, playProps))
+        return PlayResult::Default();
+
     // Request user input
     auto params = std::make_unique<UserInputParams_PlayCard>();
+    params->playerIndex = actionProps.player;
     params->minCardCount = 99;
     params->maxCardCount = 99;
+    params->allowedTypes.push_back(CardType::OFFENSE);
 
     _waitingToPlayCards = true;
 

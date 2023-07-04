@@ -10,6 +10,9 @@ bool cards::BloodDonation::CanPlay(Core* core, ActionProperties actionProps, Pla
 
 cards::PlayResult cards::BloodDonation::Play(Core* core, ActionProperties actionProps, PlayProperties* playProps)
 {
+    if (!CanPlay(core, actionProps, playProps))
+        return PlayResult::Default();
+
     // Request user input
     auto params = std::make_unique<UserInputParams_ChooseNumber>();
     params->lowerBound = 0;
@@ -27,6 +30,8 @@ cards::PlayResult cards::BloodDonation::Play(Core* core, ActionProperties action
 
 cards::PlayResult cards::BloodDonation::Resume(UserInputResponse response, Core* core, ActionProperties actionProps, PlayProperties* playProps)
 {
+    auto playPropsValue = GetPlayProperties<BloodDonationPlayProperties>(playProps);
+
     if (_waitingForDamageInput)
     {
         _waitingForDamageInput = false;
@@ -41,7 +46,7 @@ cards::PlayResult cards::BloodDonation::Resume(UserInputResponse response, Core*
         damageProps.trueDamage = true;
 
         DamageResult damageResult = core->Damage(damageProps);
-        int cardsToDraw = damageResult.removedHealthAmount / 2;
+        int cardsToDraw = damageResult.removedHealthAmount / playPropsValue.healthForOneCard;
         if (cardsToDraw == 0)
             return PlayResult::Default();
 

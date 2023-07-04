@@ -159,6 +159,7 @@
     <ClCompile Include="Core\Cards\Combo\PowerUp.cpp" />
     <ClCompile Include="Core\Cards\Combo\ReEquip.cpp" />
     <ClCompile Include="Core\Cards\Combo\Ritual.cpp" />
+    <ClCompile Include="Core\Cards\Combo\Shackling.cpp" />
     <ClCompile Include="Core\Cards\Combo\ShadowAssassin.cpp" />
     <ClCompile Include="Core\Cards\Combo\Soulstealer.cpp" />
     <ClCompile Include="Core\Cards\Combo\Superiority.cpp" />
@@ -168,6 +169,7 @@
     <ClCompile Include="Core\Cards\Combo\UltimateDefense.cpp" />
     <ClCompile Include="Core\Cards\Combo\UltimateExchange.cpp" />
     <ClCompile Include="Core\Cards\Combo\Underworld.cpp" />
+    <ClCompile Include="Core\Cards\Combo\Vampirism.cpp" />
     <ClCompile Include="Core\Cards\Defense\ArmorUp.cpp" />
     <ClCompile Include="Core\Cards\Defense\Barrier.cpp" />
     <ClCompile Include="Core\Cards\Defense\Cure.cpp" />
@@ -238,6 +240,7 @@
     <ClInclude Include="Core\Cards\Combo\PowerUp.h" />
     <ClInclude Include="Core\Cards\Combo\ReEquip.h" />
     <ClInclude Include="Core\Cards\Combo\Ritual.h" />
+    <ClInclude Include="Core\Cards\Combo\Shackling.h" />
     <ClInclude Include="Core\Cards\Combo\ShadowAssassin.h" />
     <ClInclude Include="Core\Cards\Combo\Soulstealer.h" />
     <ClInclude Include="Core\Cards\Combo\Superiority.h" />
@@ -248,6 +251,7 @@
     <ClInclude Include="Core\Cards\Combo\UltimateExchange.h" />
     <ClInclude Include="Core\Cards\Combo\Underworld.h" />
     <ClInclude Include="Core\Cards\Combo\FinalHour.h" />
+    <ClInclude Include="Core\Cards\Combo\Vampirism.h" />
     <ClInclude Include="Core\Cards\Offense\DevilsDeal.h" />
     <ClInclude Include="Core\Cards\Utility\CorpsePuppet.h" />
     <ClInclude Include="Core\ComboProperties.h" />

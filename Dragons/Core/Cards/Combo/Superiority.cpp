@@ -21,14 +21,17 @@ cards::PlayResult cards::Superiority::Play(Core* core, ActionProperties actionPr
             _cardCheating = card;
     }
 
-    // Play Armor Up
-    _cardArmorUp->Play(core, actionProps, nullptr);
-    core->AddCardToActiveCards(core->RemoveCardFromInPlayCards(_cardArmorUp), actionProps.player);
-
     // Play Hellfire Sword
     HellfireSwordPlayProperties hellfireSwordPlayProperties;
     hellfireSwordPlayProperties.stealArmor = true;
     _cardHellfireSword->Play(core, actionProps, &hellfireSwordPlayProperties);
+
+    // Play Armor Up
+    _cardArmorUp->Play(core, actionProps, nullptr);
+
+    core->AddCardToGraveyard(core->RemoveCardFromInPlayCards(_cardHellfireSword));
+    core->AddCardToGraveyard(core->RemoveCardFromInPlayCards(_cardArmorUp));
+    core->AddCardToGraveyard(core->RemoveCardFromInPlayCards(_cardCheating));
 
     if (core->GetState().players[actionProps.player].armor > 0)
     {

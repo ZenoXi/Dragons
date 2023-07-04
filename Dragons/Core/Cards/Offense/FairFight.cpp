@@ -4,12 +4,15 @@
 
 cards::PlayResult cards::FairFight::Play(Core* core, ActionProperties actionProps, PlayProperties* playProps)
 {
+    _playerIndex = actionProps.player;
+    _opponentIndex = actionProps.opponent;
+
     auto playPropsValue = GetPlayProperties<FairFightPlayProperties>(playProps);
 
     if (playPropsValue.giveOpponentArmor)
     {
         AddArmorProperties addArmorProps;
-        addArmorProps.target = actionProps.player;
+        addArmorProps.target = _opponentIndex;
         addArmorProps.amount = 4;
         addArmorProps.sourceCard = this;
         core->AddArmor(addArmorProps);
@@ -30,15 +33,15 @@ void cards::FairFight::_OnEnterActiveCards(Core* core, int playerIndex)
 
     _turnEndHandler = std::make_unique<EventHandler<TurnEndEvent>>(&core->Events(), [=](TurnEndEvent event)
     {
-        if (event.playerIndex != GetPosition().playerIndex)
+        if (event.playerIndex != _playerIndex)
             return;
 
         DamageProperties damageProps;
-        damageProps.target = event.opponentIndex;
+        damageProps.target = _opponentIndex;
         damageProps.amount = 4;
         core->Damage(damageProps);
 
-        auto cardPtr = core->RemoveCardFromActiveCards(this, event.playerIndex);
+        auto cardPtr = core->RemoveCardFromActiveCards(this, _playerIndex);
         core->AddCardToGraveyard(std::move(cardPtr));
     });
 }

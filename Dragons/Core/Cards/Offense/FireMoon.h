@@ -17,6 +17,7 @@ namespace cards
         std::unique_ptr<EventHandler<TurnEndEvent>> _turnEndHandler = nullptr;
         std::unique_ptr<EventHandler<CanPlayEvent>> _canPlayHandler = nullptr;
         bool _activated = false;
+        int _targetPlayer = -1;
 
         bool _waitingForCardDraw = false;
 

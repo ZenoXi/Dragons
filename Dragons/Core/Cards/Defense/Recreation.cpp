@@ -16,8 +16,8 @@ cards::PlayResult cards::Recreation::Play(Core* core, ActionProperties actionPro
         {
             auto cardPtr = core->RemoveCardFromGraveyard(graveyardRef[i].get());
             core->AddCardToDeck(std::move(cardPtr));
+            i--;
         }
-        i--;
     }
     core->ShuffleDeck(CardType::DEFENSE);
 

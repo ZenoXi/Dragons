@@ -219,15 +219,8 @@ cards::PlayResult Core::ResumePlay(UserInputResponse&& response)
     return _HandlePlayResult(currentlyPlayingCard->Resume(std::move(response), this, currentActionProperties, currentPlayProperties), currentlyPlayingCard, currentActionProperties, currentPlayProperties);
 }
 
-cards::PlayResult Core::_HandlePlayResult(cards::PlayResult result, cards::Card* playedCard, ActionProperties actionProps, cards::PlayProperties* playProps)
+void Core::MoveCardAfterPlay(const cards::PlayResult& result, cards::Card* playedCard, ActionProperties actionProps, cards::PlayProperties* playProps)
 {
-    if (result.waitForInput)
-    {
-        currentlyPlayingCard = playedCard;
-        currentActionProperties = actionProps;
-        currentPlayProperties = playProps;
-        return result;
-    }
     if (result.discard)
     {
         // Move to graveyard
@@ -246,6 +239,20 @@ cards::PlayResult Core::_HandlePlayResult(cards::PlayResult result, cards::Card*
         auto cardPtr = RemoveCardFromInPlayCards(playedCard);
         AddCardToHand(std::move(cardPtr), actionProps.player);
     }
+}
+
+cards::PlayResult Core::_HandlePlayResult(cards::PlayResult result, cards::Card* playedCard, ActionProperties actionProps, cards::PlayProperties* playProps)
+{
+    if (result.waitForInput)
+    {
+        currentlyPlayingCard = playedCard;
+        currentActionProperties = actionProps;
+        currentPlayProperties = playProps;
+        return result;
+    }
+
+    MoveCardAfterPlay(result, playedCard, actionProps, playProps);
+
     if (!result.notPlayed)
     {
         // Emit post play event
@@ -255,7 +262,6 @@ cards::PlayResult Core::_HandlePlayResult(cards::PlayResult result, cards::Card*
         postCardPlayedEvent.playProps = playProps;
         _events.RaiseEvent(postCardPlayedEvent);
     }
-
     return result;
 }
 
@@ -446,6 +452,7 @@ DamageResult Core::Damage(DamageProperties props)
         _events.RaiseEvent(postHealthChange);
     }
 
+    postDamageEvent.result = result;
     _events.RaiseEvent(postDamageEvent);
     return result;
 }

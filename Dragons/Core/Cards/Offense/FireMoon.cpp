@@ -5,6 +5,8 @@
 
 cards::PlayResult cards::FireMoon::Play(Core* core, ActionProperties actionProps, PlayProperties* playProps)
 {
+    _targetPlayer = actionProps.opponent;
+
     if (core->GetState().players[actionProps.player].hand.size() >= GAME_HAND_SIZE)
         return PlayResult::AddToActives();
 
@@ -68,7 +70,7 @@ void cards::FireMoon::_OnEnterActiveCards(Core* core, int playerIndex)
     {
         if (!_activated)
             return;
-        if (event.actionProps->opponent != GetPosition().playerIndex)
+        if (event.actionProps->player != _targetPlayer)
             return;
 
         if (event.card->GetCardType() == CardType::DEFENSE)
