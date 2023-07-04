@@ -46,7 +46,8 @@ cards::PlayResult cards::Superiority::Play(Core* core, ActionProperties actionPr
 
 void cards::Superiority::_OnEnterHand(Core* core, int playerIndex)
 {
-    core->HideHand(_opponentIndex, "superiority");
+    if (_opponentIndex != -1)
+        core->HideHand(_opponentIndex, "superiority");
 }
 
 void cards::Superiority::_OnEnterActiveCards(Core* core, int playerIndex)
@@ -67,15 +68,18 @@ void cards::Superiority::_OnEnterActiveCards(Core* core, int playerIndex)
 
 void cards::Superiority::_OnEnterDeck(Core* core)
 {
-    core->HideHand(_opponentIndex, "superiority");
+    if (_opponentIndex != -1)
+        core->HideHand(_opponentIndex, "superiority");
 }
 
 void cards::Superiority::_OnEnterGraveyard(Core* core)
 {
-    core->HideHand(_opponentIndex, "superiority");
+    if (_opponentIndex != -1)
+        core->HideHand(_opponentIndex, "superiority");
 }
 
 void cards::Superiority::_OnEnterDestroyedCards(Core* core)
 {
-    core->HideHand(_opponentIndex, "superiority");
+    if (_opponentIndex != -1)
+        core->HideHand(_opponentIndex, "superiority");
 }

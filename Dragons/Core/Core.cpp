@@ -8,6 +8,7 @@
 #include "Cards/Offense/BloodDonation.h"
 #include "Cards/Offense/DeathPoison.h"
 #include "Cards/Offense/DesperateStrike.h"
+#include "Cards/Offense/DevilsDeal.h"
 #include "Cards/Offense/FairFight.h"
 #include "Cards/Offense/FireMoon.h"
 #include "Cards/Offense/HeavySlash.h"
@@ -52,56 +53,119 @@
 #include "Cards/Utility/TheThief.h"
 #include "Cards/Utility/WeaponOfChoice.h"
 
+#include "Cards/Combo/Apocalypse.h"
+#include "Cards/Combo/AstroInfluence.h"
+#include "Cards/Combo/CounterScale.h"
+#include "Cards/Combo/DeathFee.h"
+#include "Cards/Combo/DifferentSides.h"
+#include "Cards/Combo/DoubleStrike.h"
+#include "Cards/Combo/DragonSword.h"
+#include "Cards/Combo/DragonWeapons.h"
+#include "Cards/Combo/DreamLand.h"
+#include "Cards/Combo/ElementalDragon.h"
+#include "Cards/Combo/FakeOut.h"
+#include "Cards/Combo/FinalHour.h"
+#include "Cards/Combo/InfernoLifeline.h"
+#include "Cards/Combo/MagicTrick.h"
+#include "Cards/Combo/NatureSpell.h"
+#include "Cards/Combo/Omniclaustra.h"
+#include "Cards/Combo/PowerUp.h"
+#include "Cards/Combo/ReEquip.h"
+#include "Cards/Combo/Ritual.h"
+#include "Cards/Combo/Shackling.h"
+#include "Cards/Combo/ShadowAssassin.h"
+#include "Cards/Combo/Soulstealer.h"
+#include "Cards/Combo/Superiority.h"
+#include "Cards/Combo/SwapPact.h"
+#include "Cards/Combo/ThreeGodsStrike.h"
+#include "Cards/Combo/TotalEntanglement.h"
+#include "Cards/Combo/UltimateDefense.h"
+#include "Cards/Combo/UltimateExchange.h"
+#include "Cards/Combo/Underworld.h"
+#include "Cards/Combo/Vampirism.h"
+
 #include <algorithm>
 
 Core::Core()
 {
-    _registeredCards.push_back(std::unique_ptr<cards::Card>(new cards::BloodDonation()));
-    _registeredCards.push_back(std::unique_ptr<cards::Card>(new cards::DeathPoison()));
-    _registeredCards.push_back(std::unique_ptr<cards::Card>(new cards::DesperateStrike()));
-    _registeredCards.push_back(std::unique_ptr<cards::Card>(new cards::FairFight()));
-    _registeredCards.push_back(std::unique_ptr<cards::Card>(new cards::FireMoon()));
-    _registeredCards.push_back(std::unique_ptr<cards::Card>(new cards::HeavySlash()));
-    _registeredCards.push_back(std::unique_ptr<cards::Card>(new cards::HellfireSword()));
-    _registeredCards.push_back(std::unique_ptr<cards::Card>(new cards::LastBreath()));
-    _registeredCards.push_back(std::unique_ptr<cards::Card>(new cards::RapidAttack()));
-    _registeredCards.push_back(std::unique_ptr<cards::Card>(new cards::SacrificialAttack()));
-    _registeredCards.push_back(std::unique_ptr<cards::Card>(new cards::Stab()));
-    _registeredCards.push_back(std::unique_ptr<cards::Card>(new cards::StarCurse()));
-    _registeredCards.push_back(std::unique_ptr<cards::Card>(new cards::VitalSpot()));
-    _registeredCards.push_back(std::unique_ptr<cards::Card>(new cards::WeaponScroll()));
+    _registeredCards.push_back(std::make_unique<cards::BloodDonation>());
+    _registeredCards.push_back(std::make_unique<cards::DeathPoison>());
+    _registeredCards.push_back(std::make_unique<cards::DesperateStrike>());
+    _registeredCards.push_back(std::make_unique<cards::DevilsDeal>());
+    _registeredCards.push_back(std::make_unique<cards::FairFight>());
+    _registeredCards.push_back(std::make_unique<cards::FireMoon>());
+    _registeredCards.push_back(std::make_unique<cards::HeavySlash>());
+    _registeredCards.push_back(std::make_unique<cards::HellfireSword>());
+    _registeredCards.push_back(std::make_unique<cards::LastBreath>());
+    _registeredCards.push_back(std::make_unique<cards::RapidAttack>());
+    _registeredCards.push_back(std::make_unique<cards::SacrificialAttack>());
+    _registeredCards.push_back(std::make_unique<cards::Stab>());
+    _registeredCards.push_back(std::make_unique<cards::StarCurse>());
+    _registeredCards.push_back(std::make_unique<cards::VitalSpot>());
+    _registeredCards.push_back(std::make_unique<cards::WeaponScroll>());
 
-    _registeredCards.push_back(std::unique_ptr<cards::Card>(new cards::ArmorUp()));
-    _registeredCards.push_back(std::unique_ptr<cards::Card>(new cards::Barrier()));
-    _registeredCards.push_back(std::unique_ptr<cards::Card>(new cards::Cure()));
-    _registeredCards.push_back(std::unique_ptr<cards::Card>(new cards::DivineProtection()));
-    _registeredCards.push_back(std::unique_ptr<cards::Card>(new cards::Healer()));
-    _registeredCards.push_back(std::unique_ptr<cards::Card>(new cards::HelpingHand()));
-    _registeredCards.push_back(std::unique_ptr<cards::Card>(new cards::LifeFlower()));
-    _registeredCards.push_back(std::unique_ptr<cards::Card>(new cards::PeacePact()));
-    _registeredCards.push_back(std::unique_ptr<cards::Card>(new cards::Preparations()));
-    _registeredCards.push_back(std::unique_ptr<cards::Card>(new cards::Recreation()));
-    _registeredCards.push_back(std::unique_ptr<cards::Card>(new cards::ShieldingNet()));
-    _registeredCards.push_back(std::unique_ptr<cards::Card>(new cards::SoothingSpell()));
-    _registeredCards.push_back(std::unique_ptr<cards::Card>(new cards::SpiritShelter()));
-    _registeredCards.push_back(std::unique_ptr<cards::Card>(new cards::TreeOfLife()));
-    _registeredCards.push_back(std::unique_ptr<cards::Card>(new cards::WarBlessing()));
+    _registeredCards.push_back(std::make_unique<cards::ArmorUp>());
+    _registeredCards.push_back(std::make_unique<cards::Barrier>());
+    _registeredCards.push_back(std::make_unique<cards::Cure>());
+    _registeredCards.push_back(std::make_unique<cards::DivineProtection>());
+    _registeredCards.push_back(std::make_unique<cards::Healer>());
+    _registeredCards.push_back(std::make_unique<cards::HelpingHand>());
+    _registeredCards.push_back(std::make_unique<cards::LifeFlower>());
+    _registeredCards.push_back(std::make_unique<cards::PeacePact>());
+    _registeredCards.push_back(std::make_unique<cards::Preparations>());
+    _registeredCards.push_back(std::make_unique<cards::Recreation>());
+    _registeredCards.push_back(std::make_unique<cards::ShieldingNet>());
+    _registeredCards.push_back(std::make_unique<cards::SoothingSpell>());
+    _registeredCards.push_back(std::make_unique<cards::SpiritShelter>());
+    _registeredCards.push_back(std::make_unique<cards::TreeOfLife>());
+    _registeredCards.push_back(std::make_unique<cards::WarBlessing>());
 
-    _registeredCards.push_back(std::unique_ptr<cards::Card>(new cards::AbsoluteZero()));
-    _registeredCards.push_back(std::unique_ptr<cards::Card>(new cards::Cheating()));
-    _registeredCards.push_back(std::unique_ptr<cards::Card>(new cards::CorpsePuppet()));
-    _registeredCards.push_back(std::unique_ptr<cards::Card>(new cards::DragonEquation()));
-    _registeredCards.push_back(std::unique_ptr<cards::Card>(new cards::DragonFlame()));
-    _registeredCards.push_back(std::unique_ptr<cards::Card>(new cards::DragonPower()));
-    _registeredCards.push_back(std::unique_ptr<cards::Card>(new cards::DragonSight()));
-    _registeredCards.push_back(std::unique_ptr<cards::Card>(new cards::FrostFire()));
-    _registeredCards.push_back(std::unique_ptr<cards::Card>(new cards::HiddenTreasures()));
-    _registeredCards.push_back(std::unique_ptr<cards::Card>(new cards::LifeExchange()));
-    _registeredCards.push_back(std::unique_ptr<cards::Card>(new cards::MindSteal()));
-    _registeredCards.push_back(std::unique_ptr<cards::Card>(new cards::SetUp()));
-    _registeredCards.push_back(std::unique_ptr<cards::Card>(new cards::SummonDead()));
-    _registeredCards.push_back(std::unique_ptr<cards::Card>(new cards::TheThief()));
-    _registeredCards.push_back(std::unique_ptr<cards::Card>(new cards::WeaponOfChoice()));
+    _registeredCards.push_back(std::make_unique<cards::AbsoluteZero>());
+    _registeredCards.push_back(std::make_unique<cards::Cheating>());
+    _registeredCards.push_back(std::make_unique<cards::CorpsePuppet>());
+    _registeredCards.push_back(std::make_unique<cards::DragonEquation>());
+    _registeredCards.push_back(std::make_unique<cards::DragonFlame>());
+    _registeredCards.push_back(std::make_unique<cards::DragonPower>());
+    _registeredCards.push_back(std::make_unique<cards::DragonSight>());
+    _registeredCards.push_back(std::make_unique<cards::FrostFire>());
+    _registeredCards.push_back(std::make_unique<cards::HiddenTreasures>());
+    _registeredCards.push_back(std::make_unique<cards::LifeExchange>());
+    _registeredCards.push_back(std::make_unique<cards::MindSteal>());
+    _registeredCards.push_back(std::make_unique<cards::SetUp>());
+    _registeredCards.push_back(std::make_unique<cards::SummonDead>());
+    _registeredCards.push_back(std::make_unique<cards::TheThief>());
+    _registeredCards.push_back(std::make_unique<cards::WeaponOfChoice>());
+
+    _registeredCards.push_back(std::make_unique<cards::Apocalypse>());
+    _registeredCards.push_back(std::make_unique<cards::AstroInfluence>());
+    _registeredCards.push_back(std::make_unique<cards::CounterScale>());
+    _registeredCards.push_back(std::make_unique<cards::DeathFee>());
+    _registeredCards.push_back(std::make_unique<cards::DifferentSides>());
+    _registeredCards.push_back(std::make_unique<cards::DoubleStrike>());
+    _registeredCards.push_back(std::make_unique<cards::DragonSword>());
+    _registeredCards.push_back(std::make_unique<cards::DragonWeapons>());
+    _registeredCards.push_back(std::make_unique<cards::DreamLand>());
+    _registeredCards.push_back(std::make_unique<cards::ElementalDragon>());
+    _registeredCards.push_back(std::make_unique<cards::FakeOut>());
+    _registeredCards.push_back(std::make_unique<cards::FinalHour>());
+    _registeredCards.push_back(std::make_unique<cards::InfernoLifeline>());
+    _registeredCards.push_back(std::make_unique<cards::MagicTrick>());
+    _registeredCards.push_back(std::make_unique<cards::NatureSpell>());
+    _registeredCards.push_back(std::make_unique<cards::Omniclaustra>());
+    _registeredCards.push_back(std::make_unique<cards::PowerUp>());
+    _registeredCards.push_back(std::make_unique<cards::ReEquip>());
+    _registeredCards.push_back(std::make_unique<cards::Ritual>());
+    _registeredCards.push_back(std::make_unique<cards::Shackling>());
+    _registeredCards.push_back(std::make_unique<cards::ShadowAssassin>());
+    _registeredCards.push_back(std::make_unique<cards::Soulstealer>());
+    _registeredCards.push_back(std::make_unique<cards::Superiority>());
+    _registeredCards.push_back(std::make_unique<cards::SwapPact>());
+    _registeredCards.push_back(std::make_unique<cards::ThreeGodsStrike>());
+    _registeredCards.push_back(std::make_unique<cards::TotalEntanglement>());
+    _registeredCards.push_back(std::make_unique<cards::UltimateDefense>());
+    _registeredCards.push_back(std::make_unique<cards::UltimateExchange>());
+    _registeredCards.push_back(std::make_unique<cards::Underworld>());
+    _registeredCards.push_back(std::make_unique<cards::Vampirism>());
 
     std::random_device dev;
     _rng = std::mt19937(dev());
@@ -112,10 +176,16 @@ void Core::InitState()
     ClearState();
 
     // Init decks
-    //_state.offenseDeck.push_back(std::make_unique<Cards::Stab>());
-    //_state.defenseDeck.push_back(std::make_unique<Cards::Healer>());
-    //_state.utilityDeck.push_back(std::make_unique<Cards::TheThief>());
-    //_state.comboDeck.push_back(std::make_unique<Cards::Omniclaustra>());
+    for (auto& card : _registeredCards)
+    {
+        AddCardToDeck(card->CreateInstance());
+        if (card->GetCardType() != cards::CardType::COMBO)
+            AddCardToDeck(card->CreateInstance());
+    }
+    ShuffleDeck(cards::CardType::OFFENSE);
+    ShuffleDeck(cards::CardType::DEFENSE);
+    ShuffleDeck(cards::CardType::UTILITY);
+    ShuffleDeck(cards::CardType::COMBO);
 
     // Init players
     _state.players.push_back(Player{});
@@ -291,10 +361,12 @@ cards::Card* Core::DrawCard(cards::CardType type, int playerIndex)
 cards::Card* Core::DiscardCard(cards::Card* card, int playerIndex)
 {
     auto cardPtr = RemoveCardFromHand(card, playerIndex);
-    cards::Card* card = cardPtr.get();
-    AddCardToGraveyard(std::move(cardPtr));
-
-    return card;
+    if (cardPtr)
+    {
+        AddCardToGraveyard(std::move(cardPtr));
+        return card;
+    }
+    return nullptr;;
 }
 
 bool Core::CanPlayComboCard(ComboProperties comboProps)
