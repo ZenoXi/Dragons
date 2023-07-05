@@ -132,6 +132,9 @@ void GameEvents::RaiseEvent(_Event ev)
                     throw std::exception("Non-matching event subscriber type. Likely two events with the same name exist");
                 }
                 subscriber->_OnEvent(ev);
+
+                if (_eventErased)
+                    break;
             }
 
             _processingEvent = false;

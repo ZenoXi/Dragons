@@ -8,7 +8,7 @@ cards::PlayResult cards::DevilsDeal::Play(Core* core, ActionProperties actionPro
     int offenseCardsInOpponentHand = core->GetState().players[actionProps.opponent].CardsInHand(CardType::OFFENSE);
     if (offenseCardsInOpponentHand == 0)
     {
-        _chosenCard = core->DrawCard(CardType::OFFENSE, actionProps.opponent);
+        _chosenCard = core->DrawCard(CardType::OFFENSE, actionProps.opponent, false);
         if (!_chosenCard)
             return PlayResult::Default();
 

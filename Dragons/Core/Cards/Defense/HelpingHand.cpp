@@ -10,7 +10,7 @@ bool cards::HelpingHand::CanPlay(Core* core, ActionProperties actionProps, PlayP
 
 cards::PlayResult cards::HelpingHand::Play(Core* core, ActionProperties actionProps, PlayProperties* playProps)
 {
-    Card* drawnCard = core->DrawCard(CardType::DEFENSE, actionProps.player);
+    Card* drawnCard = core->DrawCard(CardType::DEFENSE, actionProps.player, false);
 
     if (core->GetState().players[actionProps.player].CardsInHand(CardType::DEFENSE) == 0)
         return PlayResult::Default();

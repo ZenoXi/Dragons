@@ -24,6 +24,7 @@ struct ExtraAction
             weight += 2;
         if (discard)
             weight += 1;
+        return weight;
     }
 };
 

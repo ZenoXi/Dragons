@@ -2,42 +2,80 @@ Shielding net: Reduces all the damage by one up to a minimum 1
 	Active card
 	Damage intercept
 
+
 Spirit shelter: You don't take fatigue damage
 	Active card
 	Fatigue intercept
+TESTING:
+ GENERAL:								OK
+
 
 Divine protection: You cannot be reduced below 1 health next turn
 	Active card
 	Active card lifespan
 	Damage intercept
 
+
 Armor up: Gain 2 armor
+TESTING:
+ GENERAL:								OK
+
 
 Cure: Heal half of your missing health
+TESTING:
+ GENERAL:								OK
+
 
 Helping hand: Draw a defensive card, then give a defensive card to your opponent
+
 
 Barrier: Block next damage
 	Active card
 	Damage intercept
 
+
 Recreation: If the defensive deck is empty, create a new one from defensive cards in the graveyard, draw two defensive cards
+TESTING:
+ GENERAL:								OK
+ DRAW CARDS:								OK
+
 
 Healer: Heal 2 HP
+TESTING:
+ GENERAL:								OK
+
 
 Preparations: Gain 1 armor for each enemy offensive card
+TESTING:
+ GENERAL:								OK
+
 
 Soothing spell: Yout opponent can't play offensive cards next turn. You can play one more card this turn
 	Active card
 	Action count manipulation
+TESTING:
+ GENERAL:								OK
+ EXTRA ACTION:								OK
+
 
 Peace pact: Both players reshuffle their offensive cards into the deck
+TESTING:
+ GENERAL:								OK
+
 
 Life flower: Gain 1 health, 1 armor, and 1 maximum health
+TESTING:
+ GENERAL:								OK
+
 
 Tree of life: Heal 4 health to both players
+TESTING:
+ GENERAL:								OK
+
 
 War blessing: Increase max HP by 5 and heal 1 HP
+TESTING:
+ GENERAL:								OK
 
 
 
@@ -46,44 +84,85 @@ War blessing: Increase max HP by 5 and heal 1 HP
 
 
 Desperate strike: Deal 3 damage if you have less cards than your opponent
+TESTING:
+ GENERAL:								OK
+ CAN PLAY WHILE HAVING MORE OR EQUAL CARDS:				NOTHING STOPPING IN CODE
+
 
 Sacrificial attack: Deal 3 damage to both players
 	Draw ending
+TESTING:
+ GENERAL:								OK
+ BOTH DIE FROM DAMAGE:							UNKNOWN
+
 
 Fair fight: Give your opponent 4 armor, at the end of your turn deal 4 damage
 	Active card
 	Active card lifespan
+TESTING:
+ GENERAL:								OK
+
 
 Rapid attack: Deal 1 damage to enemy. You don't lose this card. This card can only be played once per turn
 	Non-dicardable
+TESTING:
+ GENERAL:								OK
+ STOLEN BY OPPONENT AFTER USE:						UNKNOWN
+
 
 Star curse: Set enemy current HP to be its maximum
+TESTING:
+ GENERAL:								OK
+
 
 Hellfire sword: Destroy enemy armor
+TESTING:
+ GENERAL:								OK
+
 
 Vital spot: Your next damage passes through all defenses
 	Active card
 	Active card lifespan
+TESTING:
+ GENERAL:								OK
+ INTERACTION WITH ARMOR:						OK
+ INTERACTION WITH BARRIER:						OK
+
 
 Blood donation: Deal any amount of damage to yourself. Draw a card for each two health lost.
 
+
 Heavy slash: At the start of your next turn deal 3 damage to your opponent. If he has armor, deal only 1 damage instead
 	Active card
-	Active card lifespan
+	Active card lifespane
+TESTING:
+ GENERAL:								OK
+ INTERACTION WITH ARMOR:						OK
+
 
 Weapon scroll: Discard as many offensive cards as you want, draw that many offensive cards
+
 
 Devils deal: Force enemy to play one of his offensive cards on himself. If the enemy has no offensive cards he has to draw and play it on himself
 	Use card on yourself (separation of user and receiver, possible hardcoding)
 
+
 Fire moon: Your opponent can't play any defensive cards. Draw a card
 	Active card
 
+
 Stab: Deal 2 damage to enemy
+TESTING:
+ GENERAL:								OK
+
 
 Death poison: Every offensive card this turn will deal 1 bonus damage to opponent
 	Active card
 	Active card lifespan
+TESTING:
+ GENERAL:								OK
+ ONLY APPLY TO ENEMIES:							OK
+
 
 Last breath: If you have less HP than your opponent, you have to play all of your offensive cards. Discard the rest of your hand afterwards. Playing this card counts as 2 cards
 	Custom card action cost
@@ -162,9 +241,6 @@ Superiority: [Cheating, Hellfire sword, Armor up] Combo effect - you steal enemy
 	Hand reveal lifetime
 
 Double strike: [Sacrificial attack, Stab] Combo effect - you don't receive 3 damage
-	Customize card effect
-
-Ritual: [Life exchange, Last breath, Life flower] You don't have to discard anything. Life Flower effect for each offensive card played
 	Customize card effect
 
 Omniclaustra: [Soothing spell, Divine protection] You can also not be reduced below 1 health by offensive cards

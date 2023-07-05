@@ -17,8 +17,8 @@ cards::PlayResult cards::PeacePact::Play(Core* core, ActionProperties actionProp
             {
                 auto cardPtr = core->RemoveCardFromHand(player.hand[i].get(), player.index);
                 core->AddCardToDeck(std::move(cardPtr));
+                i--;
             }
-            i--;
         }
     }
     core->ShuffleDeck(CardType::OFFENSE);

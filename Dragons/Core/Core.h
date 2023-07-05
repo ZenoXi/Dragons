@@ -25,6 +25,9 @@ class Core
     ActionProperties currentActionProperties;
     cards::PlayProperties* currentPlayProperties = nullptr;
 
+    int _actionsConsumed = 0;
+    std::vector<ExtraAction> _extraActionsConsumed;
+
 public:
     Core();
 
@@ -46,8 +49,8 @@ private:
     cards::PlayResult _HandlePlayResult(cards::PlayResult result, cards::Card* playedCard, ActionProperties actionProps, cards::PlayProperties* playProps);
 public:
     bool CanDrawCard(cards::CardType deck, int playerIndex);
-    cards::Card* DrawCard(cards::CardType type, int playerIndex);
-    cards::Card* DiscardCard(cards::Card* card, int playerIndex);
+    cards::Card* DrawCard(cards::CardType type, int playerIndex, bool consumeAction = true);
+    cards::Card* DiscardCard(cards::Card* card, int playerIndex, bool consumeAction = true);
 
     bool CanPlayComboCard(ComboProperties comboProps);
     bool CanPlayComboCard(ComboProperties comboProps, std::optional<ActionProperties> actionProps, cards::PlayProperties* playProps);
@@ -98,6 +101,7 @@ public:
     void RevealHand(int target, std::string revealSource = "-");
     void HideHand(int target, std::string revealSource = "-");
     std::unique_ptr<cards::Card> CreateCard(CardId cardId);
+    std::vector<cards::Card*> GetRegisteredCards();
 
 private:
     std::vector<std::unique_ptr<cards::Card>>& _ResolveDeckFromType(cards::CardType type);

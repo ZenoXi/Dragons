@@ -44,14 +44,14 @@ cards::PlayResult cards::WeaponScroll::Resume(UserInputResponse response, Core* 
         int discardedCount = 0;
         for (auto& card : params->chosenCards)
         {
-            if (core->DiscardCard(card, actionProps.player))
+            if (core->DiscardCard(card, actionProps.player, false))
                 discardedCount++;
         }
 
         // Draw cards
         for (int i = 0; i < discardedCount; i++)
         {
-            core->DrawCard(CardType::OFFENSE, actionProps.player);
+            core->DrawCard(CardType::OFFENSE, actionProps.player, false);
         }
 
         _waitingForCardChoice = false;

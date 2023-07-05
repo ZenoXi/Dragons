@@ -206,6 +206,8 @@ void Core::InitState()
 
     _state.currentPlayer = 0;
     _state.opposingPlayer = 1;
+
+    _state.players[0].actionsLeft = 2;
 }
 
 void Core::ClearState()
@@ -215,7 +217,37 @@ void Core::ClearState()
 
 void Core::EndTurn()
 {
+    // Apply fatigue
+    DamageProperties props;
+    props.target = _state.currentPlayer;
+    props.amount = 1;
+    props.fatigue = true;
+    Damage(props);
 
+
+    TurnEndEvent turnEndEvent;
+    turnEndEvent.playerIndex = _state.currentPlayer;
+    turnEndEvent.opponentIndex = _state.opposingPlayer;
+    _events.RaiseEvent(turnEndEvent);
+
+    if (_state.currentPlayer == 0)
+    {
+        _state.currentPlayer = 1;
+        _state.opposingPlayer = 0;
+    }
+    else
+    {
+        _state.currentPlayer = 0;
+        _state.opposingPlayer = 1;
+    }
+
+    _state.players[_state.currentPlayer].actionsLeft = 2;
+    _state.players[_state.currentPlayer].extraActions.clear();
+
+    TurnBeginEvent turnBeginEvent;
+    turnBeginEvent.playerIndex = _state.currentPlayer;
+    turnBeginEvent.opponentIndex = _state.opposingPlayer;
+    _events.RaiseEvent(turnBeginEvent);
 }
 
 bool Core::CanPlayCard(cards::Card* card)
@@ -270,6 +302,44 @@ cards::PlayResult Core::PlayCard(cards::Card* card, std::optional<ActionProperti
     if (foundCardIt == hand.end())
         return cards::PlayResult::NotPlayed();
 
+    Player& player = _state.players[actionPropsLocal.player];
+
+    // Consume action
+    if (!actionPropsLocal.freeAction)
+    {
+        _actionsConsumed = 0;
+        _extraActionsConsumed.clear();
+        for (int j = 0; j < card->GetActionCost(); j++)
+        {
+            bool extraActionUsed = false;
+            if (!player.extraActions.empty())
+            {
+                int exActionIndex = -1;
+                int exActionWeight = 99;
+                for (int i = 0; i < player.extraActions.size(); i++)
+                {
+                    if (player.extraActions[i].play && player.extraActions[i].Weight() < exActionWeight)
+                    {
+                        exActionIndex = i;
+                        exActionWeight = player.extraActions[i].Weight();
+                    }
+                }
+
+                if (exActionIndex != -1)
+                {
+                    _extraActionsConsumed.push_back(player.extraActions[exActionIndex]);
+                    player.extraActions.erase(player.extraActions.begin() + exActionIndex);
+                    extraActionUsed = true;
+                }
+            }
+            if (!extraActionUsed)
+            {
+                _actionsConsumed++;
+                player.actionsLeft--;
+            }
+        }
+    }
+
     // Emit pre play event
     PreCardPlayedEvent preCardPlayedEvent;
     preCardPlayedEvent.card = card;
@@ -323,6 +393,7 @@ cards::PlayResult Core::_HandlePlayResult(cards::PlayResult result, cards::Card*
 
     MoveCardAfterPlay(result, playedCard, actionProps, playProps);
 
+    Player& player = _state.players[actionProps.player];
     if (!result.notPlayed)
     {
         // Emit post play event
@@ -331,6 +402,19 @@ cards::PlayResult Core::_HandlePlayResult(cards::PlayResult result, cards::Card*
         postCardPlayedEvent.actionProps = &actionProps;
         postCardPlayedEvent.playProps = playProps;
         _events.RaiseEvent(postCardPlayedEvent);
+
+        // End turn
+        if (player.actionsLeft == 0 && player.extraActions.empty())
+        {
+            EndTurn();
+        }
+    }
+    else
+    {
+        // Return consumed actions
+        player.actionsLeft += _actionsConsumed;
+        for (auto& action : _extraActionsConsumed)
+            player.extraActions.push_back(action);
     }
     return result;
 }
@@ -345,7 +429,7 @@ bool Core::CanDrawCard(cards::CardType deck, int playerIndex)
     return canDraw;
 }
 
-cards::Card* Core::DrawCard(cards::CardType type, int playerIndex)
+cards::Card* Core::DrawCard(cards::CardType type, int playerIndex, bool consumeAction)
 {
     auto& deckRef = _ResolveDeckFromType(type);
     if (deckRef.empty())
@@ -355,18 +439,89 @@ cards::Card* Core::DrawCard(cards::CardType type, int playerIndex)
     cards::Card* card = cardPtr.get();
     AddCardToHand(std::move(cardPtr), playerIndex);
 
+    Player& player = _state.players[playerIndex];
+
+    // Consume action
+    if (consumeAction)
+    {
+        bool extraActionUsed = false;
+        if (!player.extraActions.empty())
+        {
+            int exActionIndex = -1;
+            int exActionWeight = 99;
+            for (int i = 0; i < player.extraActions.size(); i++)
+            {
+                if (player.extraActions[i].draw && player.extraActions[i].Weight() < exActionWeight)
+                {
+                    exActionIndex = i;
+                    exActionWeight = player.extraActions[i].Weight();
+                }
+            }
+
+            if (exActionIndex != -1)
+            {
+                player.extraActions.erase(player.extraActions.begin() + exActionIndex);
+                extraActionUsed = true;
+            }
+        }
+        if (!extraActionUsed)
+            player.actionsLeft--;
+    }
+
+    // End turn
+    if (player.actionsLeft == 0 && player.extraActions.empty())
+    {
+        EndTurn();
+    }
+
     return card;
 }
 
-cards::Card* Core::DiscardCard(cards::Card* card, int playerIndex)
+cards::Card* Core::DiscardCard(cards::Card* card, int playerIndex, bool consumeAction)
 {
     auto cardPtr = RemoveCardFromHand(card, playerIndex);
     if (cardPtr)
     {
         AddCardToGraveyard(std::move(cardPtr));
+
+        Player& player = _state.players[playerIndex];
+
+        // Consume action
+        if (consumeAction)
+        {
+            bool extraActionUsed = false;
+            if (!player.extraActions.empty())
+            {
+                int exActionIndex = -1;
+                int exActionWeight = 99;
+                for (int i = 0; i < player.extraActions.size(); i++)
+                {
+                    if (player.extraActions[i].discard && player.extraActions[i].Weight() < exActionWeight)
+                    {
+                        exActionIndex = i;
+                        exActionWeight = player.extraActions[i].Weight();
+                    }
+                }
+
+                if (exActionIndex != -1)
+                {
+                    player.extraActions.erase(player.extraActions.begin() + exActionIndex);
+                    extraActionUsed = true;
+                }
+            }
+            if (!extraActionUsed)
+                player.actionsLeft--;
+        }
+
+        // End turn
+        if (player.actionsLeft == 0 && player.extraActions.empty())
+        {
+            EndTurn();
+        }
+
         return card;
     }
-    return nullptr;;
+    return nullptr;
 }
 
 bool Core::CanPlayComboCard(ComboProperties comboProps)
@@ -468,7 +623,7 @@ DamageResult Core::Damage(DamageProperties props)
     DamageResult result;
 
     Player& targetPlayer = _state.players[props.target];
-    if (!props.ignoreArmor)
+    if (!props.ignoreArmor && !props.fatigue)
     {
         if (targetPlayer.armor > 0)
         {
@@ -1057,6 +1212,14 @@ std::unique_ptr<cards::Card> Core::CreateCard(CardId cardId)
         }
     }
     return nullptr;
+}
+
+std::vector<cards::Card*> Core::GetRegisteredCards()
+{
+    std::vector<cards::Card*> cards;
+    for (auto& card : _registeredCards)
+        cards.push_back(card.get());
+    return cards;
 }
 
 std::vector<std::unique_ptr<cards::Card>>& Core::_ResolveDeckFromType(cards::CardType type)

@@ -1,6 +1,7 @@
 #include "Recreation.h"
 
 #include "../../Core.h"
+#include "../../GameConstants.h"
 
 bool cards::Recreation::CanPlay(Core* core, ActionProperties actionProps, PlayProperties* playProps)
 {
@@ -20,6 +21,11 @@ cards::PlayResult cards::Recreation::Play(Core* core, ActionProperties actionPro
         }
     }
     core->ShuffleDeck(CardType::DEFENSE);
+
+    if (core->GetState().players[actionProps.player].hand.size() < GAME_HAND_SIZE)
+        core->DrawCard(CardType::DEFENSE, actionProps.player, false);
+    if (core->GetState().players[actionProps.player].hand.size() < GAME_HAND_SIZE)
+        core->DrawCard(CardType::DEFENSE, actionProps.player, false);
 
     return PlayResult::Default();
 }
