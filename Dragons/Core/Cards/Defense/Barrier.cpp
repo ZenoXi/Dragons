@@ -26,6 +26,8 @@ void cards::Barrier::_OnEnterActiveCards(Core* core, int playerIndex)
             return;
         if (event.props->trueDamage || event.props->fatigue)
             return;
+        if (event.props->amount == 0)
+            return;
 
         event.props->amount = 0;
 
@@ -41,12 +43,12 @@ void cards::Barrier::_OnEnterActiveCards(Core* core, int playerIndex)
         if (GetPosition().playerIndex != event.actionProps->opponent)
             return;
 
-        if (event.card->GetCardId() == DragonFlame::CARD_ID())
+        if (event.card->GetCardId() == DragonFlame::CARD_ID() && _blockDragonFlame)
         {
-            if (event.playProps)
-                GetPlayPropertiesPtr<DragonFlamePlayProps>(event.playProps)->blocked = true;
+            if (*event.playProps)
+                GetPlayPropertiesPtr<DragonFlamePlayProps>(*event.playProps)->blocked = true;
             else
-                event.playProps = &_dragonFlameBlockPlayProps;
+                *event.playProps = &_dragonFlameBlockPlayProps;
 
             if (--_attacksToBlock <= 0)
             {

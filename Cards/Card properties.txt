@@ -1,6 +1,9 @@
 Shielding net: Reduces all the damage by one up to a minimum 1
 	Active card
 	Damage intercept
+TESTING:
+ GENERAL:								OK
+ TWO INSTANCES:								OK
 
 
 Spirit shelter: You don't take fatigue damage
@@ -14,6 +17,8 @@ Divine protection: You cannot be reduced below 1 health next turn
 	Active card
 	Active card lifespan
 	Damage intercept
+TESTING:
+ GENERAL:								OK
 
 
 Armor up: Gain 2 armor
@@ -27,11 +32,16 @@ TESTING:
 
 
 Helping hand: Draw a defensive card, then give a defensive card to your opponent
+TESTING:
+ GENERAL:								OK
 
 
 Barrier: Block next damage
 	Active card
 	Damage intercept
+TESTING:
+ GENERAL:								OK
+ TWO INSTANCES:								OK
 
 
 Recreation: If the defensive deck is empty, create a new one from defensive cards in the graveyard, draw two defensive cards
@@ -175,40 +185,64 @@ Last breath: If you have less HP than your opponent, you have to play all of you
 
 Frost fire: Destroy top 5 cards of any deck
 
+
 Dragon sight: Look at the top cards of the decks. If one or more decks are missing you can check 2 or more top cards of the decks up to 4 cards
 
+
 Dragon flame: Destroy all active enemy cards
+TESTING:
+ GENERAL:								OK
+
 
 Cheating: Reveal enemy hand
 	Hand reveal
 
+
 Dragon power: If a deck is empty: Utility - draw a card; Defensive - heal 1 HP; Offensive - deal 1 damage; Combo - all effects
+
 
 Weapon of choice: Look at the top three combo cards, take one, discard the other two
 
+
 The thief: Take a random card from enemy
+
 
 Hidden treasures: Draw 2 cards
 
+
 Mind steal: Swap any amount of cards with enemy
+
 
 Summon dead: Take one card from the graveyard
 
+
 Dragon equation: Swap both players active cards
+TESTING:
+ GENERAL:								OK
+
 
 Set up: Next turn you can play/draw 4 cards instead of 2. (Doesn't stack with each other)
 	Active card
 	Active card lifetime
 	Action count manipulation
+TESTING:
+ GENERAL:								OK
+
 
 Absolute zero: Your opponent skips his next turn
 	Active card
 	Active card lifetime
 	Action count manipulation
+TESTING:
+ GENERAL:								OK
+
 
 Corpse puppet: For the next combo you can use a card from the graveyard
 	Action card
 	Action card lifetime
+TESTING:
+ GENERAL:								OK
+
 
 Life exchange: Draw three cards, then discard two cards
 
@@ -221,17 +255,27 @@ Life exchange: Draw three cards, then discard two cards
 Death fee: [Summon dead, Death poison, Helping hand] You can give your opponent any amount of cards including cards from graveyard. Deal 1 damage for each card given
 	Customize card effect
 
+
 Astro influence: [Dragon equation, Fair fight, Tree of life] Opponent doen not get the heal and armor
 	Customize card effect
+TESTING:
+ GENERAL:								OK
+
 
 Counter scale: [Dragon power, Rapid attack, Preparations] Combo effect - Gain 1 armor for each offensive card your opponent has, deal 1 damage for each defensive card your opponent has, combo effect for each deck that is empty
 
+
 Ultimate defense: [War blessing, Barrier] Combo effect - draw a defense card
+TESTING:
+ GENERAL:								OK
+
 
 Total entanglement: [Absolute zero, Fire moon, Soothing spell] Combo effect - your opponent discards his hand. you can play/draw 1 more card this turn
 	Action count manipulation
 
+
 Elmental dragon: [Corpse puppet, Heavy slash, Shielding net] You can destroy all your active cards to activate another combo for free
+
 
 Superiority: [Cheating, Hellfire sword, Armor up] Combo effect - you steal enemy armor instead of destroying it. Cheating remains active as long as you have armor
 	Customize card effect
@@ -240,53 +284,78 @@ Superiority: [Cheating, Hellfire sword, Armor up] Combo effect - you steal enemy
 	Hand reveal
 	Hand reveal lifetime
 
+
 Double strike: [Sacrificial attack, Stab] Combo effect - you don't receive 3 damage
 	Customize card effect
+
 
 Omniclaustra: [Soothing spell, Divine protection] You can also not be reduced below 1 health by offensive cards
 	Active card
 
+
 Different sides: [Hidden treasure, Desperate strike, Healer] If you have less cards than your opponent, damage increased to 5. If after drawing you have more cards than your opponent, heal increased to 5
 	Customize card effect
 
+
 Dragon weapons: [Dragon sight, Weapon of choice] Repeat Weapon of choice effect up to 4 times for each deck
+
 
 Power up: [Armor up, healer] Values of Armor up and Healer increased to 4
 	Customize card effect
+TESTING:
+ GENERAL:								OK
+
 
 Underworld: [Summon dead, Dragon flame] Combo effect - you can also take the cards you just destroyed with dragon flame
 
+
 Fake out: [Peace pact, Preparations] Only enemy discards his offensive cards. Opponent can't draw offensive cards next turn
 	Customize card effect
-	Active card
+	Active cardd
 	Active card lifetime
+TESTING:
+ GENERAL:								OK
+
 
 Magic trick: [Cheating, The thief] Combo effect - you can now choose a card from enemy hand. If opponent has two copies of your chosen card - take both, if he doesn't - draw a card
 	Hand reveal
 	Hand reveal lifetime
 
+
 Dream land: [Set up, Vital spot, Spirit shelter] Combo effect - Set up effect increased to 6, Vital spot triggers for next two attacks
 	Action count manipulation
 	Customize card effect
+TESTING:
+ GENERAL:								OK
+
 
 Vampirism: [Devils deal, Blood donation] You draw a card for each health lost and also for the damage opponent deals to himself
 	Card action in progress
 
+
 Soulstealer: [The thief, Stab, Cure] Instead of damaging and healing, you steal health equal to cure from opponent (damages through all defenses)
 	True damage
 
+
 Ultimate exchange: [Mind swap, Dragon equation] You can also swap health with your opponent
+
 
 Nature spell: [Cure, Life flower] Life flower armor and maximum health are increased to cure effect
 	Customize card effect
+TESTING:
+ GENERAL:								OK
+
 
 Inferno lifeline: [Frost fire, Blood donation, Divine protection] Reduce your health to one. Search and draw any amount of cards from one deck. Discard the rest of the deck afterwards
+
 
 Apocalypse: [Life exchange, Frost fire] Draw 10 cards. Discard cards until you have 10 or less cards
 	Card action in progress
 
+
 Final hour: [Rapid attack, Last breath] Combo effect - You don't have to discard any cards after using all offensive cards. If your hand is empty after using offensive cards, you win
 	Customize card effect
+
 
 Shackling: [Dragon flame, Devils deal, Recreation] Combo effect - destroy every active card your opponent has, your opponent can't play actives and offensive cards damage himself while recreation isn't triggered
 	Active card classification
@@ -294,19 +363,28 @@ Shackling: [Dragon flame, Devils deal, Recreation] Combo effect - destroy every 
 	Active card lifespan
 	Damage interception
 
+
 Dragon sword: [Hellfire sword, Heavy slash] You also destroy opponents armor at the start of your next turn
 	Active card
 	Active card lifespan
+TESTING:
+ GENERAL:								OK
+
 
 Re-equip: [Weapon of choice, Weapon scroll, Peace pact] You can redraw every offensive card you discarded using Weapon of choice effect
 
+
 Swap pact: [Mind steal, Star curse, War blessing] Combo effect - After swapping cards, you choose if you want to swap maximum health with your opponent before applying Star curse and War blessing
+
 
 Shadow assassin: [Vital spot, Death poison] Every damage this turn will go through all defenses without triggering vital spot. You can play one more card this turn
 	Active card
 	Active card lifespan
 	True damage
 	Action count manipulation
+TESTING:
+ GENERAL:								OK
+
 
 Three gods strike: [Dragon sight, Sacrificial attack, Barrier] Combo effect - choose one: - Dragon sight draws 4 top cards instead; - Sacrificial attack steals health instead; - Barrier blocks twice and blocks Dragon flame
 	Customize card effect

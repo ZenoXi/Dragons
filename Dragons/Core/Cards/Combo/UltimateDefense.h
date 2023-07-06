@@ -10,9 +10,6 @@ namespace cards
 {
     class UltimateDefense : public Card
     {
-        bool _waitingForCardDraw = false;
-        bool _resumeToCleanUp = false;
-
         const std::vector<CardId> _requiredCardIds
         {
             WarBlessing::CARD_ID(),
@@ -26,7 +23,6 @@ namespace cards
 
         bool CanPlay(Core* core, ActionProperties actionProps, PlayProperties* playProps);
         PlayResult Play(Core* core, ActionProperties actionProps, PlayProperties* playProps);
-        PlayResult Resume(UserInputResponse response, Core* core, ActionProperties actionProps, PlayProperties* playProps);
 
         static CardId CARD_ID() { return { "ultimate_defense" }; }
         CardId GetCardId() const { return CARD_ID(); }

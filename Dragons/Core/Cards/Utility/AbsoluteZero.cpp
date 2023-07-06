@@ -23,6 +23,8 @@ void cards::AbsoluteZero::_OnEnterActiveCards(Core* core, int playerIndex)
             return;
 
         core->EndTurn();
+
+        core->AddCardToGraveyard(core->RemoveCardFromActiveCards(this, GetPosition().playerIndex));
     });
 }
 

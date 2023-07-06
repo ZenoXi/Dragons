@@ -21,10 +21,13 @@ private:
     };
     std::vector<_EventData> _events;
 
-    bool _processingEvent = false;
-    const char* _currentEvent;
-    int _currentSubIndex = -1;
-    bool _eventErased = false;
+    struct _EventInProgress
+    {
+        const char* name;
+        int subIndex;
+        bool eventErased;
+    };
+    std::vector<_EventInProgress> _eventsInProgress;
 
     template<class _Event>
     void _Subscribe(EventSubscriber<_Event>* sub, bool maxPriority = false);
@@ -57,6 +60,8 @@ void GameEvents::_Subscribe(EventSubscriber<_Event>* sub, bool maxPriority)
             if (subscriber == eventData.subscribers.end())
             {
                 if (maxPriority)
+                    // If an event is being processed, adding a max priority subscriber
+                    // will cause the current handler to be called twice
                     eventData.subscribers.insert(eventData.subscribers.begin(), std::any(sub));
                 else
                     eventData.subscribers.push_back(std::any(sub));
@@ -85,12 +90,13 @@ void GameEvents::_Unsubscribe(EventSubscriber<_Event>* sub)
                 
                 // If an event gets unsubscribed while it is being processed,
                 // ensure all remaining subscribers receive the event
-                if (_processingEvent && _currentEvent == _Event::_NAME_())
+                for (auto& event : _eventsInProgress)
                 {
-                    if (_currentSubIndex <= i)
-                    {
-                        _currentSubIndex--;
-                    }
+                    if (event.name != _Event::_NAME_())
+                        continue;
+
+                    if (event.subIndex <= i)
+                        event.subIndex--;
                 }
 
                 eventData.subscribers.erase(eventData.subscribers.begin() + i);
@@ -99,8 +105,11 @@ void GameEvents::_Unsubscribe(EventSubscriber<_Event>* sub)
                     _events.erase(eventIt);
 
                     // If the event is erased mid processing, notify dispatch to avoid bad memory access
-                    if (_processingEvent && _currentEvent == _Event::_NAME_())
-                        _eventErased = true;
+                    for (auto& event : _eventsInProgress)
+                    {
+                        if (event.name == _Event::_NAME_())
+                            event.eventErased = true;
+                    }
                 }
 
                 break;
@@ -117,30 +126,33 @@ void GameEvents::RaiseEvent(_Event ev)
     {
         if (_events[i].eventName == _Event::_NAME_())
         {
-            _processingEvent = true;
-            _eventErased = false;
-            _currentEvent = _Event::_NAME_();
+            _EventInProgress event;
+            event.name = _Event::_NAME_();
+            event.eventErased = false;
+
+            _eventsInProgress.push_back(event);
+            auto& eventInProgress = _eventsInProgress.back();
 
             // Send event to subscribers
-            for (_currentSubIndex = 0; _currentSubIndex < _events[i].subscribers.size(); _currentSubIndex++)
+            for (eventInProgress.subIndex = 0; eventInProgress.subIndex < _events[i].subscribers.size(); eventInProgress.subIndex++)
             {
-                EventSubscriber<_Event>* subscriber = std::any_cast<EventSubscriber<_Event>*>(_events[i].subscribers[_currentSubIndex]);
+                EventSubscriber<_Event>* subscriber = std::any_cast<EventSubscriber<_Event>*>(_events[i].subscribers[eventInProgress.subIndex]);
                 if (!subscriber)
                 {
-                    _processingEvent = false;
+                    _eventsInProgress.pop_back();
                     // This should NEVER be hit
                     throw std::exception("Non-matching event subscriber type. Likely two events with the same name exist");
                 }
                 subscriber->_OnEvent(ev);
 
-                if (_eventErased)
+                if (eventInProgress.eventErased)
                     break;
             }
 
-            _processingEvent = false;
-            if (_eventErased)
+            _eventsInProgress.pop_back();
+            if (eventInProgress.eventErased)
             {
-                _eventErased = false;
+                eventInProgress.eventErased = false;
                 break;
             }
 

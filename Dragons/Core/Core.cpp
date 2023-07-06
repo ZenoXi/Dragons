@@ -344,7 +344,7 @@ cards::PlayResult Core::PlayCard(cards::Card* card, std::optional<ActionProperti
     PreCardPlayedEvent preCardPlayedEvent;
     preCardPlayedEvent.card = card;
     preCardPlayedEvent.actionProps = &actionPropsLocal;
-    preCardPlayedEvent.playProps = playProps;
+    preCardPlayedEvent.playProps = &playProps;
     _events.RaiseEvent(preCardPlayedEvent);
 
     // Remove card from hand and move it to currently in play card set
@@ -426,6 +426,7 @@ bool Core::CanDrawCard(cards::CardType deck, int playerIndex)
     canDrawEvent.playerIndex = playerIndex;
     canDrawEvent.deck = deck;
     canDrawEvent.canDraw = &canDraw;
+    _events.RaiseEvent(canDrawEvent);
     return canDraw;
 }
 
@@ -1017,7 +1018,6 @@ void Core::AddCardToInPlayCards(std::unique_ptr<cards::Card> card)
         return;
     }
 
-    card->OnEnterGraveyard(this);
     _state.inPlayCards.push_back(std::move(card));
 }
 
@@ -1044,7 +1044,7 @@ std::unique_ptr<cards::Card> Core::RemoveCardFromInPlayCards(int cardIndex)
 
 void Core::AddCardToDestroyedCards(std::unique_ptr<cards::Card> card)
 {
-    card->OnEnterGraveyard(this);
+    card->OnEnterDestroyedCards(this);
     _state.destroyedCards.push_back(std::move(card));
 }
 

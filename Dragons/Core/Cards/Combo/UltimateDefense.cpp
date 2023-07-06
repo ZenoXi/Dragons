@@ -27,48 +27,10 @@ cards::PlayResult cards::UltimateDefense::Play(Core* core, ActionProperties acti
     core->AddCardToActiveCards(core->RemoveCardFromInPlayCards(_cardBarrier), actionProps.player);
 
     // Draw card
-    if (core->GetState().players[actionProps.player].hand.size() >= GAME_HAND_SIZE)
-    {
-        _resumeToCleanUp = true;
-        return PlayResult::Resume();
-    }
+    if (core->GetState().players[actionProps.player].hand.size() < GAME_HAND_SIZE)
+        core->DrawCard(CardType::DEFENSE, actionProps.player, false);
 
-    auto params = std::make_unique<UserInputParams_DrawCard>();
-    params->minCardCount = 1;
-    params->maxCardCount = 1;
-    params->playerIndex = actionProps.player;
+    core->AddCardToGraveyard(core->RemoveCardFromInPlayCards(_cardWarBlessing));
 
-    _waitingForCardDraw = true;
-
-    PlayResult result;
-    result.waitForInput = true;
-    result.inputRequest.inputType = UserInputType::DRAW_CARD;
-    result.inputRequest.inputPrompt = L"Draw a card";
-    result.inputRequest.inputParams = std::unique_ptr<UserInputParams>(params.release());
-    return result;
-
-}
-
-cards::PlayResult cards::UltimateDefense::Resume(UserInputResponse response, Core* core, ActionProperties actionProps, PlayProperties* playProps)
-{
-    if (_waitingForCardDraw)
-    {
-        _waitingForCardDraw = false;
-
-        _resumeToCleanUp = true;
-        return PlayResult::Resume();
-    }
-    else if (_resumeToCleanUp)
-    {
-        _resumeToCleanUp = false;
-
-        core->AddCardToGraveyard(core->RemoveCardFromInPlayCards(_cardWarBlessing));
-        core->AddCardToGraveyard(core->RemoveCardFromInPlayCards(_cardBarrier));
-
-        return PlayResult::Default();
-    }
-
-    PlayResult result;
-    result.notPlayed = true;
-    return result;
+    return PlayResult::Default();
 }

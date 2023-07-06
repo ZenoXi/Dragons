@@ -11,7 +11,11 @@
 void PrintState(Core& core)
 {
     std::wostringstream ss;
-    ss << " OffDeck (" << core.GetState().offenseDeck.size() << ") | DefDeck (" << core.GetState().defenseDeck.size() << ") | UtiDeck (" << core.GetState().utilityDeck.size() << ") | ComDeck (" << core.GetState().comboDeck.size() << ")" << '\n';
+    ss << " OffDeck (" << core.GetState().offenseDeck.size() << ")" << (core.CanDrawCard(cards::CardType::OFFENSE, core.GetState().currentPlayer) ? " " : " DISABLED")
+       << " | DefDeck (" << core.GetState().defenseDeck.size() << ")" << (core.CanDrawCard(cards::CardType::DEFENSE, core.GetState().currentPlayer) ? " " : " DISABLED")
+       << " | UtiDeck (" << core.GetState().utilityDeck.size() << ")" << (core.CanDrawCard(cards::CardType::UTILITY, core.GetState().currentPlayer) ? " " : " DISABLED")
+       << " | ComDeck (" << core.GetState().comboDeck.size() << ")" << (core.CanDrawCard(cards::CardType::COMBO, core.GetState().currentPlayer) ? " " : " DISABLED") << '\n';
+
     ss << " Graveyard (" << core.GetState().graveyard.size() << ")\n";
 
     ss << std::fixed << std::setw(83) << std::setfill(L'-') << "" << std::setfill(L' ') << '\n';
@@ -56,8 +60,8 @@ void PrintState(Core& core)
     ss << std::fixed << std::setw(32) << std::left << "" << '\n';
 
     ss << std::setw(15) << std::fixed << "" << "| ";
-    ss << std::fixed << std::setw(32) << std::left << "Hand:" << "| ";
-    ss << std::fixed << std::setw(32) << std::left << "Hand:" << '\n';
+    ss << std::fixed << std::setw(32) << std::left << "Hand:" << (core.GetState().players[0].revealSources.empty() ? "" : " (revealed)") << "| ";
+    ss << std::fixed << std::setw(32) << std::left << "Hand:" << (core.GetState().players[1].revealSources.empty() ? "" : " (revealed)") << '\n';
 
     int p1CardCount = core.GetState().players[0].hand.size();
     int p2CardCount = core.GetState().players[1].hand.size();
@@ -77,6 +81,14 @@ void PrintState(Core& core)
     ss << std::fixed << std::setw(83) << std::setfill(L'-') << "" << std::setfill(L' ') << '\n';
 
     ss << " Displayed cards:\n";
+    for (int i = 0; i < core.GetState().displayedCards.size(); i++)
+        ss << "  " << i << ": " << core.GetState().displayedCards[i].card->GetCardName() << '\n';
+
+    ss << std::fixed << std::setw(83) << std::setfill(L'-') << "" << std::setfill(L' ') << '\n';
+
+    ss << " In play cards:\n";
+    for (int i = 0; i < core.GetState().inPlayCards.size(); i++)
+        ss << "  " << i << ": " << core.GetState().inPlayCards[i]->GetCardName() << '\n';
 
     ss << std::fixed << std::setw(83) << std::setfill(L'-') << "" << std::setfill(L' ') << '\n';
 
@@ -92,10 +104,79 @@ void PrintState(Core& core)
 
     ss << std::fixed << std::setw(83) << std::setfill(L'-') << "" << std::setfill(L' ') << '\n';
 
-    ss << " > ";
-
     system("cls");
     std::wcout << ss.str();
+}
+
+void HandleInputRequest(cards::PlayResult& result, Core& core, cards::Card* card)
+{
+    switch (result.inputRequest.inputType)
+    {
+    case UserInputType::CHOOSE_CARD_FROM_HAND:
+    {
+        auto params = reinterpret_cast<UserInputParams_ChooseCardFromHand*>(result.inputRequest.inputParams.get());
+
+        while (true)
+        {
+            PrintState(core);
+            std::cout << " CHOOSE CARDS FROM HAND (min: " << params->minCardCount << ", max: " << params->maxCardCount << ")\n";
+            std::cout << "  Choosing: player " << params->choosingPlayerIndex + 1 << " from player " << params->handPlayerIndex + 1 << '\n';
+            std::cout << "  Allowed card types:\n";
+            if (params->allowedTypes.empty())
+            {
+                std::cout << "    all\n";
+            }
+            else
+            {
+                for (auto type : params->allowedTypes)
+                {
+                    std::cout << "    " << cards::CardTypeToString(type) << '\n';
+                }
+            }
+            std::wcout << " " << result.inputRequest.inputPrompt << "\n\n";
+
+            std::vector<int> chosenCards;
+            for (int i = 0; i < params->maxCardCount; i++)
+            {
+                int index;
+                std::cin >> index;
+
+                if (index == -1)
+                    break;
+
+                chosenCards.push_back(index);
+            }
+
+            if (chosenCards.size() < params->minCardCount || chosenCards.size() > params->maxCardCount)
+                continue;
+
+            for (auto index : chosenCards)
+            {
+                params->chosenCards.clear();
+                params->chosenCards.push_back(core.GetState().players[params->handPlayerIndex].hand[index].get());
+            }
+
+            UserInputResponse response;
+            response.inputParams = std::move(result.inputRequest.inputParams);
+            auto resumeResult = core.ResumePlay(std::move(response));
+
+            if (resumeResult.waitForInput)
+            {
+                HandleInputRequest(resumeResult, core, card);
+            }
+
+            break;
+        }
+
+        break;
+    }
+    default:
+    {
+        std::wcout << "INPUT TYPE NOT IMPLEMENTED FOR CARD: " << card->GetCardName() << "\n";
+        int k;
+        std::cin >> k;
+    }
+    }
 }
 
 void PlayCard(Core& core, cards::Card* card)
@@ -103,9 +184,7 @@ void PlayCard(Core& core, cards::Card* card)
     cards::PlayResult result = core.PlayCard(card);
     if (result.waitForInput)
     {
-        std::wcout << "INPUT TYPE NOT IMPLEMENTED FOR CARD: " << card->GetCardName() << "\n";
-        int k;
-        std::cin >> k;
+        HandleInputRequest(result, core, card);
     }
 }
 
@@ -123,6 +202,7 @@ int main()
 
         auto& currentPlayer = core.GetState().players[core.GetState().currentPlayer];
 
+        std::cout << " > ";
         std::string input;
         std::cin >> input;
         
@@ -203,6 +283,17 @@ int main()
             }
 
             core.AddCardToHand(cardList[cardIndex]->CreateInstance(), currentPlayer.index);
+            continue;
+        }
+        else if (input == "gy" || input == "grave")
+        {
+            system("cls");
+            for (int i = 0; i < core.GetState().graveyard.size(); i++)
+                std::wcout << i << ": " << core.GetState().graveyard[i]->GetCardName() << "\n";
+
+            int cardIndex;
+            std::cin >> cardIndex;
+
             continue;
         }
         else if (input == "e" || input == "end")

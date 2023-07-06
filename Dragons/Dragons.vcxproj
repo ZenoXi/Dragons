@@ -144,6 +144,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Core\Cards\CardType.cpp" />
     <ClCompile Include="Core\Cards\Combo\Apocalypse.cpp" />
     <ClCompile Include="Core\Cards\Combo\AstroInfluence.cpp" />
     <ClCompile Include="Core\Cards\Combo\CounterScale.cpp" />

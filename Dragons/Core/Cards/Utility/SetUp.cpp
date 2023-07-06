@@ -26,6 +26,8 @@ void cards::SetUp::_OnEnterActiveCards(Core* core, int playerIndex)
             return;
 
         core->SetActionCount(event.playerIndex, _actionCount);
+
+        core->AddCardToGraveyard(core->RemoveCardFromActiveCards(this, GetPosition().playerIndex));
     });
 }
 
