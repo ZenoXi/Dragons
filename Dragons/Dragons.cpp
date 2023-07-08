@@ -170,6 +170,116 @@ void HandleInputRequest(cards::PlayResult& result, Core& core, cards::Card* card
 
         break;
     }
+    case UserInputType::CHOOSE_NUMBER:
+    {
+        auto params = reinterpret_cast<UserInputParams_ChooseNumber*>(result.inputRequest.inputParams.get());
+
+        while (true)
+        {
+            PrintState(core);
+            std::cout << " CHOOSE NUMBER (min: " << params->lowerBound << ", max: " << params->upperBound << ")\n";
+            std::wcout << " " << result.inputRequest.inputPrompt << "\n\n";
+
+            int number;
+            std::cin >> number;
+
+            if (number < params->lowerBound || number > params->upperBound)
+                continue;
+            params->chosenNumber = number;
+
+            UserInputResponse response;
+            response.inputParams = std::move(result.inputRequest.inputParams);
+            auto resumeResult = core.ResumePlay(std::move(response));
+
+            if (resumeResult.waitForInput)
+            {
+                HandleInputRequest(resumeResult, core, card);
+            }
+
+            break;
+        }
+
+        break;
+    }
+    case UserInputType::DRAW_CARD:
+    {
+        auto params = reinterpret_cast<UserInputParams_DrawCard*>(result.inputRequest.inputParams.get());
+
+        while (true)
+        {
+            PrintState(core);
+            std::cout << " DRAW CARD (min: " << params->minCardCount << ", max: " << params->maxCardCount << ")\n";
+            if (params->ignoreHandSize)
+                std::cout << "  HAND SIZE IGNORED\n";
+            std::cout << "  Player: " << params->playerIndex + 1 << '\n';
+            std::cout << "  Allowed card types:\n";
+            if (params->allowedTypes.empty())
+            {
+                std::cout << "    all\n";
+            }
+            else
+            {
+                for (auto type : params->allowedTypes)
+                {
+                    std::cout << "    " << cards::CardTypeToString(type) << '\n';
+                }
+            }
+            std::wcout << " " << result.inputRequest.inputPrompt << "\n\n";
+
+            std::string cardType;
+            cards::CardType type;
+            while (true)
+            {
+                std::cin >> cardType;
+                type = cards::CardType::NONE;
+                if (cardType == "o" || cardType == "off")
+                    type = cards::CardType::OFFENSE;
+                else if (cardType == "d" || cardType == "def")
+                    type = cards::CardType::DEFENSE;
+                else if (cardType == "u" || cardType == "uti")
+                    type = cards::CardType::UTILITY;
+                else if (cardType == "c" || cardType == "com")
+                    type = cards::CardType::COMBO;
+                else if (cardType == "q" || cardType == "quit")
+                    break;
+
+                if (type == cards::CardType::NONE)
+                    continue;
+
+                if (!params->allowedTypes.empty())
+                {
+                    bool isAllowed = false;
+                    for (auto allowedType : params->allowedTypes)
+                    {
+                        if (allowedType == type)
+                        {
+                            isAllowed = true;
+                            break;
+                        }
+                    }
+                    if (!isAllowed)
+                        continue;
+                }
+
+                break;
+            }
+
+
+
+            UserInputResponse response;
+            response.inputParams = std::move(result.inputRequest.inputParams);
+            auto resumeResult = core.ResumePlay(std::move(response));
+
+            if (resumeResult.waitForInput)
+            {
+                HandleInputRequest(resumeResult, core, card);
+            }
+
+            break;
+        }
+
+        break;
+    }
     default:
     {
         std::wcout << "INPUT TYPE NOT IMPLEMENTED FOR CARD: " << card->GetCardName() << "\n";
@@ -230,10 +340,10 @@ int main()
             else if (cardType == "u" || cardType == "uti")
                 type = cards::CardType::UTILITY;
             else if (cardType == "c" || cardType == "com")
-                type = cards::CardType::COMBO; \
+                type = cards::CardType::COMBO;
 
-                if (type == cards::CardType::NONE)
-                    continue;
+            if (type == cards::CardType::NONE)
+                continue;
 
             core.DrawCard(type, core.GetState().currentPlayer);
             continue;
