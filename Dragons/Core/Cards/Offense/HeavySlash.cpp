@@ -20,7 +20,7 @@ void cards::HeavySlash::_OnEnterActiveCards(Core* core, int playerIndex)
     if (_turnBeginHandler)
         return;
 
-    _turnBeginHandler = std::make_unique<EventHandler<TurnBeginEvent>>(&core->Events(), [=](TurnBeginEvent event)
+    _turnBeginHandler = std::make_unique<EventHandler<TurnBeginEvent>>(&core->Events(), [&](TurnBeginEvent event)
     {
         if (event.playerIndex != _playerIndex)
             return;

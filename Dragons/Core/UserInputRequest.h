@@ -172,6 +172,7 @@ struct UserInputParams_PlayCard : public UserInputParams
 {
     // Request
     int playerIndex;
+    int opponentIndex;
     int minCardCount;
     int maxCardCount;
     std::vector<cards::CardType> allowedTypes; // Empty list means no restriction

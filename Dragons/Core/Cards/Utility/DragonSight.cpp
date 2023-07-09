@@ -43,9 +43,6 @@ cards::PlayResult cards::DragonSight::Play(Core* core, ActionProperties actionPr
         params->minDeckCount = 1;
         params->maxDeckCount = 1;
         params->allowEmptyDecks = false;
-        for (int i = 0; i < 4; i++)
-            if (!_deckCopies[i].empty())
-                params->allowedDecks.push_back((CardType)i);
 
         _waitingForDeckChoice = true;
 
@@ -78,6 +75,8 @@ cards::PlayResult cards::DragonSight::Resume(UserInputResponse response, Core* c
 
     if (_waitingForDeckChoice)
     {
+        _waitingForDeckChoice = false;
+
         UserInputParams_ChooseDeck* responseParams = reinterpret_cast<UserInputParams_ChooseDeck*>(response.inputParams.get());
         if (!responseParams)
             return PlayResult::Default();
@@ -136,7 +135,6 @@ cards::PlayResult cards::DragonSight::Resume(UserInputResponse response, Core* c
         auto params = std::make_unique<UserInputParams_WaitForConfirmation>();
         params->playerIndex = actionProps.player;
 
-        _waitingForDeckChoice = false;
         _waitingForConfirmation = true;
 
         PlayResult result;

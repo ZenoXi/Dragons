@@ -267,6 +267,19 @@ bool Core::CanPlayCard(cards::Card* card, std::optional<ActionProperties> action
     if (actionPropsLocal.opponent == DEFAULT_OPPONENT)
         actionPropsLocal.opponent = _state.opposingPlayer;
 
+    // Validate action cost
+    if (!actionPropsLocal.freeAction)
+    {
+        int playsAvailable = _state.players[actionPropsLocal.player].actionsLeft;
+        for (auto& extraAction : _state.players[actionPropsLocal.player].extraActions)
+        {
+            if (extraAction.play)
+                playsAvailable++;
+        }
+        if (playsAvailable < card->GetActionCost())
+            return false;
+    }
+
     bool canPlay = card->CanPlay(this, actionPropsLocal, playProps);
 
     // Emit event
@@ -305,6 +318,8 @@ cards::PlayResult Core::PlayCard(cards::Card* card, std::optional<ActionProperti
     Player& player = _state.players[actionPropsLocal.player];
 
     // Consume action
+    // This needs to be done before invoking card play code, because otherwise
+    // cards that add an extra play (eg. Soothing Spell) will consume it themselves
     if (!actionPropsLocal.freeAction)
     {
         _actionsConsumed = 0;
@@ -356,7 +371,12 @@ cards::PlayResult Core::PlayCard(cards::Card* card, std::optional<ActionProperti
 
 cards::PlayResult Core::ResumePlay(UserInputResponse&& response)
 {
-    return _HandlePlayResult(currentlyPlayingCard->Resume(std::move(response), this, currentActionProperties, currentPlayProperties), currentlyPlayingCard, currentActionProperties, currentPlayProperties);
+    return _HandlePlayResult(
+        _currentlyPlayingCards.back().card->Resume(std::move(response), this, _currentlyPlayingCards.back().actionProps, _currentlyPlayingCards.back().playProps),
+        _currentlyPlayingCards.back().card,
+        _currentlyPlayingCards.back().actionProps,
+        _currentlyPlayingCards.back().playProps
+    );
 }
 
 void Core::MoveCardAfterPlay(const cards::PlayResult& result, cards::Card* playedCard, ActionProperties actionProps, cards::PlayProperties* playProps)
@@ -385,10 +405,13 @@ cards::PlayResult Core::_HandlePlayResult(cards::PlayResult result, cards::Card*
 {
     if (result.waitForInput)
     {
-        currentlyPlayingCard = playedCard;
-        currentActionProperties = actionProps;
-        currentPlayProperties = playProps;
+        _currentlyPlayingCards.push_back({ playedCard, actionProps, playProps });
         return result;
+    }
+    else
+    {
+        if (!_currentlyPlayingCards.empty() && _currentlyPlayingCards.back().card == playedCard)
+            _currentlyPlayingCards.pop_back();
     }
 
     MoveCardAfterPlay(result, playedCard, actionProps, playProps);
@@ -404,7 +427,10 @@ cards::PlayResult Core::_HandlePlayResult(cards::PlayResult result, cards::Card*
         _events.RaiseEvent(postCardPlayedEvent);
 
         // End turn
-        if (player.actionsLeft == 0 && player.extraActions.empty())
+        // Check for end of turn should probably be done by checking only after primary card play has finished
+        // because thats the only time it makes sense to do that. Atm !actionProps.freeAction is a workaround
+        // because I can't be bothered to do it properly (and dont really have the time)
+        if (!actionProps.freeAction && player.actionsLeft == 0 && player.extraActions.empty())
         {
             EndTurn();
         }
@@ -467,12 +493,12 @@ cards::Card* Core::DrawCard(cards::CardType type, int playerIndex, bool consumeA
         }
         if (!extraActionUsed)
             player.actionsLeft--;
-    }
 
-    // End turn
-    if (player.actionsLeft == 0 && player.extraActions.empty())
-    {
-        EndTurn();
+        // End turn
+        if (player.actionsLeft == 0 && player.extraActions.empty())
+        {
+            EndTurn();
+        }
     }
 
     return card;
@@ -512,12 +538,12 @@ cards::Card* Core::DiscardCard(cards::Card* card, int playerIndex, bool consumeA
             }
             if (!extraActionUsed)
                 player.actionsLeft--;
-        }
 
-        // End turn
-        if (player.actionsLeft == 0 && player.extraActions.empty())
-        {
-            EndTurn();
+            // End turn
+            if (player.actionsLeft == 0 && player.extraActions.empty())
+            {
+                EndTurn();
+            }
         }
 
         return card;

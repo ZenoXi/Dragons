@@ -17,6 +17,7 @@ cards::PlayResult cards::LastBreath::Play(Core* core, ActionProperties actionPro
     // Request user input
     auto params = std::make_unique<UserInputParams_PlayCard>();
     params->playerIndex = actionProps.player;
+    params->opponentIndex = actionProps.opponent;
     params->minCardCount = 99;
     params->maxCardCount = 99;
     params->allowedTypes.push_back(CardType::OFFENSE);

@@ -38,6 +38,8 @@ cards::PlayResult cards::DevilsDeal::Resume(UserInputResponse response, Core* co
 {
     if (_waitingForCardChoice)
     {
+        _waitingForCardChoice = false;
+
         UserInputParams_ChooseCardFromHand* responseParams = reinterpret_cast<UserInputParams_ChooseCardFromHand*>(response.inputParams.get());
         _chosenCard = responseParams->chosenCards[0];
 
@@ -46,10 +48,12 @@ cards::PlayResult cards::DevilsDeal::Resume(UserInputResponse response, Core* co
     }
     else if (_resumeToCardPlay)
     {
+        _resumeToCardPlay = false;
+
         core->AddCardToInPlayCards(core->RemoveCardFromHand(_chosenCard, actionProps.opponent));
         ActionProperties customActionProps = actionProps;
         customActionProps.player = actionProps.opponent;
-        customActionProps.opponent = actionProps.player;
+        customActionProps.opponent = actionProps.opponent;
         PlayResult result = _chosenCard->Play(core, customActionProps, nullptr);
         if (result.waitForInput)
         {
@@ -66,7 +70,7 @@ cards::PlayResult cards::DevilsDeal::Resume(UserInputResponse response, Core* co
 
         ActionProperties customActionProps = actionProps;
         customActionProps.player = actionProps.opponent;
-        customActionProps.opponent = actionProps.player;
+        customActionProps.opponent = actionProps.opponent;
         PlayResult result = _chosenCard->Resume(std::move(response), core, customActionProps, nullptr);
         if (result.waitForInput)
         {

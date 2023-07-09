@@ -18,8 +18,8 @@ cards::PlayResult cards::WeaponScroll::Play(Core* core, ActionProperties actionP
     auto params = std::make_unique<UserInputParams_ChooseCardFromHand>();
     params->choosingPlayerIndex = actionProps.player;
     params->handPlayerIndex = actionProps.player;
-    params->minCardCount = 0;
-    params->maxCardCount = 10;
+    params->minCardCount = 1;
+    params->maxCardCount = offenseCardsInHand;
     params->allowedTypes.push_back(CardType::OFFENSE);
 
     _waitingForCardChoice = true;

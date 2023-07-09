@@ -111,6 +111,7 @@ Fair fight: Give your opponent 4 armor, at the end of your turn deal 4 damage
 	Active card lifespan
 TESTING:
  GENERAL:								OK
+ STOLEN BY OPPONENT AFTER PLAYING ON YOURSELF:				IDK LMAO WHAT? (stealing actives should probably swap every player index)
 
 
 Rapid attack: Deal 1 damage to enemy. You don't lose this card. This card can only be played once per turn
@@ -140,6 +141,8 @@ TESTING:
 
 
 Blood donation: Deal any amount of damage to yourself. Draw a card for each two health lost.
+TESTING:
+ GENERAL:								OK
 
 
 Heavy slash: At the start of your next turn deal 3 damage to your opponent. If he has armor, deal only 1 damage instead
@@ -151,14 +154,34 @@ TESTING:
 
 
 Weapon scroll: Discard as many offensive cards as you want, draw that many offensive cards
+TESTING:
+ GENERAL:								OK
 
 
 Devils deal: Force enemy to play one of his offensive cards on himself. If the enemy has no offensive cards he has to draw and play it on himself
 	Use card on yourself (separation of user and receiver, possible hardcoding)
+TESTING:
+ BLOOD DONATION:							OK
+ DEATH POISON:								OK
+ DESPERATE STRIKE:							OK
+ DEVILS DEAL:								OK
+ FAIR FIGHT:								OK
+ FIRE MOON:								OK
+ HEAVY SLASH:								OK
+ HELLFIRE SWORD:							OK
+ LAST BREATH:								OK
+ RAPID ATTACK:								OK
+ SACRIFICIAL ATTACK:							OK
+ STAB:									OK
+ STAR CURSE:								OK
+ VITAL SPOT:								OK
+ WEAPON SCROLL:								OK
 
 
 Fire moon: Your opponent can't play any defensive cards. Draw a card
 	Active card
+TESTING:
+ GENERAL:								OK
 
 
 Stab: Deal 2 damage to enemy
@@ -176,6 +199,11 @@ TESTING:
 
 Last breath: If you have less HP than your opponent, you have to play all of your offensive cards. Discard the rest of your hand afterwards. Playing this card counts as 2 cards
 	Custom card action cost
+TESTING:
+ GENERAL:								OK
+ CUSTOM ACTION COST:							OK
+ DISCARD:								OK
+ EARLY EXIT WHEN NOTHING TO PLAY:					OK
 
 
 
@@ -184,9 +212,14 @@ Last breath: If you have less HP than your opponent, you have to play all of you
 
 
 Frost fire: Destroy top 5 cards of any deck
+TESTING:
+ GENERAL:								OK
 
 
 Dragon sight: Look at the top cards of the decks. If one or more decks are missing you can check 2 or more top cards of the decks up to 4 cards
+TESTING:
+ GENERAL:								OK
+ EMPTY DECKS:								OK
 
 
 Dragon flame: Destroy all active enemy cards
@@ -196,24 +229,39 @@ TESTING:
 
 Cheating: Reveal enemy hand
 	Hand reveal
+TESTING:
+ GENERAL:								OK
 
 
 Dragon power: If a deck is empty: Utility - draw a card; Defensive - heal 1 HP; Offensive - deal 1 damage; Combo - all effects
+TESTING:
+ GENERAL:								OK
 
 
 Weapon of choice: Look at the top three combo cards, take one, discard the other two
+TESTING:
+ GENERAL:								OK
 
 
 The thief: Take a random card from enemy
+TESTING:
+ GENERAL:								OK
 
 
 Hidden treasures: Draw 2 cards
+TESTING:
+ GENERAL:								OK
 
 
 Mind steal: Swap any amount of cards with enemy
+TESTING:
+ GENERAL:								OK
+ CHOOSE CARDS FROM ENEMY:						NOT DONE
 
 
 Summon dead: Take one card from the graveyard
+TESTING:
+ GENERAL:								OK
 
 
 Dragon equation: Swap both players active cards
@@ -245,6 +293,8 @@ TESTING:
 
 
 Life exchange: Draw three cards, then discard two cards
+TESTING:
+ GENERAL:								OK
 
 
 

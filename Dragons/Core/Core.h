@@ -21,9 +21,13 @@ class Core
     std::mt19937 _rng;
 
     // Info necessary to resume after user input
-    cards::Card* currentlyPlayingCard = nullptr;
-    ActionProperties currentActionProperties;
-    cards::PlayProperties* currentPlayProperties = nullptr;
+    struct _InPlayCard
+    {
+        cards::Card* card = nullptr;
+        ActionProperties actionProps;
+        cards::PlayProperties* playProps = nullptr;
+    };
+    std::vector<_InPlayCard> _currentlyPlayingCards;
 
     int _actionsConsumed = 0;
     std::vector<ExtraAction> _extraActionsConsumed;
@@ -47,6 +51,7 @@ public:
     void MoveCardAfterPlay(const cards::PlayResult& result, cards::Card* playedCard, ActionProperties actionProps, cards::PlayProperties* playProps);
 private:
     cards::PlayResult _HandlePlayResult(cards::PlayResult result, cards::Card* playedCard, ActionProperties actionProps, cards::PlayProperties* playProps);
+    
 public:
     bool CanDrawCard(cards::CardType deck, int playerIndex);
     cards::Card* DrawCard(cards::CardType type, int playerIndex, bool consumeAction = true);

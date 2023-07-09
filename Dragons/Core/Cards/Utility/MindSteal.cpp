@@ -12,7 +12,7 @@ cards::PlayResult cards::MindSteal::Play(Core* core, ActionProperties actionProp
     if (core->GetState().players[actionProps.opponent].hand.empty())
         return PlayResult::Default();
 
-    int maxCards = core->GetState().players[actionProps.opponent].hand.size();
+    int maxCards = std::min(core->GetState().players[actionProps.player].hand.size(), core->GetState().players[actionProps.opponent].hand.size());
 
     auto params = std::make_unique<UserInputParams_ChooseCardFromHand>();
     params->choosingPlayerIndex = actionProps.player;
