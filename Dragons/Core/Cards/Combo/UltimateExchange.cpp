@@ -60,7 +60,7 @@ cards::PlayResult cards::UltimateExchange::Resume(UserInputResponse response, Co
 
         PlayResult result;
         result.waitForInput = true;
-        result.inputRequest.inputType = UserInputType::CHOOSE_CARD_FROM_ACTIVE_CARDS;
+        result.inputRequest.inputType = UserInputType::YES_OR_NO;
         result.inputRequest.inputPrompt = L"Do you want to swap health with your opponent?";
         result.inputRequest.inputParams = std::unique_ptr<UserInputParams>(params.release());
         return result;

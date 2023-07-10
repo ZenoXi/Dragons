@@ -110,7 +110,7 @@ void cards::Shackling::_OnEnterActiveCards(Core* core, int playerIndex)
     });
     _preDamageHandler = std::make_unique<EventHandler<PreDamageEvent_BuffPass>>(&core->Events(), [=](PreDamageEvent_BuffPass event)
     {
-        if (event.props->source != _targetPlayer || event.props->sourceCard->GetCardType() != CardType::OFFENSE)
+        if (event.props->source != _targetPlayer || (event.props->sourceCard && event.props->sourceCard->GetCardType() != CardType::OFFENSE))
             return;
 
         if (event.props->target != _targetPlayer)

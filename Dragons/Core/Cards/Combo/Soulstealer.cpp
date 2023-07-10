@@ -73,6 +73,7 @@ cards::PlayResult cards::Soulstealer::Resume(UserInputResponse response, Core* c
         DamageProperties damageProps;
         damageProps.source = actionProps.player;
         damageProps.target = actionProps.opponent;
+        damageProps.sourceCard = this;
         damageProps.amount = healAmount;
         damageProps.ignoreArmor = true;
         damageProps.trueDamage = true;

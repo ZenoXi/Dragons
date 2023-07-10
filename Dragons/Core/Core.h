@@ -107,6 +107,7 @@ public:
     void HideHand(int target, std::string revealSource = "-");
     std::unique_ptr<cards::Card> CreateCard(CardId cardId);
     std::vector<cards::Card*> GetRegisteredCards();
+    int OpponentOf(int playerIndex);
 
 private:
     std::vector<std::unique_ptr<cards::Card>>& _ResolveDeckFromType(cards::CardType type);

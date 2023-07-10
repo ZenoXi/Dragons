@@ -92,9 +92,6 @@ cards::PlayResult cards::DeathFee::Resume(UserInputResponse response, Core* core
         params->playerIndex = actionProps.player;
         params->minCardCount = 0;
         params->maxCardCount = maxCardsToPick;
-        //params->allowedSets.push_back(CardSet{ CardSets::HAND, actionProps.player });
-        //params->allowedSets.push_back(CardSet{ CardSets::GRAVEYARD });
-        //params->allowedTypes.push_back(CardType::DEFENSE);
 
         _waitingToSelectCards = true;
 
@@ -114,9 +111,10 @@ cards::PlayResult cards::DeathFee::Resume(UserInputResponse response, Core* core
         core->ClearDisplayedCards();
 
         DamageProperties damageProps;
-        damageProps.amount = 1;
         damageProps.source = actionProps.player;
         damageProps.target = actionProps.opponent;
+        damageProps.sourceCard = this;
+        damageProps.amount = 1;
 
         for (auto chosenCard : params->chosenCards)
         {

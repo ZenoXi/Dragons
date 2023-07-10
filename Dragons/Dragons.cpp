@@ -138,6 +138,8 @@ void HandleInputRequest(cards::PlayResult& result, Core& core, cards::Card* card
         while (true)
         {
             PrintState(core);
+            std::cout << " WAIT FOR CONFIRMATION\n";
+            std::wcout << "  " << result.inputRequest.inputPrompt << "\n\n";
             std::cout << " Type 'c' to continue\n";
             std::cout << " > ";
 
@@ -146,6 +148,44 @@ void HandleInputRequest(cards::PlayResult& result, Core& core, cards::Card* card
 
             if (input == "c" || input == "C")
                 break;
+        }
+
+        UserInputResponse response;
+        response.inputParams = std::move(result.inputRequest.inputParams);
+        auto resumeResult = core.ResumePlay(std::move(response));
+
+        if (resumeResult.waitForInput)
+        {
+            HandleInputRequest(resumeResult, core, card);
+        }
+
+        break;
+    }
+    case UserInputType::YES_OR_NO:
+    {
+        auto params = reinterpret_cast<UserInputParams_YesOrNo*>(result.inputRequest.inputParams.get());
+
+        while (true)
+        {
+            PrintState(core);
+            std::cout << " YES OR NO\n";
+            std::wcout << "  " << result.inputRequest.inputPrompt << "\n\n";
+            std::cout << " Type 'y' or 'n' to continue\n";
+            std::cout << " > ";
+
+            std::string input;
+            std::cin >> input;
+
+            if (input == "y" || input == "Y")
+            {
+                params->yes = true;
+                break;
+            }
+            else if (input == "n" || input == "N")
+            {
+                params->yes = false;
+                break;
+            }
         }
 
         UserInputResponse response;
@@ -197,7 +237,7 @@ void HandleInputRequest(cards::PlayResult& result, Core& core, cards::Card* card
                 chosenCards.insert(index);
             }
 
-            if (chosenCards.size() < params->minCardCount || chosenCards.size() > maxCards)
+            if (chosenCards.size() < minCards || chosenCards.size() > maxCards)
                 continue;
 
             params->chosenCards.clear();
@@ -206,16 +246,78 @@ void HandleInputRequest(cards::PlayResult& result, Core& core, cards::Card* card
                 params->chosenCards.push_back(core.GetState().players[params->handPlayerIndex].hand[index].get());
             }
 
-            UserInputResponse response;
-            response.inputParams = std::move(result.inputRequest.inputParams);
-            auto resumeResult = core.ResumePlay(std::move(response));
+            break;
+        }
 
-            if (resumeResult.waitForInput)
+        UserInputResponse response;
+        response.inputParams = std::move(result.inputRequest.inputParams);
+        auto resumeResult = core.ResumePlay(std::move(response));
+
+        if (resumeResult.waitForInput)
+        {
+            HandleInputRequest(resumeResult, core, card);
+        }
+
+        break;
+    }
+
+    case UserInputType::CHOOSE_CARD_FROM_ACTIVE_CARDS:
+    {
+        auto params = reinterpret_cast<UserInputParams_ChooseCardFromActiveCards*>(result.inputRequest.inputParams.get());
+
+        while (true)
+        {
+            PrintState(core);
+            std::cout << " CHOOSE CARDS FROM ACTIVE CARDS (min: " << params->minCardCount << ", max: " << params->maxCardCount << ")\n";
+            std::cout << "  Choosing: player " << params->choosingPlayerIndex + 1 << " from player " << params->targetActivesPlayerIndex + 1 << '\n';
+            std::cout << "  Allowed card types:\n";
+            if (params->allowedTypes.empty())
             {
-                HandleInputRequest(resumeResult, core, card);
+                std::cout << "    all\n";
+            }
+            else
+            {
+                for (auto type : params->allowedTypes)
+                {
+                    std::cout << "    " << cards::CardTypeToString(type) << '\n';
+                }
+            }
+            std::wcout << " " << result.inputRequest.inputPrompt << "\n\n";
+
+            int maxCards = std::min(params->maxCardCount, (int)core.GetState().players[params->targetActivesPlayerIndex].activeCards.size());
+            int minCards = std::min(params->minCardCount, (int)core.GetState().players[params->targetActivesPlayerIndex].activeCards.size());
+
+            std::set<int> chosenCards;
+            while (chosenCards.size() < maxCards)
+            {
+                int index;
+                std::cin >> index;
+
+                if (index == -1)
+                    break;
+
+                chosenCards.insert(index);
+            }
+
+            if (chosenCards.size() < minCards || chosenCards.size() > maxCards)
+                continue;
+
+            params->chosenCards.clear();
+            for (auto index : chosenCards)
+            {
+                params->chosenCards.push_back(core.GetState().players[params->targetActivesPlayerIndex].activeCards[index].get());
             }
 
             break;
+        }
+
+        UserInputResponse response;
+        response.inputParams = std::move(result.inputRequest.inputParams);
+        auto resumeResult = core.ResumePlay(std::move(response));
+
+        if (resumeResult.waitForInput)
+        {
+            HandleInputRequest(resumeResult, core, card);
         }
 
         break;

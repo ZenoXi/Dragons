@@ -66,7 +66,7 @@ cards::PlayResult cards::MagicTrick::Resume(UserInputResponse response, Core* co
             core->AddCardToHand(core->RemoveCardFromHand(card, actionProps.opponent), actionProps.player);
         }
 
-        core->HideHand(actionProps.opponent, "magic_hand");
+        core->HideHand(actionProps.opponent, "magic_trick");
 
         if (cardInstances.size() == 1)
         {

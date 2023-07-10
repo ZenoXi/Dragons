@@ -15,8 +15,8 @@ cards::PlayResult cards::SacrificialAttack::Play(Core* core, ActionProperties ac
 
         DamageProperties damageProps;
         damageProps.source = actionProps.player;
-        damageProps.amount = 3;
         damageProps.sourceCard = this;
+        damageProps.amount = 3;
 
         damageProps.target = player.index;
         if (playPropsValue.stealHealth && player.index == actionProps.opponent)

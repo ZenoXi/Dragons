@@ -40,9 +40,10 @@ cards::PlayResult cards::BloodDonation::Resume(UserInputResponse response, Core*
             return PlayResult::Default();
 
         DamageProperties damageProps;
-        damageProps.amount = params->chosenNumber;
-        damageProps.source = -1;
+        damageProps.source = actionProps.player;
         damageProps.target = actionProps.player;
+        damageProps.sourceCard = this;
+        damageProps.amount = params->chosenNumber;
         damageProps.trueDamage = true;
 
         DamageResult damageResult = core->Damage(damageProps);

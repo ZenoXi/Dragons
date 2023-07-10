@@ -41,7 +41,6 @@ struct CardLeaveDeckEvent
 {
     static const char* _NAME_() { return "card_leave_deck"; }
     cards::Card* card;
-    cards::CardType deck;
 };
 
 struct CardEnterGraveyardEvent
@@ -65,6 +64,18 @@ struct CardEnterDestroyedCardsEvent
 struct CardLeaveDestroyedCardsEvent
 {
     static const char* _NAME_() { return "card_leave_destroyed_cards"; }
+    cards::Card* card;
+};
+
+struct CardEnterInPlayCardsEvent
+{
+    static const char* _NAME_() { return "card_enter_in_play_cards"; }
+    cards::Card* card;
+};
+
+struct CardLeaveInPlayCardsEvent
+{
+    static const char* _NAME_() { return "card_leave_in_play_cards"; }
     cards::Card* card;
 };
 

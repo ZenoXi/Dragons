@@ -26,6 +26,7 @@ void cards::HeavySlash::_OnEnterActiveCards(Core* core, int playerIndex)
             return;
 
         DamageProperties damageProps;
+        damageProps.source = _playerIndex;
         damageProps.target = _opponentIndex;
         if (core->GetState().players[_opponentIndex].armor > 0)
             damageProps.amount = 1;

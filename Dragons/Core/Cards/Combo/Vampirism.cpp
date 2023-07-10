@@ -26,10 +26,7 @@ cards::PlayResult cards::Vampirism::Play(Core* core, ActionProperties actionProp
     });
 
     // Play Blood Donation
-    BloodDonationPlayProperties bloodDonationPlayProperties;
-    // Make sure no cards will be drawn by blood donation itself and do it manually after Devils Deal is played
-    bloodDonationPlayProperties.healthForOneCard = 999;
-    PlayResult result = _cardBloodDonation->Play(core, actionProps, &bloodDonationPlayProperties);
+    PlayResult result = _cardBloodDonation->Play(core, actionProps, &_bloodDonationPlayProperties);
     if (result.waitForInput)
     {
         _resumeBloodDonation = true;
@@ -46,7 +43,7 @@ cards::PlayResult cards::Vampirism::Resume(UserInputResponse response, Core* cor
     {
         _resumeBloodDonation = false;
 
-        PlayResult result = _cardBloodDonation->Resume(std::move(response), core, actionProps, nullptr);
+        PlayResult result = _cardBloodDonation->Resume(std::move(response), core, actionProps, &_bloodDonationPlayProperties);
         if (result.waitForInput)
         {
             _resumeBloodDonation = true;

@@ -77,9 +77,10 @@ cards::PlayResult cards::CounterScale::Resume(UserInputResponse response, Core* 
         int armorAmount = core->GetState().players[actionProps.opponent].CardsInHand(CardType::OFFENSE);
         int damageAmount = core->GetState().players[actionProps.opponent].CardsInHand(CardType::DEFENSE);
         DamageProperties damageProps;
-        damageProps.amount = damageAmount;
         damageProps.source = actionProps.player;
         damageProps.target = actionProps.opponent;
+        damageProps.sourceCard = this;
+        damageProps.amount = damageAmount;
         AddArmorProperties addArmorProps;
         addArmorProps.target = actionProps.player;
         addArmorProps.amount = armorAmount;

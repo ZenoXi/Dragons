@@ -35,7 +35,6 @@ cards::PlayResult cards::Superiority::Play(Core* core, ActionProperties actionPr
 
     if (core->GetState().players[actionProps.player].armor > 0)
     {
-        core->RevealHand(actionProps.opponent, "superiority");
         return PlayResult::AddToActives();
     }
     else
@@ -46,12 +45,18 @@ cards::PlayResult cards::Superiority::Play(Core* core, ActionProperties actionPr
 
 void cards::Superiority::_OnEnterHand(Core* core, int playerIndex)
 {
-    if (_opponentIndex != -1)
-        core->HideHand(_opponentIndex, "superiority");
+    if (_revealedHandIndex != -1)
+        core->HideHand(_revealedHandIndex, "superiority");
 }
 
 void cards::Superiority::_OnEnterActiveCards(Core* core, int playerIndex)
 {
+    if (_revealedHandIndex != -1)
+        core->HideHand(_revealedHandIndex, "superiority");
+
+    _revealedHandIndex = core->OpponentOf(playerIndex);
+    core->RevealHand(_revealedHandIndex, "superiority");
+
     _postArmorChangeHandler = std::make_unique<EventHandler<PostArmorChangeEvent>>(&core->Events(), [=](PostArmorChangeEvent event)
     {
         if (GetPosition().playerIndex != event.target)
@@ -59,7 +64,9 @@ void cards::Superiority::_OnEnterActiveCards(Core* core, int playerIndex)
 
         if (event.newValue == 0)
         {
-            core->HideHand(_opponentIndex, "superiority");
+            if (_revealedHandIndex != -1)
+                core->HideHand(_revealedHandIndex, "superiority");
+
             auto cardPtr = core->RemoveCardFromActiveCards(this, GetPosition().playerIndex);
             core->AddCardToGraveyard(std::move(cardPtr));
         }
@@ -68,18 +75,18 @@ void cards::Superiority::_OnEnterActiveCards(Core* core, int playerIndex)
 
 void cards::Superiority::_OnEnterDeck(Core* core)
 {
-    if (_opponentIndex != -1)
-        core->HideHand(_opponentIndex, "superiority");
+    if (_revealedHandIndex != -1)
+        core->HideHand(_revealedHandIndex, "superiority");
 }
 
 void cards::Superiority::_OnEnterGraveyard(Core* core)
 {
-    if (_opponentIndex != -1)
-        core->HideHand(_opponentIndex, "superiority");
+    if (_revealedHandIndex != -1)
+        core->HideHand(_revealedHandIndex, "superiority");
 }
 
 void cards::Superiority::_OnEnterDestroyedCards(Core* core)
 {
-    if (_opponentIndex != -1)
-        core->HideHand(_opponentIndex, "superiority");
+    if (_revealedHandIndex != -1)
+        core->HideHand(_revealedHandIndex, "superiority");
 }

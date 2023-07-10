@@ -21,6 +21,7 @@ cards::PlayResult cards::DesperateStrike::Play(Core* core, ActionProperties acti
         DamageProperties damageProps;
         damageProps.source = actionProps.player;
         damageProps.target = actionProps.opponent;
+        damageProps.sourceCard = this;
         damageProps.amount = playPropsValue.damageAmount;
         core->Damage(damageProps);
     }

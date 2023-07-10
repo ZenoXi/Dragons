@@ -57,8 +57,8 @@ cards::PlayResult cards::TotalEntanglement::Resume(UserInputResponse response, C
         _resumeToSoothingSpell = false;
 
         // Play Soothing Spell
-        _cardAbsoluteZero->Play(core, actionProps, nullptr);
-        core->AddCardToActiveCards(core->RemoveCardFromInPlayCards(_cardAbsoluteZero), actionProps.player);
+        _cardSoothingSpell->Play(core, actionProps, nullptr);
+        core->AddCardToActiveCards(core->RemoveCardFromInPlayCards(_cardSoothingSpell), actionProps.player);
 
         // Discard opponent hand
         auto& handRef = core->GetState().players[actionProps.opponent].hand;

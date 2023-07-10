@@ -187,6 +187,9 @@ void Core::InitState()
     ShuffleDeck(cards::CardType::UTILITY);
     ShuffleDeck(cards::CardType::COMBO);
 
+    _state.utilityDeck.clear();
+    _state.comboDeck.clear();
+
     // Init players
     _state.players.push_back(Player{});
     _state.players[0].health = GAME_STARTING_HEALTH;
@@ -918,9 +921,7 @@ std::unique_ptr<cards::Card> Core::RemoveCardFromHand(cards::Card* card, int pla
     {
         if (_state.players[playerIndex].hand[i].get() == card)
         {
-            std::unique_ptr<cards::Card> movedCard = std::move(_state.players[playerIndex].hand[i]);
-            _state.players[playerIndex].hand.erase(_state.players[playerIndex].hand.begin() + i);
-            return movedCard;
+            return RemoveCardFromHand(i, playerIndex);
         }
     }
     return nullptr;
@@ -930,6 +931,12 @@ std::unique_ptr<cards::Card> Core::RemoveCardFromHand(int cardIndex, int playerI
 {
     std::unique_ptr<cards::Card> movedCard = std::move(_state.players[playerIndex].hand[cardIndex]);
     _state.players[playerIndex].hand.erase(_state.players[playerIndex].hand.begin() + cardIndex);
+
+    CardLeaveHandEvent event;
+    event.card = movedCard.get();
+    event.playerIndex = playerIndex;
+    _events.RaiseEvent(event);
+
     return movedCard;
 }
 
@@ -951,9 +958,7 @@ std::unique_ptr<cards::Card> Core::RemoveCardFromActiveCards(cards::Card* card, 
     {
         if (_state.players[playerIndex].activeCards[i].get() == card)
         {
-            std::unique_ptr<cards::Card> movedCard = std::move(_state.players[playerIndex].activeCards[i]);
-            _state.players[playerIndex].activeCards.erase(_state.players[playerIndex].activeCards.begin() + i);
-            return movedCard;
+            return RemoveCardFromActiveCards(i, playerIndex);
         }
     }
     return nullptr;
@@ -963,6 +968,12 @@ std::unique_ptr<cards::Card> Core::RemoveCardFromActiveCards(int cardIndex, int 
 {
     std::unique_ptr<cards::Card> movedCard = std::move(_state.players[playerIndex].activeCards[cardIndex]);
     _state.players[playerIndex].activeCards.erase(_state.players[playerIndex].activeCards.begin() + cardIndex);
+
+    CardLeaveActivesEvent event;
+    event.card = movedCard.get();
+    event.playerIndex = playerIndex;
+    _events.RaiseEvent(event);
+
     return movedCard;
 }
 
@@ -987,9 +998,7 @@ std::unique_ptr<cards::Card> Core::RemoveCardFromDeck(cards::Card* card)
     {
         if (deckRef[i].get() == card)
         {
-            std::unique_ptr<cards::Card> movedCard = std::move(deckRef[i]);
-            deckRef.erase(deckRef.begin() + i);
-            return movedCard;
+            return RemoveCardFromDeck(card->GetCardType(), i);
         }
     }
     return nullptr;
@@ -1000,6 +1009,11 @@ std::unique_ptr<cards::Card> Core::RemoveCardFromDeck(cards::CardType deck, int 
     auto& deckRef = _ResolveDeckFromType(deck);
     std::unique_ptr<cards::Card> movedCard = std::move(deckRef[cardIndex]);
     deckRef.erase(deckRef.begin() + cardIndex);
+
+    CardLeaveDeckEvent event;
+    event.card = movedCard.get();
+    _events.RaiseEvent(event);
+
     return movedCard;
 }
 
@@ -1021,9 +1035,7 @@ std::unique_ptr<cards::Card> Core::RemoveCardFromGraveyard(cards::Card* card)
     {
         if (_state.graveyard[i].get() == card)
         {
-            std::unique_ptr<cards::Card> movedCard = std::move(_state.graveyard[i]);
-            _state.graveyard.erase(_state.graveyard.begin() + i);
-            return movedCard;
+            return RemoveCardFromGraveyard(i);
         }
     }
     return nullptr;
@@ -1033,6 +1045,11 @@ std::unique_ptr<cards::Card> Core::RemoveCardFromGraveyard(int cardIndex)
 {
     std::unique_ptr<cards::Card> movedCard = std::move(_state.graveyard[cardIndex]);
     _state.graveyard.erase(_state.graveyard.begin() + cardIndex);
+
+    CardLeaveGraveyardEvent event;
+    event.card = movedCard.get();
+    _events.RaiseEvent(event);
+
     return movedCard;
 }
 
@@ -1053,9 +1070,7 @@ std::unique_ptr<cards::Card> Core::RemoveCardFromInPlayCards(cards::Card* card)
     {
         if (_state.inPlayCards[i].get() == card)
         {
-            std::unique_ptr<cards::Card> movedCard = std::move(_state.inPlayCards[i]);
-            _state.inPlayCards.erase(_state.inPlayCards.begin() + i);
-            return movedCard;
+            return RemoveCardFromInPlayCards(i);
         }
     }
     return nullptr;
@@ -1065,6 +1080,11 @@ std::unique_ptr<cards::Card> Core::RemoveCardFromInPlayCards(int cardIndex)
 {
     std::unique_ptr<cards::Card> movedCard = std::move(_state.inPlayCards[cardIndex]);
     _state.inPlayCards.erase(_state.inPlayCards.begin() + cardIndex);
+
+    CardLeaveInPlayCardsEvent event;
+    event.card = movedCard.get();
+    _events.RaiseEvent(event);
+
     return movedCard;
 }
 
@@ -1080,9 +1100,7 @@ std::unique_ptr<cards::Card> Core::RemoveCardFromDestroyedCards(cards::Card* car
     {
         if (_state.destroyedCards[i].get() == card)
         {
-            std::unique_ptr<cards::Card> movedCard = std::move(_state.destroyedCards[i]);
-            _state.destroyedCards.erase(_state.destroyedCards.begin() + i);
-            return movedCard;
+            return RemoveCardFromDestroyedCards(i);
         }
     }
     return nullptr;
@@ -1092,6 +1110,11 @@ std::unique_ptr<cards::Card> Core::RemoveCardFromDestroyedCards(int cardIndex)
 {
     std::unique_ptr<cards::Card> movedCard = std::move(_state.destroyedCards[cardIndex]);
     _state.destroyedCards.erase(_state.destroyedCards.begin() + cardIndex);
+
+    CardLeaveDestroyedCardsEvent event;
+    event.card = movedCard.get();
+    _events.RaiseEvent(event);
+
     return movedCard;
 }
 
@@ -1106,7 +1129,7 @@ bool Core::RemoveCardFromDisplayedCards(cards::Card* card)
     {
         if (_state.displayedCards[i].card == card)
         {
-            _state.displayedCards.erase(_state.displayedCards.begin() + i);
+            RemoveCardFromDisplayedCards(i);
             return true;
         }
     }
@@ -1115,7 +1138,13 @@ bool Core::RemoveCardFromDisplayedCards(cards::Card* card)
 
 void Core::RemoveCardFromDisplayedCards(int cardIndex)
 {
+    cards::Card* card = _state.displayedCards[cardIndex].card;
+
     _state.displayedCards.erase(_state.displayedCards.begin() + cardIndex);
+
+    CardLeaveDisplayedCardsEvent event;
+    event.card = card;
+    _events.RaiseEvent(event);
 }
 
 bool Core::ModifyDisplayedCard(DisplayInfo newDisplayInfo)
@@ -1135,8 +1164,14 @@ void Core::ClearDisplayedCards()
 {
     while (!_state.displayedCards.empty())
     {
+        cards::Card* card = _state.displayedCards.front().card;
+
         _state.displayedCards.erase(_state.displayedCards.begin());
         // Add event invoke on each erase
+
+        CardLeaveDisplayedCardsEvent event;
+        event.card = card;
+        _events.RaiseEvent(event);
     }
 }
 
@@ -1246,6 +1281,16 @@ std::vector<cards::Card*> Core::GetRegisteredCards()
     for (auto& card : _registeredCards)
         cards.push_back(card.get());
     return cards;
+}
+
+int Core::OpponentOf(int playerIndex)
+{
+    if (playerIndex == 0)
+        return 1;
+    else if (playerIndex == 1)
+        return 0;
+    else
+        return -1;
 }
 
 std::vector<std::unique_ptr<cards::Card>>& Core::_ResolveDeckFromType(cards::CardType type)

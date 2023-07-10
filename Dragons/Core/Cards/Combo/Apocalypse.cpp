@@ -107,7 +107,7 @@ cards::PlayResult cards::Apocalypse::Resume(UserInputResponse response, Core* co
         params->minCardCount = requiredCardDiscardAmount;
         params->maxCardCount = 99;
 
-        _waitingForCardDraw = true;
+        _waitingForCardDiscard = true;
 
         PlayResult result;
         result.waitForInput = true;

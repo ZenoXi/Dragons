@@ -37,7 +37,9 @@ void cards::FairFight::_OnEnterActiveCards(Core* core, int playerIndex)
             return;
 
         DamageProperties damageProps;
+        damageProps.source = _playerIndex;
         damageProps.target = _opponentIndex;
+        damageProps.sourceCard = this;
         damageProps.amount = 4;
         core->Damage(damageProps);
 

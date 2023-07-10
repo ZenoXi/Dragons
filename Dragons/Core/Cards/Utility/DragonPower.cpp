@@ -40,6 +40,7 @@ cards::PlayResult cards::DragonPower::Play(Core* core, ActionProperties actionPr
         DamageProperties damageProps;
         damageProps.source = actionProps.player;
         damageProps.target = actionProps.opponent;
+        damageProps.sourceCard = this;
         damageProps.amount = damageAmount;
         core->Damage(damageProps);
     }

@@ -19,6 +19,8 @@ namespace cards
         bool _waitingForCardDraw = false;
         bool _resumeToCleanUp = false;
 
+        BloodDonationPlayProperties _bloodDonationPlayProperties;
+
         std::unique_ptr<EventHandler<PostDamageEvent>> _postDamageHandler = nullptr;
         int _damageToSelf;
         int _opponentDamageToSelf;
@@ -32,7 +34,11 @@ namespace cards
         cards::Card* _cardBloodDonation = nullptr;
 
     public:
-        Vampirism() {}
+        Vampirism()
+        {
+            // Make sure no cards will be drawn by blood donation itself and do it manually after Devils Deal is played
+            _bloodDonationPlayProperties.healthForOneCard = 999;
+        }
 
         bool CanPlay(Core* core, ActionProperties actionProps, PlayProperties* playProps);
         PlayResult Play(Core* core, ActionProperties actionProps, PlayProperties* playProps);

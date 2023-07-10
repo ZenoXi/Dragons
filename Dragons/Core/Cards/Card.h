@@ -90,6 +90,11 @@ namespace cards
         virtual PlayResult Resume(UserInputResponse response, Core* core, ActionProperties actionProps, PlayProperties* playProps) { return PlayResult{}; }
         virtual void Draw(Core* core, ActionProperties actionProps) {}
         virtual void Discard(Core* core, ActionProperties actionProps) {}
+        // TODO:
+        // Most active cards are broken if they change the player whose active card set they are in
+        // The fix is using relative player indices and only specifying if the target is OPPONENT or PLAYER
+        // and using that in combination with the current active card position to determine which player
+        // this refers to
         virtual bool IsActive() { return false; }
         virtual int GetActionCost() { return 1; }
 
@@ -122,33 +127,33 @@ namespace cards
         CardSet GetPosition() const { return _position; }
         void OnEnterHand(Core* core, int playerIndex)
         {
-            _OnEnterHand(core, playerIndex);
             _position.set = CardSets::HAND;
             _position.playerIndex = playerIndex;
+            _OnEnterHand(core, playerIndex);
         }
         void OnEnterActiveCards(Core* core, int playerIndex)
         {
-            _OnEnterActiveCards(core, playerIndex);
             _position.set = CardSets::ACTIVE_CARDS;
             _position.playerIndex = playerIndex;
+            _OnEnterActiveCards(core, playerIndex);
         }
         void OnEnterDeck(Core* core)
         {
-            _OnEnterDeck(core);
             _position.set = CardSets::DECK;
             _position.playerIndex = -1;
+            _OnEnterDeck(core);
         }
         void OnEnterGraveyard(Core* core)
         {
-            _OnEnterGraveyard(core);
             _position.set = CardSets::GRAVEYARD;
             _position.playerIndex = -1;
+            _OnEnterGraveyard(core);
         }
         void OnEnterDestroyedCards(Core* core)
         {
-            _OnEnterDestroyedCards(core);
             _position.set = CardSets::DESTROYED;
             _position.playerIndex = -1;
+            _OnEnterDestroyedCards(core);
         }
 
     private:

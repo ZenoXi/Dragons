@@ -14,7 +14,7 @@ namespace cards
     class Superiority : public Card
     {
         std::unique_ptr<EventHandler<PostArmorChangeEvent>> _postArmorChangeHandler = nullptr;
-        int _opponentIndex = -1;
+        int _revealedHandIndex = -1;
 
         const std::vector<CardId> _requiredCardIds
         {

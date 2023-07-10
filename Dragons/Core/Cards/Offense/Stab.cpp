@@ -8,6 +8,7 @@ cards::PlayResult cards::Stab::Play(Core* core, ActionProperties actionProps, Pl
     damageProps.source = actionProps.player;
     damageProps.target = actionProps.opponent;
     damageProps.amount = 2;
+    damageProps.sourceCard = this;
     core->Damage(damageProps);
 
     return PlayResult::Default();

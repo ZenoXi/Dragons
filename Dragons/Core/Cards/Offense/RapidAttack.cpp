@@ -25,6 +25,7 @@ cards::PlayResult cards::RapidAttack::Play(Core* core, ActionProperties actionPr
     DamageProperties damageProps;
     damageProps.source = actionProps.player;
     damageProps.target = actionProps.opponent;
+    damageProps.sourceCard = this;
     damageProps.amount = 1;
     core->Damage(damageProps);
 
