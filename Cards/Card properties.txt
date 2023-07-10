@@ -304,6 +304,8 @@ TESTING:
 
 Death fee: [Summon dead, Death poison, Helping hand] You can give your opponent any amount of cards including cards from graveyard. Deal 1 damage for each card given
 	Customize card effect
+TESTING:
+ GENERAL:								OK
 
 
 Astro influence: [Dragon equation, Fair fight, Tree of life] Opponent doen not get the heal and armor

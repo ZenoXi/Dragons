@@ -53,6 +53,8 @@ cards::PlayResult cards::DeathFee::Resume(UserInputResponse response, Core* core
     {
         _resumeToHelpingHand = false;
 
+        core->DrawCard(CardType::DEFENSE, actionProps.player, false);
+
         int cardsToFullOpponentHand = GAME_HAND_SIZE - core->GetState().players[actionProps.opponent].hand.size();
         if (cardsToFullOpponentHand < 1)
         {
@@ -68,19 +70,37 @@ cards::PlayResult cards::DeathFee::Resume(UserInputResponse response, Core* core
         if (defenseCardsAvailable < maxCardsToPick)
             maxCardsToPick = defenseCardsAvailable;
 
-        auto params = std::make_unique<UserInputParams_ChooseCardFromSet>();
+        std::array<bool, 2> displayedTo;
+        displayedTo[actionProps.player] = true;
+        displayedTo[actionProps.opponent] = false;
+        for (auto& card : core->GetState().players[actionProps.player].hand)
+        {
+            if (card->GetCardType() == CardType::DEFENSE)
+            {
+                core->AddCardToDisplayedCards({ card.get(), displayedTo });
+            }
+        }
+        for (auto& card : core->GetState().graveyard)
+        {
+            if (card->GetCardType() == CardType::DEFENSE)
+            {
+                core->AddCardToDisplayedCards({ card.get(), displayedTo });
+            }
+        }
+
+        auto params = std::make_unique<UserInputParams_ChooseCardFromDisplayedCards>();
         params->playerIndex = actionProps.player;
         params->minCardCount = 0;
         params->maxCardCount = maxCardsToPick;
-        params->allowedSets.push_back(CardSet{ CardSets::HAND, actionProps.player });
-        params->allowedSets.push_back(CardSet{ CardSets::GRAVEYARD });
-        params->allowedTypes.push_back(CardType::DEFENSE);
+        //params->allowedSets.push_back(CardSet{ CardSets::HAND, actionProps.player });
+        //params->allowedSets.push_back(CardSet{ CardSets::GRAVEYARD });
+        //params->allowedTypes.push_back(CardType::DEFENSE);
 
         _waitingToSelectCards = true;
 
         PlayResult result;
         result.waitForInput = true;
-        result.inputRequest.inputType = UserInputType::CHOOSE_CARD_FROM_SET;
+        result.inputRequest.inputType = UserInputType::CHOOSE_CARD_FROM_DISPLAYED_CARDS;
         result.inputRequest.inputPrompt = L"Choose defense cards to give your opponent";
         result.inputRequest.inputParams = std::unique_ptr<UserInputParams>(params.release());
         return result;
@@ -88,33 +108,27 @@ cards::PlayResult cards::DeathFee::Resume(UserInputResponse response, Core* core
     else if (_waitingToSelectCards)
     {
         _waitingToSelectCards = false;
-        UserInputParams_ChooseCardFromSet* params = reinterpret_cast<UserInputParams_ChooseCardFromSet*>(response.inputParams.get());
-        if (!params)
-        {
-            _resumeToCleanUp = true;
-            return PlayResult::Resume();
-        }
-        if (params->chosenCards.size() == 0)
-        {
-            _resumeToCleanUp = true;
-            return PlayResult::Resume();
-        }
+
+        UserInputParams_ChooseCardFromDisplayedCards* params = reinterpret_cast<UserInputParams_ChooseCardFromDisplayedCards*>(response.inputParams.get());
+
+        core->ClearDisplayedCards();
 
         DamageProperties damageProps;
         damageProps.amount = 1;
         damageProps.source = actionProps.player;
         damageProps.target = actionProps.opponent;
 
-        for (int i = 0; i < params->chosenCards.size(); i++)
+        for (auto chosenCard : params->chosenCards)
         {
-            if (params->chosenCardSet[i].set == CardSets::HAND)
+            CardSet set = core->GetCardSet(chosenCard);
+            if (set.set == CardSets::HAND)
             {
-                auto cardPtr = core->RemoveCardFromHand(params->chosenCards[i], actionProps.player);
+                auto cardPtr = core->RemoveCardFromHand(chosenCard, actionProps.player);
                 core->AddCardToHand(std::move(cardPtr), actionProps.opponent);
             }
-            else if (params->chosenCardSet[i].set == CardSets::GRAVEYARD)
+            else if (set.set == CardSets::GRAVEYARD)
             {
-                auto cardPtr = core->RemoveCardFromGraveyard(params->chosenCards[i]);
+                auto cardPtr = core->RemoveCardFromGraveyard(chosenCard);
                 core->AddCardToHand(std::move(cardPtr), actionProps.opponent);
             }
             core->Damage(damageProps);
