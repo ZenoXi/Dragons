@@ -7,6 +7,9 @@ cards::PlayResult cards::WeaponOfChoice::Play(Core* core, ActionProperties actio
     auto playPropsValue = GetPlayProperties<WeaponOfChoicePlayProperties>(playProps);
     auto& deckRef = core->GetState().GetDeck(playPropsValue.deck);
 
+    if (deckRef.empty())
+        return PlayResult::Default();
+
     std::array<bool, 2> displayedTo;
     displayedTo[actionProps.player] = true;
     displayedTo[actionProps.opponent] = false;

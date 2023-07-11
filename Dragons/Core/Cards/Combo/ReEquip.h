@@ -23,6 +23,7 @@ namespace cards
 
         std::unique_ptr<EventHandler<CardLeaveHandEvent>> _cardLeaveHandHandler = nullptr;
         std::unique_ptr<EventHandler<CardEnterGraveyardEvent>> _cardEnterGraveyardHandler = nullptr;
+        std::unique_ptr<EventHandler<CardEnterDeckEvent>> _cardEnterDeckHandler = nullptr;
         bool _ignoreCard = false;
         std::vector<Card*> _discardedOffenseCards;
 

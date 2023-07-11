@@ -913,6 +913,11 @@ void Core::AddCardToHand(std::unique_ptr<cards::Card> card, int playerIndex)
 
     card->OnEnterHand(this, playerIndex);
     _state.players[playerIndex].hand.push_back(std::move(card));
+
+    CardEnterHandEvent event;
+    event.card = _state.players[playerIndex].hand.back().get();
+    event.playerIndex = playerIndex;
+    _events.RaiseEvent(event);
 }
 
 std::unique_ptr<cards::Card> Core::RemoveCardFromHand(cards::Card* card, int playerIndex)
@@ -950,6 +955,11 @@ void Core::AddCardToActiveCards(std::unique_ptr<cards::Card> card, int playerInd
 
     card->OnEnterActiveCards(this, playerIndex);
     _state.players[playerIndex].activeCards.push_back(std::move(card));
+
+    CardEnterActivesEvent event;
+    event.card = _state.players[playerIndex].activeCards.back().get();
+    event.playerIndex = playerIndex;
+    _events.RaiseEvent(event);
 }
 
 std::unique_ptr<cards::Card> Core::RemoveCardFromActiveCards(cards::Card* card, int playerIndex)
@@ -988,6 +998,11 @@ bool Core::AddCardToDeck(std::unique_ptr<cards::Card> card)
     auto& deckRef = _ResolveDeckFromType(card->GetCardType());
     card->OnEnterDeck(this);
     deckRef.push_back(std::move(card));
+
+    CardEnterDeckEvent event;
+    event.card = deckRef.back().get();
+    _events.RaiseEvent(event);
+
     return true;
 }
 
@@ -1027,6 +1042,10 @@ void Core::AddCardToGraveyard(std::unique_ptr<cards::Card> card)
 
     card->OnEnterGraveyard(this);
     _state.graveyard.push_back(std::move(card));
+
+    CardEnterGraveyardEvent event;
+    event.card = _state.graveyard.back().get();
+    _events.RaiseEvent(event);
 }
 
 std::unique_ptr<cards::Card> Core::RemoveCardFromGraveyard(cards::Card* card)
@@ -1062,6 +1081,10 @@ void Core::AddCardToInPlayCards(std::unique_ptr<cards::Card> card)
     }
 
     _state.inPlayCards.push_back(std::move(card));
+
+    CardEnterInPlayCardsEvent event;
+    event.card = _state.inPlayCards.back().get();
+    _events.RaiseEvent(event);
 }
 
 std::unique_ptr<cards::Card> Core::RemoveCardFromInPlayCards(cards::Card* card)
@@ -1092,6 +1115,10 @@ void Core::AddCardToDestroyedCards(std::unique_ptr<cards::Card> card)
 {
     card->OnEnterDestroyedCards(this);
     _state.destroyedCards.push_back(std::move(card));
+
+    CardEnterDestroyedCardsEvent event;
+    event.card = _state.destroyedCards.back().get();
+    _events.RaiseEvent(event);
 }
 
 std::unique_ptr<cards::Card> Core::RemoveCardFromDestroyedCards(cards::Card* card)
@@ -1121,6 +1148,10 @@ std::unique_ptr<cards::Card> Core::RemoveCardFromDestroyedCards(int cardIndex)
 void Core::AddCardToDisplayedCards(DisplayInfo displayInfo)
 {
     _state.displayedCards.push_back(displayInfo);
+
+    CardEnterDisplayedCardsEvent event;
+    event.card = _state.displayedCards.back().card;
+    _events.RaiseEvent(event);
 }
 
 bool Core::RemoveCardFromDisplayedCards(cards::Card* card)
@@ -1167,7 +1198,6 @@ void Core::ClearDisplayedCards()
         cards::Card* card = _state.displayedCards.front().card;
 
         _state.displayedCards.erase(_state.displayedCards.begin());
-        // Add event invoke on each erase
 
         CardLeaveDisplayedCardsEvent event;
         event.card = card;

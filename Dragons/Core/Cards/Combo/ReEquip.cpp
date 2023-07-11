@@ -55,13 +55,14 @@ cards::PlayResult cards::ReEquip::Resume(UserInputResponse response, Core* core,
 
         _ignoreCard = false;
         _discardedOffenseCards.clear();
-        _cardEnterGraveyardHandler = std::make_unique<EventHandler<CardEnterGraveyardEvent>>(&core->Events(), [=](CardEnterGraveyardEvent event)
+        _cardLeaveHandHandler = std::make_unique<EventHandler<CardLeaveHandEvent>>(&core->Events(), [=](CardLeaveHandEvent event)
         {
-            if (event.card->GetCardType() == CardType::OFFENSE && !_ignoreCard)
-            {
-                _discardedOffenseCards.push_back(event.card);
-            }
-            _ignoreCard = false;
+            if (event.playerIndex == actionProps.opponent)
+                return;
+            if (event.card->GetCardType() != CardType::OFFENSE)
+                return;
+
+            _discardedOffenseCards.push_back(event.card);
         });
 
         PlayResult result = _cardWeaponScroll->Play(core, actionProps, nullptr);
@@ -92,17 +93,8 @@ cards::PlayResult cards::ReEquip::Resume(UserInputResponse response, Core* core,
     {
         _resumeToPeacePact = false;
 
-        // Detect card discard source, to differentiate which player discarded which card during Peace Pact
-        _cardLeaveHandHandler = std::make_unique<EventHandler<CardLeaveHandEvent>>(&core->Events(), [=](CardLeaveHandEvent event)
-        {
-            if (event.playerIndex == actionProps.opponent)
-                _ignoreCard = true;
-        });
-
         _cardPeacePact->Play(core, actionProps, nullptr);
-
         _cardLeaveHandHandler.reset();
-        _cardEnterGraveyardHandler.reset();
 
         _resumeToCardChoice = true;
         return PlayResult::Resume();
@@ -148,7 +140,13 @@ cards::PlayResult cards::ReEquip::Resume(UserInputResponse response, Core* core,
         core->ClearDisplayedCards();
         // Take selected cards
         for (auto& card : chosenCards)
-            core->AddCardToHand(core->RemoveCardFromGraveyard(card), actionProps.player);
+        {
+            CardSet set = core->GetCardSet(card);
+            if (set.set == CardSets::GRAVEYARD)
+                core->AddCardToHand(core->RemoveCardFromGraveyard(card), actionProps.player);
+            else if (set.set == CardSets::DECK)
+                core->AddCardToHand(core->RemoveCardFromDeck(card), actionProps.player);
+        }
 
         _resumeToCleanUp = true;
         return PlayResult::Resume();

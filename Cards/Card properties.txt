@@ -445,6 +445,8 @@ Shackling: [Dragon flame, Devils deal, Recreation] Combo effect - destroy every 
 	Active card
 	Active card lifespan
 	Damage interception
+TESTING:
+ GENERAL:								OK
 
 
 Dragon sword: [Hellfire sword, Heavy slash] You also destroy opponents armor at the start of your next turn
@@ -455,9 +457,13 @@ TESTING:
 
 
 Re-equip: [Weapon of choice, Weapon scroll, Peace pact] You can redraw every offensive card you discarded using Weapon of choice effect
+TESTING:
+ GENERAL:								OK
 
 
 Swap pact: [Mind steal, Star curse, War blessing] Combo effect - After swapping cards, you choose if you want to swap maximum health with your opponent before applying Star curse and War blessing
+TESTING:
+ GENERAL:								OK
 
 
 Shadow assassin: [Vital spot, Death poison] Every damage this turn will go through all defenses without triggering vital spot. You can play one more card this turn
@@ -471,6 +477,8 @@ TESTING:
 
 Three gods strike: [Dragon sight, Sacrificial attack, Barrier] Combo effect - choose one: - Dragon sight draws 4 top cards instead; - Sacrificial attack steals health instead; - Barrier blocks twice and blocks Dragon flame
 	Customize card effect
+TESTING:
+ GENERAL:								OK
 
 
 

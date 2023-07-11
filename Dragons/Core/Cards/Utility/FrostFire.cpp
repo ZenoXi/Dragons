@@ -33,16 +33,12 @@ cards::PlayResult cards::FrostFire::Resume(UserInputResponse response, Core* cor
 
         CardType chosenDeck = params->chosenDecks[0];
 
-        int cardsLeftToDestroy = 5;
-        while (cardsLeftToDestroy > 0)
+        int cardsToDestroy = std::min(5, (int)core->GetState().GetDeck(chosenDeck).size());
+        for (int i = 0; i < cardsToDestroy; i++)
         {
-            if (core->GetState().GetDeck(chosenDeck).empty())
-                break;
-
             Card* topCard = core->GetState().GetDeck(chosenDeck).back().get();
             auto cardPtr = core->RemoveCardFromDeck(topCard);
             core->AddCardToDestroyedCards(std::move(cardPtr));
-            cardsLeftToDestroy--;
         }
 
         _waitingForDeckChoice = false;

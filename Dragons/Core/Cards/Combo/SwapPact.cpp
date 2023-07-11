@@ -60,7 +60,7 @@ cards::PlayResult cards::SwapPact::Resume(UserInputResponse response, Core* core
 
         PlayResult result;
         result.waitForInput = true;
-        result.inputRequest.inputType = UserInputType::CHOOSE_CARD_FROM_ACTIVE_CARDS;
+        result.inputRequest.inputType = UserInputType::YES_OR_NO;
         result.inputRequest.inputPrompt = L"Do you want to swap max health with your opponent?";
         result.inputRequest.inputParams = std::unique_ptr<UserInputParams>(params.release());
         return result;
@@ -78,6 +78,9 @@ cards::PlayResult cards::SwapPact::Resume(UserInputResponse response, Core* core
             core->SetMaxHealth(actionProps.player, newPlayerMaxHealth, true);
             core->SetMaxHealth(actionProps.opponent, newOpponentMaxHealth, true);
         }
+
+        _resumeToStarCurse = true;
+        return PlayResult::Resume();
     }
     else if (_resumeToStarCurse)
     {

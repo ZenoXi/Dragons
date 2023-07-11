@@ -57,11 +57,10 @@ cards::PlayResult cards::Shackling::Resume(UserInputResponse response, Core* cor
         _resumeToRecreation = false;
 
         _recreationActivated = false;
+        // Recreation, if played after CanPlay returns false, will only draw cards
         if (_cardRecreation->CanPlay(core, actionProps, nullptr))
-        {
-            _cardRecreation->Play(core, actionProps, nullptr);
             _recreationActivated = true;
-        }
+        _cardRecreation->Play(core, actionProps, nullptr);
 
         _resumeToCleanUp = true;
         return PlayResult::Resume();
@@ -118,7 +117,7 @@ void cards::Shackling::_OnEnterActiveCards(Core* core, int playerIndex)
     });
     _cardLeaveDeckHandler = std::make_unique<EventHandler<CardLeaveDeckEvent>>(&core->Events(), [=](CardLeaveDeckEvent event)
     {
-        if (event.deck != CardType::DEFENSE || !core->GetState().defenseDeck.empty())
+        if (event.card->GetCardType() != CardType::DEFENSE || !core->GetState().defenseDeck.empty())
             return;
 
         auto cardPtr = core->RemoveCardFromActiveCards(_cardRecreation, GetPosition().playerIndex);

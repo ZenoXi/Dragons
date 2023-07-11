@@ -199,6 +199,73 @@ void HandleInputRequest(cards::PlayResult& result, Core& core, cards::Card* card
 
         break;
     }
+    case UserInputType::CHOOSE_NUMBER:
+    {
+        auto params = reinterpret_cast<UserInputParams_ChooseNumber*>(result.inputRequest.inputParams.get());
+
+        while (true)
+        {
+            PrintState(core);
+            std::cout << " CHOOSE NUMBER (min: " << params->lowerBound << ", max: " << params->upperBound << ")\n";
+            std::wcout << " " << result.inputRequest.inputPrompt << "\n\n";
+
+            int number;
+            std::cin >> number;
+
+            if (number < params->lowerBound || number > params->upperBound)
+                continue;
+            params->chosenNumber = number;
+
+            break;
+        }
+
+        UserInputResponse response;
+        response.inputParams = std::move(result.inputRequest.inputParams);
+        auto resumeResult = core.ResumePlay(std::move(response));
+
+        if (resumeResult.waitForInput)
+        {
+            HandleInputRequest(resumeResult, core, card);
+        }
+
+        break;
+    }
+    case UserInputType::CHOOSE_OPTION:
+    {
+        auto params = reinterpret_cast<UserInputParams_ChooseOption*>(result.inputRequest.inputParams.get());
+
+        while (true)
+        {
+            PrintState(core);
+            std::cout << " CHOOSE OPTION\n";
+            std::wcout << " " << result.inputRequest.inputPrompt << "\n\n";
+            std::wcout << " Options:\n";
+            for (int i = 0; i < params->options.size(); i++)
+                std::wcout << " " << i << ": " << params->options[i] << '\n';
+            std::cout << '\n';
+
+            std::cout << " > ";
+            int index;
+            std::cin >> index;
+
+            if (index < 0 || index >= params->options.size())
+                continue;
+            params->chosenOptionIndex = index;
+
+            break;
+        }
+
+        UserInputResponse response;
+        response.inputParams = std::move(result.inputRequest.inputParams);
+        auto resumeResult = core.ResumePlay(std::move(response));
+
+        if (resumeResult.waitForInput)
+        {
+            HandleInputRequest(resumeResult, core, card);
+        }
+
+        break;
+    }
     case UserInputType::CHOOSE_CARD_FROM_HAND:
     {
         auto params = reinterpret_cast<UserInputParams_ChooseCardFromHand*>(result.inputRequest.inputParams.get());
@@ -437,37 +504,6 @@ void HandleInputRequest(cards::PlayResult& result, Core& core, cards::Card* card
         if (resumeResult.waitForInput)
         {
             HandleInputRequest(resumeResult, core, card);
-        }
-
-        break;
-    }
-    case UserInputType::CHOOSE_NUMBER:
-    {
-        auto params = reinterpret_cast<UserInputParams_ChooseNumber*>(result.inputRequest.inputParams.get());
-
-        while (true)
-        {
-            PrintState(core);
-            std::cout << " CHOOSE NUMBER (min: " << params->lowerBound << ", max: " << params->upperBound << ")\n";
-            std::wcout << " " << result.inputRequest.inputPrompt << "\n\n";
-
-            int number;
-            std::cin >> number;
-
-            if (number < params->lowerBound || number > params->upperBound)
-                continue;
-            params->chosenNumber = number;
-
-            UserInputResponse response;
-            response.inputParams = std::move(result.inputRequest.inputParams);
-            auto resumeResult = core.ResumePlay(std::move(response));
-
-            if (resumeResult.waitForInput)
-            {
-                HandleInputRequest(resumeResult, core, card);
-            }
-
-            break;
         }
 
         break;
