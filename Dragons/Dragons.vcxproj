@@ -72,15 +72,19 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
+    <IncludePath>F:\Visual Studio projects\Minor\Dragons\Dragons;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
+    <IncludePath>F:\Visual Studio projects\Minor\Dragons\Dragons;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
+    <IncludePath>F:\Visual Studio projects\Minor\Dragons\Dragons;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
+    <IncludePath>F:\Visual Studio projects\Minor\Dragons\Dragons;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -144,6 +148,15 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="App.cpp" />
+    <ClCompile Include="Components\Base\Button.cpp" />
+    <ClCompile Include="Components\Base\Checkbox.cpp" />
+    <ClCompile Include="Components\Base\ComponentBase.cpp" />
+    <ClCompile Include="Components\Base\DirectionalPanel.cpp" />
+    <ClCompile Include="Components\Base\Label.cpp" />
+    <ClCompile Include="Components\Base\MenuPanel.cpp" />
+    <ClCompile Include="Components\Base\TextInput.cpp" />
+    <ClCompile Include="Components\Custom\Board.cpp" />
     <ClCompile Include="Core\Cards\CardType.cpp" />
     <ClCompile Include="Core\Cards\Combo\Apocalypse.cpp" />
     <ClCompile Include="Core\Cards\Combo\AstroInfluence.cpp" />
@@ -221,9 +234,33 @@
     <ClCompile Include="Core\Cards\Utility\TheThief.cpp" />
     <ClCompile Include="Core\Cards\Utility\WeaponOfChoice.cpp" />
     <ClCompile Include="Core\Core.cpp" />
+    <ClCompile Include="D2DEffects\TintEffect.cpp" />
     <ClCompile Include="Dragons.cpp" />
+    <ClCompile Include="Helper\ResourceManager.cpp" />
+    <ClCompile Include="Helper\StringHelper.cpp" />
+    <ClCompile Include="Helper\Time.cpp" />
+    <ClCompile Include="OldDragons.cpp" />
+    <ClCompile Include="Scenes\EntryScene.cpp" />
+    <ClCompile Include="Scenes\Scene.cpp" />
+    <ClCompile Include="Window\DisplayWindow.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="App.h" />
+    <ClInclude Include="Components\Base\Button.h" />
+    <ClInclude Include="Components\Base\Canvas.h" />
+    <ClInclude Include="Components\Base\Checkbox.h" />
+    <ClInclude Include="Components\Base\ComponentBase.h" />
+    <ClInclude Include="Components\Base\DirectionalPanel.h" />
+    <ClInclude Include="Components\Base\EmptyPanel.h" />
+    <ClInclude Include="Components\Base\Image.h" />
+    <ClInclude Include="Components\Base\Label.h" />
+    <ClInclude Include="Components\Base\MenuItem.h" />
+    <ClInclude Include="Components\Base\MenuPanel.h" />
+    <ClInclude Include="Components\Base\NumberInput.h" />
+    <ClInclude Include="Components\Base\Panel.h" />
+    <ClInclude Include="Components\Base\TextInput.h" />
+    <ClInclude Include="Components\ComHelper.h" />
+    <ClInclude Include="Components\Custom\Board.h" />
     <ClInclude Include="Core\ActionProperties.h" />
     <ClInclude Include="Core\AddArmorProperties.h" />
     <ClInclude Include="Core\Cards\CardPosition.h" />
@@ -319,6 +356,22 @@
     <ClInclude Include="Core\HealProperties.h" />
     <ClInclude Include="Core\Player.h" />
     <ClInclude Include="Core\UserInputRequest.h" />
+    <ClInclude Include="D2DEffects\TintEffect.h" />
+    <ClInclude Include="Helper\decimal.h" />
+    <ClInclude Include="Helper\Event.h" />
+    <ClInclude Include="Helper\ResourceManager.h" />
+    <ClInclude Include="Helper\StringHelper.h" />
+    <ClInclude Include="Helper\Time.h" />
+    <ClInclude Include="Scenes\EntryScene.h" />
+    <ClInclude Include="Scenes\Scene.h" />
+    <ClInclude Include="Window\DisplayWindow.h" />
+    <ClInclude Include="Window\DragDropEventHandler.h" />
+    <ClInclude Include="Window\Graphics.h" />
+    <ClInclude Include="Window\KeyboardEventHandler.h" />
+    <ClInclude Include="Window\KeyboardManager.h" />
+    <ClInclude Include="Window\MouseEventHandler.h" />
+    <ClInclude Include="Window\MouseManager.h" />
+    <ClInclude Include="Window\WindowsEx.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
