@@ -10,6 +10,8 @@ bool cards::ShadowAssassin::CanPlay(Core* core, ActionProperties actionProps, Pl
 
 cards::PlayResult cards::ShadowAssassin::Play(Core* core, ActionProperties actionProps, PlayProperties* playProps)
 {
+    // TODO: this should be an active card
+
     auto cardsForCombo = core->GetCardsForCombo(ComboProperties{ _requiredCardIds, actionProps.player });
     for (auto& card : cardsForCombo)
     {
@@ -49,6 +51,8 @@ cards::PlayResult cards::ShadowAssassin::Play(Core* core, ActionProperties actio
         }
     });
     _activeComboEffects.push_back(std::move(effect));
+
+    core->AddExtraAction(actionProps.player, { true, false, false });
 
     return PlayResult::Default();
 }

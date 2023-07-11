@@ -26,6 +26,8 @@ cards::PlayResult cards::DragonSword::Play(Core* core, ActionProperties actionPr
     _cardHeavySlash->Play(core, actionProps, nullptr);
     core->AddCardToActiveCards(core->RemoveCardFromInPlayCards(_cardHeavySlash), actionProps.player);
 
+    core->AddCardToGraveyard(core->RemoveCardFromInPlayCards(_cardHellfireSword));
+
     return PlayResult::AddToActives();
 }
 

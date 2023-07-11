@@ -23,6 +23,7 @@ cards::PlayResult cards::DeathFee::Play(Core* core, ActionProperties actionProps
 
     // Play Death Poison
     _cardDeathPoison->Play(core, actionProps, nullptr);
+    core->AddCardToActiveCards(core->RemoveCardFromInPlayCards(_cardDeathPoison), actionProps.player);
 
     // Play Summon Dead
     if (_cardSummonDead->CanPlay(core, actionProps, nullptr))
@@ -139,7 +140,6 @@ cards::PlayResult cards::DeathFee::Resume(UserInputResponse response, Core* core
     {
         _resumeToCleanUp = false;
 
-        core->AddCardToGraveyard(core->RemoveCardFromInPlayCards(_cardDeathPoison));
         core->AddCardToGraveyard(core->RemoveCardFromInPlayCards(_cardSummonDead));
         core->AddCardToGraveyard(core->RemoveCardFromInPlayCards(_cardHelpingHand));
 

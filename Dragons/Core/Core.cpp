@@ -198,6 +198,10 @@ void Core::InitState()
     _state.players[0].actionsLeft = 0;
     _state.players[0].handRevealed = false;
     _state.players[0].index = 0;
+    _state.players[0].hand.push_back(std::make_unique<cards::ElementalDragon>());
+    _state.players[0].hand.push_back(std::make_unique<cards::HeavySlash>());
+    _state.players[0].hand.push_back(std::make_unique<cards::ShieldingNet>());
+    _state.players[0].hand.push_back(std::make_unique<cards::CorpsePuppet>());
 
     _state.players.push_back(Player{});
     _state.players[1].health = GAME_STARTING_HEALTH;

@@ -331,6 +331,38 @@ TESTING:
 
 
 Elmental dragon: [Corpse puppet, Heavy slash, Shielding net] You can destroy all your active cards to activate another combo for free
+TESTING:
+ GENERAL:								OK
+ APOCALYPSE:								OK
+ ASTRO INFLUENCE:							OK
+ COUNTER SCALE:								OK
+ DEATH FEE:								OK
+ DIFFERENT SIDES:							NOT TESTED
+ DOUBLE STRIKE:								NOT TESTED
+ DRAGON SWORD:								OK
+ DRAGON WEAPONS:							NOT TESTED
+ DREAM LAND:								OK
+ ELEMENTAL DRAGON:							IMPOSSIBLE
+ FAKE OUT:								OK
+ FINAL HOUR:								OK
+ INFERNO LIFELINE:							OK
+ MAGIC TRICK:								NOT TESTED
+ NATURE SPELL:								NOT TESTED
+ OMNICLAUSTRA:								OK
+ POWER UP:								NOT TESTED
+ RE-EQUIP:								NOT TESTED
+ RITUAL:								NOT TESTED
+ SHACKLING:								OK
+ SHADOW ASSASSIN:							OK
+ SOULSTEALER:								NOT TESTED
+ SUPERIORITY:								OK
+ SWAP PACT:								NOT TESTED
+ THREE GODS STRIKE:							OK
+ TOTAL ENTANGLEMENT:							OK
+ ULTIMATE DEFENSE:							NOT TESTED
+ ULTIMATE EXCHANGE:							NOT TESTED
+ UNDERWORLD:								NOT TESTED
+ VAMPIRISM:								NOT TESTED
 
 
 Superiority: [Cheating, Hellfire sword, Armor up] Combo effect - you steal enemy armor instead of destroying it. Cheating remains active as long as you have armor
@@ -346,6 +378,11 @@ TESTING:
 
 Double strike: [Sacrificial attack, Stab] Combo effect - you don't receive 3 damage
 	Customize card effect
+TESTING:
+ GENERAL:								OK
+
+
+Ritual: [Life exchange, Last breath, Life flower] You don't have to discard anything. Life Flower effect for each offensive card played
 TESTING:
  GENERAL:								OK
 

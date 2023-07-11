@@ -103,6 +103,7 @@ cards::PlayResult cards::Ritual::Resume(UserInputResponse response, Core* core, 
         }
 
         _resumeToCleanUp = true;
+        return PlayResult::Resume();
     }
     else if (_resumeToCleanUp)
     {

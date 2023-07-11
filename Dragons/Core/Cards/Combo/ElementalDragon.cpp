@@ -123,6 +123,7 @@ cards::PlayResult cards::ElementalDragon::Resume(UserInputResponse response, Cor
         }, true /* max priority */);
 
         PlayResult result = _chosenCard->Play(core, actionProps, nullptr);
+        _preGetComboCardsHandler.reset();
         if (result.waitForInput)
         {
             _resumeComboPlay = true;
