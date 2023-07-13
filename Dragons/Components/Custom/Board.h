@@ -56,6 +56,7 @@ namespace zcom
             float yPos = 0.0f;
             float rotation = 0.0f;
             cards::CardSet set = { cards::CardSets::NONE, -1 };
+            float zIndex = 0;
 
             float targetXPos = 0.0f;
             float targetYPos = 0.0f;
@@ -70,8 +71,17 @@ namespace zcom
         };
         std::vector<_Card> _cards;
 
-        float CARD_WIDTH = 200;
-        float CARD_HEIGHT = 300;
+        static constexpr float CARD_WIDTH = 160;
+        static constexpr float CARD_HEIGHT = 250;
+
+        static constexpr float PI = 3.141592f;
+        static constexpr float RADIAN = 57.2958f;
+
+        ID2D1Bitmap* _offenseCardBitmap = nullptr;
+        ID2D1Bitmap* _defenseCardBitmap = nullptr;
+        ID2D1Bitmap* _utilityCardBitmap = nullptr;
+        ID2D1Bitmap* _comboCardBitmap = nullptr;
+        float shadowRadius = 2.0f;
 
     protected:
         friend class Scene;
@@ -92,6 +102,7 @@ namespace zcom
 
     private:
 
+        void _GenerateCardBitmap(Graphics g, ID2D1Bitmap** bitmapRef, D2D1_COLOR_F color);
         void _CreateMissingCards();
         void _CalculateCardTargetPositions();
     };

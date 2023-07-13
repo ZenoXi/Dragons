@@ -27,7 +27,7 @@ void EntryScene::_Init(const SceneOptionsBase* options)
 
     _board = Create<zcom::Board>(&core);
     _board->SetParentSizePercent(1.0f, 1.0f);
-    _board->SetBackgroundColor(D2D1::ColorF(0.1f, 0.06f, 0.03f));
+    _board->SetBackgroundColor(D2D1::ColorF(0.2f, 0.12f, 0.06f));
 
     _canvas->AddComponent(_helloWorldLabel.get());
     _canvas->AddComponent(_board.get());

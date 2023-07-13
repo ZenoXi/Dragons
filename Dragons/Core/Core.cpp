@@ -187,9 +187,6 @@ void Core::InitState()
     ShuffleDeck(cards::CardType::UTILITY);
     ShuffleDeck(cards::CardType::COMBO);
 
-    _state.utilityDeck.clear();
-    _state.comboDeck.clear();
-
     // Init players
     _state.players.push_back(Player{});
     _state.players[0].health = GAME_STARTING_HEALTH;
