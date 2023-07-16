@@ -83,6 +83,8 @@ namespace zcom
         ID2D1Bitmap* _comboCardBitmap = nullptr;
         float shadowRadius = 2.0f;
 
+        float extraAngle = 0.0f;
+
     protected:
         friend class Scene;
         friend class Base;

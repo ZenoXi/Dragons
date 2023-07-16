@@ -236,6 +236,8 @@
     <ClCompile Include="Core\Core.cpp" />
     <ClCompile Include="D2DEffects\TintEffect.cpp" />
     <ClCompile Include="Dragons.cpp" />
+    <ClCompile Include="Helper\Functions.cpp" />
+    <ClCompile Include="Helper\Navigation.cpp" />
     <ClCompile Include="Helper\ResourceManager.cpp" />
     <ClCompile Include="Helper\StringHelper.cpp" />
     <ClCompile Include="Helper\Time.cpp" />
@@ -357,8 +359,11 @@
     <ClInclude Include="Core\Player.h" />
     <ClInclude Include="Core\UserInputRequest.h" />
     <ClInclude Include="D2DEffects\TintEffect.h" />
+    <ClInclude Include="Helper\Constants.h" />
     <ClInclude Include="Helper\decimal.h" />
     <ClInclude Include="Helper\Event.h" />
+    <ClInclude Include="Helper\Functions.h" />
+    <ClInclude Include="Helper\Navigation.h" />
     <ClInclude Include="Helper\ResourceManager.h" />
     <ClInclude Include="Helper\StringHelper.h" />
     <ClInclude Include="Helper\Time.h" />

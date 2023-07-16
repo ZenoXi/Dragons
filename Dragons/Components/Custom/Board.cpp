@@ -1,6 +1,8 @@
 #include "Board.h"
 #include "App.h"
 
+#include "Helper/Functions.h"
+
 void zcom::Board::_OnUpdate()
 {
 
@@ -8,7 +10,17 @@ void zcom::Board::_OnUpdate()
 
 void zcom::Board::_OnDraw(Graphics g)
 {
-    float padding = std::ceilf(shadowRadius);
+    //float padding = std::ceilf(shadowRadius);
+    float padding = 0.0f;
+
+    //if (_offenseCardBitmap)
+    //    _offenseCardBitmap->Release();
+    //if (_defenseCardBitmap)
+    //    _defenseCardBitmap->Release();
+    //if (_utilityCardBitmap)
+    //    _utilityCardBitmap->Release();
+    //if (_comboCardBitmap)
+    //    _comboCardBitmap->Release();
 
     // Generate card bitmaps
     if (!_offenseCardBitmap)
@@ -24,6 +36,8 @@ void zcom::Board::_OnDraw(Graphics g)
     _CalculateCardTargetPositions();
 
     std::sort(_cards.begin(), _cards.end(), [](const _Card& card1, const _Card& card2) { return card1.zIndex < card2.zIndex; });
+
+    //g.target->DrawBitmap(_offenseCardBitmap);
 
     for (auto& card : _cards)
     {
@@ -73,23 +87,23 @@ void zcom::Board::_OnDraw(Graphics g)
             card.targetYPos + CARD_HEIGHT / 2 + padding
         );
 
-        g.target->DrawBitmap(_offenseCardBitmap);
-        HRESULT hr = g.target->Flush();
-        if (hr != S_OK)
-        {
-            std::cout << "?\n";
-        }
+        //g.target->DrawBitmap(_offenseCardBitmap, rect);
+        //HRESULT hr = g.target->Flush();
+        //if (hr != S_OK)
+        //{
+        //    std::cout << "?\n";
+        //}
 
-        //g.target->SetTransform(D2D1::Matrix3x2F::Rotation(card.targetRotation * RADIAN, { card.targetXPos, card.targetYPos }));
-        //if (card.card->GetCardType() == cards::CardType::OFFENSE)
-        //    g.target->DrawBitmap(_offenseCardBitmap, &rect);
-        //else if (card.card->GetCardType() == cards::CardType::DEFENSE)
-        //    g.target->DrawBitmap(_defenseCardBitmap, &rect);
-        //else if (card.card->GetCardType() == cards::CardType::UTILITY)
-        //    g.target->DrawBitmap(_utilityCardBitmap, &rect);
-        //else if (card.card->GetCardType() == cards::CardType::COMBO)
-        //    g.target->DrawBitmap(_comboCardBitmap, &rect);
-        //g.target->SetTransform(D2D1::Matrix3x2F::Identity());
+        g.target->SetTransform(D2D1::Matrix3x2F::Rotation(-card.targetRotation * RADIAN, { card.targetXPos, card.targetYPos }));
+        if (card.card->GetCardType() == cards::CardType::OFFENSE)
+            g.target->DrawBitmap(_offenseCardBitmap, &rect);
+        else if (card.card->GetCardType() == cards::CardType::DEFENSE)
+            g.target->DrawBitmap(_defenseCardBitmap, &rect);
+        else if (card.card->GetCardType() == cards::CardType::UTILITY)
+            g.target->DrawBitmap(_utilityCardBitmap, &rect);
+        else if (card.card->GetCardType() == cards::CardType::COMBO)
+            g.target->DrawBitmap(_comboCardBitmap, &rect);
+        g.target->SetTransform(D2D1::Matrix3x2F::Identity());
 
         //g.target->FillRoundedRectangle(roundedRect, fillBrush);
         //g.target->DrawRoundedRectangle(roundedRect, borderBrush, 2.0f);
@@ -98,7 +112,9 @@ void zcom::Board::_OnDraw(Graphics g)
 
 void zcom::Board::_GenerateCardBitmap(Graphics g, ID2D1Bitmap** bitmapRef, D2D1_COLOR_F color)
 {
-    float padding = std::ceilf(shadowRadius);
+    //float padding = 100.0f;
+    //float padding = std::ceilf(shadowRadius);
+    float padding = 0.0f;
 
     ID2D1Image* stash = nullptr;
 
@@ -117,24 +133,39 @@ void zcom::Board::_GenerateCardBitmap(Graphics g, ID2D1Bitmap** bitmapRef, D2D1_
 
     ID2D1SolidColorBrush* fillBrush = nullptr;
     g.target->CreateSolidColorBrush(color, &fillBrush);
+    ID2D1SolidColorBrush* borderBrush = nullptr;
+    color.r *= 0.5f;
+    color.g *= 0.5f;
+    color.b *= 0.5f;
+    color.a = 0.8f;
+    g.target->CreateSolidColorBrush(color, &borderBrush);
 
-    D2D1_RECT_F rect = D2D1::RectF(
-        padding,
-        padding,
-        CARD_WIDTH + padding,
-        CARD_HEIGHT + padding
+    D2D1_RECT_F cardRect = D2D1::RectF(
+        padding + 1.0f,
+        padding + 1.0f,
+        CARD_WIDTH + padding - 1.0f,
+        CARD_HEIGHT + padding - 1.0f
     );
-    D2D1_ROUNDED_RECT roundedRect = D2D1::RoundedRect(rect, 5.0f, 5.0f);
+    D2D1_ROUNDED_RECT roundedCardRect = D2D1::RoundedRect(cardRect, 5.0f, 5.0f);
+
+    D2D1_RECT_F borderRect = D2D1::RectF(
+        padding + 0.5f,
+        padding + 0.5f,
+        CARD_WIDTH + padding - 0.5f,
+        CARD_HEIGHT + padding - 0.5f
+    );
+    D2D1_ROUNDED_RECT roundedBorderRect = D2D1::RoundedRect(borderRect, 5.0f, 5.0f);
 
     g.target->GetTarget(&stash);
     g.target->SetTarget(contentBitmap);
     g.target->Clear();
-    g.target->FillRoundedRectangle(roundedRect, fillBrush);
+    g.target->FillRoundedRectangle(roundedCardRect, fillBrush);
+    g.target->DrawRoundedRectangle(roundedBorderRect, borderBrush);
     g.target->SetTarget(stash);
     stash->Release();
 
-    // Compose bitmap with shadow
-    //ID2D1Bitmap1* compositeBitmap = nullptr;
+    //// Create shadow bitmap
+    //ID2D1Bitmap1* shadowBitmap = nullptr;
     //g.target->CreateBitmap(
     //    D2D1::SizeU(CARD_WIDTH + padding * 2, CARD_HEIGHT + padding * 2),
     //    nullptr,
@@ -143,19 +174,20 @@ void zcom::Board::_GenerateCardBitmap(Graphics g, ID2D1Bitmap** bitmapRef, D2D1_
     //        D2D1_BITMAP_OPTIONS_TARGET,
     //        { DXGI_FORMAT_B8G8R8A8_UNORM, D2D1_ALPHA_MODE_PREMULTIPLIED }
     //    ),
-    //    &compositeBitmap
+    //    &shadowBitmap
     //);
 
     //ID2D1Effect* shadowEffect = nullptr;
     //g.target->CreateEffect(CLSID_D2D1Shadow, &shadowEffect);
     //shadowEffect->SetInput(0, contentBitmap);
-    //shadowEffect->SetValue(D2D1_SHADOW_PROP_COLOR, D2D1::Vector4F(0.0f, 0.0f, 0.0f, 0.8f));
+    //shadowEffect->SetValue(D2D1_SHADOW_PROP_COLOR, D2D1::Vector4F(0.1f, 0.1f, 0.1f, 1.0f));
     //shadowEffect->SetValue(D2D1_SHADOW_PROP_BLUR_STANDARD_DEVIATION, shadowRadius);
 
     //g.target->GetTarget(&stash);
-    //g.target->SetTarget(compositeBitmap);
+    //g.target->SetTarget(shadowBitmap);
     //g.target->Clear();
     //g.target->DrawImage(shadowEffect, D2D1::Point2F(0.0f, 0.0f));
+    //g.target->DrawBitmap(contentBitmap);
     //g.target->SetTarget(stash);
     //stash->Release();
 
@@ -171,18 +203,19 @@ void zcom::Board::_GenerateCardBitmap(Graphics g, ID2D1Bitmap** bitmapRef, D2D1_
     {
         D2D1_POINT_2U point = D2D1::Point2U();
         D2D1_RECT_U rect = D2D1::RectU(0, 0, CARD_WIDTH + padding * 2, CARD_HEIGHT + padding * 2);
-        HRESULT hr = (*bitmapRef)->CopyFromBitmap(&point, contentBitmap, &rect);
-        hr = g.target->Flush();
-        //HRESULT hr = (*bitmapRef)->CopyFromBitmap(&point, compositeBitmap, &rect);
-        if (hr != S_OK)
-        {
-            std::cout << "!\n";
-        }
+        //HRESULT hr = (*bitmapRef)->CopyFromBitmap(&point, contentBitmap, &rect);
+        g.target->GetTarget(&stash);
+        //g.target->SetTarget(shadowBitmap);
+        g.target->SetTarget(contentBitmap);
+        (*bitmapRef)->CopyFromRenderTarget(&point, g.target, &rect);
+        g.target->SetTarget(stash);
+        stash->Release();
     }
 
     fillBrush->Release();
+    borderBrush->Release();
     //shadowEffect->Release();
-    //compositeBitmap->Release();
+    //shadowBitmap->Release();
     contentBitmap->Release();
 }
 
@@ -278,9 +311,9 @@ void zcom::Board::_CalculateCardTargetPositions()
             {
                 if (card.card == core->GetState().offenseDeck[i].get())
                 {
-                    card.zIndex = core->GetState().offenseDeck.size() - i - 1;
+                    card.zIndex = i;
                     card.set.set = cards::CardSets::DECK;
-                    card.targetXPos = offenseDeckCenterPosX - card.zIndex;
+                    card.targetXPos = offenseDeckCenterPosX - i * 1.25f;
                     card.targetYPos = offenseDeckCenterPosY;
                     card.targetRotation = PI / 2;
                     break;
@@ -293,9 +326,9 @@ void zcom::Board::_CalculateCardTargetPositions()
             {
                 if (card.card == core->GetState().defenseDeck[i].get())
                 {
-                    card.zIndex = core->GetState().defenseDeck.size() - i - 1;
+                    card.zIndex = i;
                     card.set.set = cards::CardSets::DECK;
-                    card.targetXPos = defenseDeckCenterPosX - card.zIndex;
+                    card.targetXPos = defenseDeckCenterPosX - i * 1.25f;
                     card.targetYPos = defenseDeckCenterPosY;
                     card.targetRotation = PI / 2;
                     break;
@@ -308,9 +341,9 @@ void zcom::Board::_CalculateCardTargetPositions()
             {
                 if (card.card == core->GetState().utilityDeck[i].get())
                 {
-                    card.zIndex = core->GetState().utilityDeck.size() - i - 1;
+                    card.zIndex = i;
                     card.set.set = cards::CardSets::DECK;
-                    card.targetXPos = utilityDeckCenterPosX - card.zIndex;
+                    card.targetXPos = utilityDeckCenterPosX - i * 1.25f;
                     card.targetYPos = utilityDeckCenterPosY;
                     card.targetRotation = PI / 2;
                     break;
@@ -323,11 +356,93 @@ void zcom::Board::_CalculateCardTargetPositions()
             {
                 if (card.card == core->GetState().comboDeck[i].get())
                 {
-                    card.zIndex = core->GetState().comboDeck.size() - i - 1;
+                    card.zIndex = i;
                     card.set.set = cards::CardSets::DECK;
-                    card.targetXPos = comboDeckCenterPosX - card.zIndex;
+                    card.targetXPos = comboDeckCenterPosX - i * 1.25f;
                     card.targetYPos = comboDeckCenterPosY;
                     card.targetRotation = PI / 2;
+                    break;
+                }
+            }
+        }
+    }
+
+    extraAngle += 0.01f;
+
+    // Calculate hand card positions
+    {
+        { // Player 1
+            int cardsInHand = core->GetState().players[0].hand.size();
+            Pos2D<float> circleCenter = { viewWidth / 2, viewHeight + 350.0f };
+            Pos2D<float> circleTop = circleCenter + Pos2D<float>(0.0f, -500.0f);
+            float gapBetweenCards = 0.2f;
+
+            for (int i = 0; i < cardsInHand; i++)
+            {
+                for (auto& card : _cards)
+                {
+                    if (card.card == core->GetState().players[0].hand[i].get())
+                    {
+                        float cardAngle = (gapBetweenCards * (cardsInHand - 1)) / 2 - gapBetweenCards * i;
+                        Pos2D<float> cardPos = point_rotated_by(circleCenter, circleTop, cardAngle);
+
+                        card.zIndex = i;
+                        card.set.set = cards::CardSets::DECK;
+                        card.targetXPos = cardPos.x;
+                        card.targetYPos = cardPos.y;
+                        card.targetRotation = cardAngle;
+                        //card.targetRotation = 0.1f;
+                        break;
+                    }
+                }
+            }
+        }
+        { // Player 2
+            int cardsInHand = core->GetState().players[1].hand.size();
+            Pos2D<float> circleCenter = { viewWidth / 2, -350.0f };
+            Pos2D<float> circleBottom = circleCenter + Pos2D<float>(0.0f, 500.0f);
+            float startAngle = PI;
+            float gapBetweenCards = 0.2f;
+
+            for (int i = 0; i < cardsInHand; i++)
+            {
+                for (auto& card : _cards)
+                {
+                    if (card.card == core->GetState().players[1].hand[i].get())
+                    {
+                        float cardAngle = (gapBetweenCards * (cardsInHand - 1)) / 2 - gapBetweenCards * i;
+                        Pos2D<float> cardPos = point_rotated_by(circleCenter, circleBottom, cardAngle);
+
+                        card.zIndex = i;
+                        card.set.set = cards::CardSets::DECK;
+                        card.targetXPos = cardPos.x;
+                        card.targetYPos = cardPos.y;
+                        card.targetRotation = startAngle + cardAngle;
+                        //card.targetRotation = 0.1f;
+                        break;
+                    }
+                }
+            }
+        }
+    }
+
+
+    // Calculate graveyard card positions
+    {
+        float graveyardDeckCenterPosX = viewWidth - gapFromScreenEdge - CARD_WIDTH / 2;
+        float graveyardDeckCenterPosY = viewHeight / 2;
+
+        for (int i = 0; i < core->GetState().graveyard.size(); i++)
+        {
+            for (auto& card : _cards)
+            {
+                if (card.card == core->GetState().graveyard[i].get())
+                {
+                    card.zIndex = i;
+                    card.set.set = cards::CardSets::DECK;
+                    card.targetXPos = graveyardDeckCenterPosX + i * 1.5f;
+                    card.targetYPos = graveyardDeckCenterPosY;
+                    card.targetRotation = 0.0f;
                     break;
                 }
             }

@@ -24,14 +24,19 @@ void EntryScene::_Init(const SceneOptionsBase* options)
     _helloWorldLabel->SetFontSize(32.0f);
     _helloWorldLabel->SetHorizontalTextAlignment(zcom::TextAlignment::CENTER);
     _helloWorldLabel->SetVerticalTextAlignment(zcom::Alignment::CENTER);
+    _helloWorldLabel->SetBackgroundColor(D2D1::ColorF(0.79f, 0.22f, 0.14f));
 
     _board = Create<zcom::Board>(&core);
     _board->SetParentSizePercent(1.0f, 1.0f);
-    _board->SetBackgroundColor(D2D1::ColorF(0.2f, 0.12f, 0.06f));
+    zcom::PROP_Shadow shadowProp;
+    shadowProp.color = D2D1::ColorF(0.0f, 0.0f, 0.0f, 0.5f);
+    shadowProp.blurStandardDeviation = 5.0f;
+    _board->SetProperty(shadowProp);
+    _board->SetBackgroundColor(D2D1::ColorF(0, 0.0f));
 
-    _canvas->AddComponent(_helloWorldLabel.get());
     _canvas->AddComponent(_board.get());
-    _canvas->SetBackgroundColor(D2D1::ColorF(0.1f, 0.1f, 0.1f));
+    //_canvas->AddComponent(_helloWorldLabel.get());
+    _canvas->SetBackgroundColor(D2D1::ColorF(0.2f, 0.12f, 0.06f));
 }
 
 void EntryScene::_Uninit()
