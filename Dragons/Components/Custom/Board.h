@@ -27,11 +27,18 @@ namespace zcom
 
         EventTargets _OnLeftPressed(int x, int y)
         {
+            core->AddCardToHand(core->GetRegisteredCards().front()->CreateInstance(), 0);
             return EventTargets().Add(this, x, y);
         }
 
         EventTargets _OnLeftReleased(int x, int y)
         {
+            return EventTargets().Add(this, x, y);
+        }
+
+        EventTargets _OnRightPressed(int x, int y)
+        {
+            core->AddCardToDestroyedCards(core->RemoveCardFromHand(core->GetState().players[0].hand.size() - 1, 0));
             return EventTargets().Add(this, x, y);
         }
 
@@ -66,9 +73,12 @@ namespace zcom
         };
         std::vector<_Card> _cards;
         cards::Card* _hoveredCard = nullptr;
+        bool _hoveredCardInHand = false;
 
         static constexpr float CARD_WIDTH = 160;
         static constexpr float CARD_HEIGHT = 250;
+        static constexpr float RENDER_CARD_WIDTH = 320;
+        static constexpr float RENDER_CARD_HEIGHT = 500;
 
         static constexpr float PI = 3.141592f;
         static constexpr float RADIAN = 57.2958f;
