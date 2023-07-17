@@ -21,15 +21,9 @@ namespace zcom
         void _OnUpdate();
         void _OnDraw(Graphics g);
 
-        void _OnMouseEnterArea()
-        {
-
-        }
-
-        void _OnMouseLeaveArea()
-        {
-
-        }
+        EventTargets _OnMouseMove(int deltaX, int deltaY);
+        void _OnMouseEnterArea();
+        void _OnMouseLeaveArea();
 
         EventTargets _OnLeftPressed(int x, int y)
         {
@@ -56,7 +50,8 @@ namespace zcom
             float yPos = 0.0f;
             float rotation = 0.0f;
             cards::CardSet set = { cards::CardSets::NONE, -1 };
-            float zIndex = 0;
+            int zIndex = 0;
+            float scale = 1.0f;
 
             float targetXPos = 0.0f;
             float targetYPos = 0.0f;
@@ -70,6 +65,7 @@ namespace zcom
             float progress = 0.0f;
         };
         std::vector<_Card> _cards;
+        cards::Card* _hoveredCard = nullptr;
 
         static constexpr float CARD_WIDTH = 160;
         static constexpr float CARD_HEIGHT = 250;
@@ -82,8 +78,6 @@ namespace zcom
         ID2D1Bitmap* _utilityCardBitmap = nullptr;
         ID2D1Bitmap* _comboCardBitmap = nullptr;
         float shadowRadius = 2.0f;
-
-        float extraAngle = 0.0f;
 
     protected:
         friend class Scene;
@@ -107,5 +101,6 @@ namespace zcom
         void _GenerateCardBitmap(Graphics g, ID2D1Bitmap** bitmapRef, D2D1_COLOR_F color);
         void _CreateMissingCards();
         void _CalculateCardTargetPositions();
+        cards::Card* _GetHoveredCard();
     };
 }

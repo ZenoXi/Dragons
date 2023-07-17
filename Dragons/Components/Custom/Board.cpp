@@ -36,7 +36,14 @@ void zcom::Board::_OnDraw(Graphics g)
     _CalculateCardTargetPositions();
 
     std::sort(_cards.begin(), _cards.end(), [](const _Card& card1, const _Card& card2) { return card1.zIndex < card2.zIndex; });
-
+    // Move hovered card to end
+    auto it = std::find_if(_cards.begin(), _cards.end(), [&](const _Card& card) { return card.card == _hoveredCard; });
+    if (it != _cards.end())
+    {
+        _Card card = *it;
+        _cards.erase(it);
+        _cards.insert(_cards.end(), card);
+    }
     //g.target->DrawBitmap(_offenseCardBitmap);
 
     for (auto& card : _cards)
@@ -81,10 +88,10 @@ void zcom::Board::_OnDraw(Graphics g)
         //borderBrush->Release();
 
         D2D1_RECT_F rect = D2D1::RectF(
-            card.targetXPos - CARD_WIDTH / 2 - padding,
-            card.targetYPos - CARD_HEIGHT / 2 - padding,
-            card.targetXPos + CARD_WIDTH / 2 + padding,
-            card.targetYPos + CARD_HEIGHT / 2 + padding
+            card.targetXPos - (CARD_WIDTH / 2 - padding) * card.scale,
+            card.targetYPos - (CARD_HEIGHT / 2 - padding) * card.scale,
+            card.targetXPos + (CARD_WIDTH / 2 + padding) * card.scale,
+            card.targetYPos + (CARD_HEIGHT / 2 + padding) * card.scale
         );
 
         //g.target->DrawBitmap(_offenseCardBitmap, rect);
@@ -108,6 +115,22 @@ void zcom::Board::_OnDraw(Graphics g)
         //g.target->FillRoundedRectangle(roundedRect, fillBrush);
         //g.target->DrawRoundedRectangle(roundedRect, borderBrush, 2.0f);
     }
+}
+
+zcom::EventTargets zcom::Board::_OnMouseMove(int deltaX, int deltaY)
+{
+    _hoveredCard = _GetHoveredCard();
+    return EventTargets().Add(this, GetMousePosX(), GetMousePosY());
+}
+
+void zcom::Board::_OnMouseEnterArea()
+{
+
+}
+
+void zcom::Board::_OnMouseLeaveArea()
+{
+    _hoveredCard = nullptr;
 }
 
 void zcom::Board::_GenerateCardBitmap(Graphics g, ID2D1Bitmap** bitmapRef, D2D1_COLOR_F color)
@@ -292,6 +315,10 @@ void zcom::Board::_CalculateCardTargetPositions()
     {
         card.targetXPos = viewWidth / 2;
         card.targetYPos = viewHeight / 2;
+        if (card.card == _hoveredCard)
+            card.scale = 1.25f;
+        else
+            card.scale = 1.0f;
     }
 
     // Calculate deck positions
@@ -367,14 +394,12 @@ void zcom::Board::_CalculateCardTargetPositions()
         }
     }
 
-    extraAngle += 0.01f;
-
     // Calculate hand card positions
     {
         { // Player 1
             int cardsInHand = core->GetState().players[0].hand.size();
-            Pos2D<float> circleCenter = { viewWidth / 2, viewHeight + 350.0f };
-            Pos2D<float> circleTop = circleCenter + Pos2D<float>(0.0f, -500.0f);
+            Pos2D<float> circleCenter = { viewWidth / 2, viewHeight + 550.0f };
+            Pos2D<float> circleTop = circleCenter + Pos2D<float>(0.0f, -700.0f);
             float gapBetweenCards = 0.2f;
 
             for (int i = 0; i < cardsInHand; i++)
@@ -387,7 +412,7 @@ void zcom::Board::_CalculateCardTargetPositions()
                         Pos2D<float> cardPos = point_rotated_by(circleCenter, circleTop, cardAngle);
 
                         card.zIndex = i;
-                        card.set.set = cards::CardSets::DECK;
+                        card.set.set = cards::CardSets::HAND;
                         card.targetXPos = cardPos.x;
                         card.targetYPos = cardPos.y;
                         card.targetRotation = cardAngle;
@@ -399,8 +424,8 @@ void zcom::Board::_CalculateCardTargetPositions()
         }
         { // Player 2
             int cardsInHand = core->GetState().players[1].hand.size();
-            Pos2D<float> circleCenter = { viewWidth / 2, -350.0f };
-            Pos2D<float> circleBottom = circleCenter + Pos2D<float>(0.0f, 500.0f);
+            Pos2D<float> circleCenter = { viewWidth / 2, -550.0f };
+            Pos2D<float> circleBottom = circleCenter + Pos2D<float>(0.0f, 700.0f);
             float startAngle = PI;
             float gapBetweenCards = 0.2f;
 
@@ -414,7 +439,7 @@ void zcom::Board::_CalculateCardTargetPositions()
                         Pos2D<float> cardPos = point_rotated_by(circleCenter, circleBottom, cardAngle);
 
                         card.zIndex = i;
-                        card.set.set = cards::CardSets::DECK;
+                        card.set.set = cards::CardSets::HAND;
                         card.targetXPos = cardPos.x;
                         card.targetYPos = cardPos.y;
                         card.targetRotation = startAngle + cardAngle;
@@ -439,8 +464,8 @@ void zcom::Board::_CalculateCardTargetPositions()
                 if (card.card == core->GetState().graveyard[i].get())
                 {
                     card.zIndex = i;
-                    card.set.set = cards::CardSets::DECK;
-                    card.targetXPos = graveyardDeckCenterPosX + i * 1.5f;
+                    card.set.set = cards::CardSets::GRAVEYARD;
+                    card.targetXPos = graveyardDeckCenterPosX + i * 1.25f;
                     card.targetYPos = graveyardDeckCenterPosY;
                     card.targetRotation = 0.0f;
                     break;
@@ -448,21 +473,91 @@ void zcom::Board::_CalculateCardTargetPositions()
             }
         }
     }
+}
 
-    for (auto& card : _cards)
+cards::Card* zcom::Board::_GetHoveredCard()
+{
+    std::vector<_Card> sortedCards = _cards;
+    std::sort(sortedCards.begin(), sortedCards.end(), [&](const _Card& card1, const _Card& card2) { return card1.zIndex > card2.zIndex; });
+    // Move hovered card to beggining
+    auto it = std::find_if(sortedCards.begin(), sortedCards.end(), [&](const _Card& card) { return card.card == _hoveredCard; });
+    if (it != sortedCards.end())
     {
-        cards::CardSet set = core->GetCardSet(card.card);
-        switch (set.set)
-        {
-        case cards::CardSets::DECK:
-        {
+        _Card card = *it;
+        sortedCards.erase(it);
+        sortedCards.insert(sortedCards.begin(), card);
+    }
 
-        }
-        default:
+    for (auto& card : sortedCards)
+    {
+        // Skip cards not on top of decks
+        bool skip = false;
+        for (int i = 0; i < core->GetState().offenseDeck.size() - 1; i++)
         {
-            // 
-            break;
+            if (card.card == core->GetState().offenseDeck[i].get())
+            {
+                skip = true;
+                break;
+            }
         }
+        if (skip)
+            continue;
+        for (int i = 0; i < core->GetState().defenseDeck.size() - 1; i++)
+        {
+            if (card.card == core->GetState().defenseDeck[i].get())
+            {
+                skip = true;
+                break;
+            }
+        }
+        if (skip)
+            continue;
+        for (int i = 0; i < core->GetState().utilityDeck.size() - 1; i++)
+        {
+            if (card.card == core->GetState().utilityDeck[i].get())
+            {
+                skip = true;
+                break;
+            }
+        }
+        if (skip)
+            continue;
+        for (int i = 0; i < core->GetState().comboDeck.size() - 1; i++)
+        {
+            if (card.card == core->GetState().comboDeck[i].get())
+            {
+                skip = true;
+                break;
+            }
+        }
+        if (skip)
+            continue;
+        for (int i = 0; i < core->GetState().graveyard.size() - 1; i++)
+        {
+            if (card.card == core->GetState().graveyard[i].get())
+            {
+                skip = true;
+                break;
+            }
+        }
+        if (skip)
+            continue;
+
+        Pos2D<float> mousePos = { (float)GetMousePosX(), (float)GetMousePosY() };
+        Pos2D<float> cardCenterPos = { card.targetXPos, card.targetYPos };
+        // Rotate mouse position around card center to align relative coordinates to upright card position
+        Pos2D<float> adjustedMousePos = point_rotated_by(cardCenterPos, mousePos, -card.targetRotation);
+
+        float cardLeftSide = card.targetXPos - (CARD_WIDTH / 2) * card.scale;
+        float cardRightSide = card.targetXPos + (CARD_WIDTH / 2) * card.scale;
+        float cardTopSide = card.targetYPos - (CARD_HEIGHT / 2) * card.scale;
+        float cardBottomSide = card.targetYPos + (CARD_HEIGHT / 2) * card.scale;
+        if (adjustedMousePos.x >= cardLeftSide && adjustedMousePos.x <= cardRightSide &&
+            adjustedMousePos.y >= cardTopSide && adjustedMousePos.y <= cardBottomSide)
+        {
+            return card.card;
         }
     }
+
+    return nullptr;
 }
