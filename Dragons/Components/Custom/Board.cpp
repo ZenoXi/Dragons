@@ -94,7 +94,7 @@ void zcom::Board::_OnDraw(Graphics g)
         //borderBrush->Release();
 
         _Card copy = card;
-        if (_hoveredCard == card.card && _hoveredCardInHand)
+        if (_hoveredCard == card.card && _hoveredCardInHand && _hoveredCard->GetPosition().playerIndex == 0)
         {
             float newHeight = CARD_HEIGHT * 1.5f;
             card.targetYPos = viewHeight - newHeight / 2 - 50.0f;
@@ -138,14 +138,8 @@ zcom::EventTargets zcom::Board::_OnMouseMove(int deltaX, int deltaY)
 {
     _hoveredCard = _GetHoveredCard();
     _hoveredCardInHand = false;
-    for (auto& card : core->GetState().players[0].hand)
-    {
-        if (card.get() == _hoveredCard)
-        {
-            _hoveredCardInHand = true;
-            break;
-        }
-    }
+    if (_hoveredCard && _hoveredCard->GetPosition().set == cards::CardSets::HAND)
+        _hoveredCardInHand = true;
     return EventTargets().Add(this, GetMousePosX(), GetMousePosY());
 }
 
@@ -311,7 +305,7 @@ void zcom::Board::_CalculateCardTargetPositions()
     {
         card.targetXPos = viewWidth / 2;
         card.targetYPos = viewHeight / 2;
-        if (card.card == _hoveredCard && !_hoveredCardInHand)
+        if (card.card == _hoveredCard)
             card.scale = 1.1f;
         else
             card.scale = 1.0f;
@@ -413,6 +407,7 @@ void zcom::Board::_CalculateCardTargetPositions()
 
                         card.zIndex = i;
                         card.set.set = cards::CardSets::HAND;
+                        card.set.playerIndex = 0;
                         card.targetXPos = cardPos.x;
                         card.targetYPos = cardPos.y;
                         card.targetRotation = cardAngle * (0.0f + 0.2f * cardsInHand);
@@ -423,10 +418,13 @@ void zcom::Board::_CalculateCardTargetPositions()
         }
         { // Player 2
             int cardsInHand = core->GetState().players[1].hand.size();
-            Pos2D<float> circleCenter = { viewWidth / 2, -550.0f };
-            Pos2D<float> circleBottom = circleCenter + Pos2D<float>(0.0f, 700.0f);
+            float circleCenterOffset = 800.0f + cardsInHand * 100.0f;
+            Pos2D<float> circleCenter = { viewWidth / 2, -circleCenterOffset };
+            Pos2D<float> circleBottom = circleCenter + Pos2D<float>(0.0f, circleCenterOffset + 100.0f);
+            float gapBetweenCards = 0.18f;
+            if (cardsInHand > 0)
+                gapBetweenCards -= 0.18f * std::powf(1.0f - 1.0f / cardsInHand, 2.0f);
             float startAngle = PI;
-            float gapBetweenCards = 0.15f;
 
             for (int i = 0; i < cardsInHand; i++)
             {
@@ -439,11 +437,52 @@ void zcom::Board::_CalculateCardTargetPositions()
 
                         card.zIndex = i;
                         card.set.set = cards::CardSets::HAND;
+                        card.set.playerIndex = 1;
                         card.targetXPos = cardPos.x;
                         card.targetYPos = cardPos.y;
-                        card.targetRotation = startAngle + cardAngle;
+                        card.targetRotation = startAngle + cardAngle * (0.0f + 0.2f * cardsInHand);
                         break;
                     }
+                }
+            }
+        }
+    }
+
+    // Calculate active card positions
+    {
+        float gapBetweenCards = 30.0f;
+        float horizontalGapFromEdge = 500.0f;
+        float maxActiveCardWidth = viewWidth - horizontalGapFromEdge * 2;
+
+        for (int i = 0; i < core->GetState().players[0].activeCards.size(); i++)
+        {
+            for (auto& card : _cards)
+            {
+                if (card.card == core->GetState().players[0].activeCards[i].get())
+                {
+                    card.zIndex = -100 + i;
+                    card.set.set = cards::CardSets::ACTIVE_CARDS;
+                    card.set.playerIndex = 0;
+                    card.targetXPos = horizontalGapFromEdge + CARD_WIDTH / 2 + (CARD_WIDTH + gapBetweenCards) * i;
+                    card.targetYPos = viewHeight - 250.0f - CARD_HEIGHT / 2;
+                    card.targetRotation = 0.0f;
+                    break;
+                }
+            }
+        }
+        for (int i = 0; i < core->GetState().players[1].activeCards.size(); i++)
+        {
+            for (auto& card : _cards)
+            {
+                if (card.card == core->GetState().players[1].activeCards[i].get())
+                {
+                    card.zIndex = -100 + i;
+                    card.set.set = cards::CardSets::ACTIVE_CARDS;
+                    card.set.playerIndex = 1;
+                    card.targetXPos = viewWidth - horizontalGapFromEdge - CARD_WIDTH / 2 - (CARD_WIDTH + gapBetweenCards) * i;
+                    card.targetYPos = 250.0f + CARD_HEIGHT / 2;
+                    card.targetRotation = PI;
+                    break;
                 }
             }
         }

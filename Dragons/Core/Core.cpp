@@ -256,10 +256,14 @@ void Core::InitState()
     _state.players[0].actionsLeft = 0;
     _state.players[0].handRevealed = false;
     _state.players[0].index = 0;
-    _state.players[0].hand.push_back(std::make_unique<cards::ElementalDragon>());
-    _state.players[0].hand.push_back(std::make_unique<cards::HeavySlash>());
-    _state.players[0].hand.push_back(std::make_unique<cards::ShieldingNet>());
-    _state.players[0].hand.push_back(std::make_unique<cards::CorpsePuppet>());
+    AddCardToHand(std::make_unique<cards::ElementalDragon>(), 0);
+    AddCardToHand(std::make_unique<cards::HeavySlash>(), 0);
+    AddCardToHand(std::make_unique<cards::ShieldingNet>(), 0);
+    AddCardToHand(std::make_unique<cards::CorpsePuppet>(), 0);
+    AddCardToActiveCards(std::make_unique<cards::ElementalDragon>(), 0);
+    AddCardToActiveCards(std::make_unique<cards::HeavySlash>(), 0);
+    AddCardToActiveCards(std::make_unique<cards::ShieldingNet>(), 0);
+    AddCardToActiveCards(std::make_unique<cards::CorpsePuppet>(), 0);
 
     _state.players.push_back(Player{});
     _state.players[1].health = GAME_STARTING_HEALTH;
@@ -268,10 +272,14 @@ void Core::InitState()
     _state.players[1].actionsLeft = 0;
     _state.players[1].handRevealed = false;
     _state.players[1].index = 1;
-    _state.players[1].hand.push_back(std::make_unique<cards::ElementalDragon>());
-    _state.players[1].hand.push_back(std::make_unique<cards::HeavySlash>());
-    _state.players[1].hand.push_back(std::make_unique<cards::ShieldingNet>());
-    _state.players[1].hand.push_back(std::make_unique<cards::CorpsePuppet>());
+    AddCardToHand(std::make_unique<cards::ElementalDragon>(), 1);
+    AddCardToHand(std::make_unique<cards::HeavySlash>(), 1);
+    AddCardToHand(std::make_unique<cards::ShieldingNet>(), 1);
+    AddCardToHand(std::make_unique<cards::CorpsePuppet>(), 1);
+    AddCardToActiveCards(std::make_unique<cards::ElementalDragon>(), 1);
+    AddCardToActiveCards(std::make_unique<cards::HeavySlash>(), 1);
+    AddCardToActiveCards(std::make_unique<cards::ShieldingNet>(), 1);
+    AddCardToActiveCards(std::make_unique<cards::CorpsePuppet>(), 1);
 
     _state.currentPlayer = 0;
     _state.opposingPlayer = 1;

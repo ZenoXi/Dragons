@@ -157,6 +157,7 @@
     <ClCompile Include="Components\Base\MenuPanel.cpp" />
     <ClCompile Include="Components\Base\TextInput.cpp" />
     <ClCompile Include="Components\Custom\Board.cpp" />
+    <ClCompile Include="Components\Custom\Card.cpp" />
     <ClCompile Include="Core\Cards\CardType.cpp" />
     <ClCompile Include="Core\Cards\Combo\Apocalypse.cpp" />
     <ClCompile Include="Core\Cards\Combo\AstroInfluence.cpp" />
@@ -263,6 +264,7 @@
     <ClInclude Include="Components\Base\TextInput.h" />
     <ClInclude Include="Components\ComHelper.h" />
     <ClInclude Include="Components\Custom\Board.h" />
+    <ClInclude Include="Components\Custom\Card.h" />
     <ClInclude Include="Core\ActionProperties.h" />
     <ClInclude Include="Core\AddArmorProperties.h" />
     <ClInclude Include="Core\Cards\CardPosition.h" />
