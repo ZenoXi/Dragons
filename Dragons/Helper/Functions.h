@@ -106,6 +106,15 @@ bool add_bounds(float &value, const float &min_v, const float &max_v);
 bool check_bounds(const int &value, const int &min_v, const int &max_v);
 bool check_bounds(const float &value, const float &min_v, const float &max_v);
 
+// Color
+struct Color
+{
+    float r;
+    float g;
+    float b;
+    float a;
+};
+Color HSVtoRGB(float H, float S, float V);
 
 // TEMPLATED FUNCTION DEFINITIONS //
 

@@ -187,67 +187,6 @@ void Core::InitState()
     ShuffleDeck(cards::CardType::UTILITY);
     ShuffleDeck(cards::CardType::COMBO);
 
-    _state.graveyard.push_back(std::make_unique<cards::ElementalDragon>());
-    _state.graveyard.push_back(std::make_unique<cards::ElementalDragon>());
-    _state.graveyard.push_back(std::make_unique<cards::HeavySlash>());
-    _state.graveyard.push_back(std::make_unique<cards::HeavySlash>());
-    _state.graveyard.push_back(std::make_unique<cards::ElementalDragon>());
-    _state.graveyard.push_back(std::make_unique<cards::HeavySlash>());
-    _state.graveyard.push_back(std::make_unique<cards::HeavySlash>());
-    _state.graveyard.push_back(std::make_unique<cards::ShieldingNet>());
-    _state.graveyard.push_back(std::make_unique<cards::ShieldingNet>());
-    _state.graveyard.push_back(std::make_unique<cards::CorpsePuppet>());
-    _state.graveyard.push_back(std::make_unique<cards::ShieldingNet>());
-    _state.graveyard.push_back(std::make_unique<cards::ShieldingNet>());
-    _state.graveyard.push_back(std::make_unique<cards::CorpsePuppet>());
-    _state.graveyard.push_back(std::make_unique<cards::CorpsePuppet>());
-    _state.graveyard.push_back(std::make_unique<cards::CorpsePuppet>());
-    _state.graveyard.push_back(std::make_unique<cards::HeavySlash>());
-    _state.graveyard.push_back(std::make_unique<cards::CorpsePuppet>());
-    _state.graveyard.push_back(std::make_unique<cards::CorpsePuppet>());
-    _state.graveyard.push_back(std::make_unique<cards::CorpsePuppet>());
-    _state.graveyard.push_back(std::make_unique<cards::CorpsePuppet>());
-    _state.graveyard.push_back(std::make_unique<cards::ElementalDragon>());
-    _state.graveyard.push_back(std::make_unique<cards::ElementalDragon>());
-    _state.graveyard.push_back(std::make_unique<cards::HeavySlash>());
-    _state.graveyard.push_back(std::make_unique<cards::HeavySlash>());
-    _state.graveyard.push_back(std::make_unique<cards::ElementalDragon>());
-    _state.graveyard.push_back(std::make_unique<cards::HeavySlash>());
-    _state.graveyard.push_back(std::make_unique<cards::HeavySlash>());
-    _state.graveyard.push_back(std::make_unique<cards::ShieldingNet>());
-    _state.graveyard.push_back(std::make_unique<cards::ShieldingNet>());
-    _state.graveyard.push_back(std::make_unique<cards::CorpsePuppet>());
-    _state.graveyard.push_back(std::make_unique<cards::ShieldingNet>());
-    _state.graveyard.push_back(std::make_unique<cards::ShieldingNet>());
-    _state.graveyard.push_back(std::make_unique<cards::CorpsePuppet>());
-    _state.graveyard.push_back(std::make_unique<cards::CorpsePuppet>());
-    _state.graveyard.push_back(std::make_unique<cards::CorpsePuppet>());
-    _state.graveyard.push_back(std::make_unique<cards::HeavySlash>());
-    _state.graveyard.push_back(std::make_unique<cards::CorpsePuppet>());
-    _state.graveyard.push_back(std::make_unique<cards::CorpsePuppet>());
-    _state.graveyard.push_back(std::make_unique<cards::CorpsePuppet>());
-    _state.graveyard.push_back(std::make_unique<cards::CorpsePuppet>());
-    _state.graveyard.push_back(std::make_unique<cards::ElementalDragon>());
-    _state.graveyard.push_back(std::make_unique<cards::ElementalDragon>());
-    _state.graveyard.push_back(std::make_unique<cards::HeavySlash>());
-    _state.graveyard.push_back(std::make_unique<cards::HeavySlash>());
-    _state.graveyard.push_back(std::make_unique<cards::ElementalDragon>());
-    _state.graveyard.push_back(std::make_unique<cards::HeavySlash>());
-    _state.graveyard.push_back(std::make_unique<cards::HeavySlash>());
-    _state.graveyard.push_back(std::make_unique<cards::ShieldingNet>());
-    _state.graveyard.push_back(std::make_unique<cards::ShieldingNet>());
-    _state.graveyard.push_back(std::make_unique<cards::CorpsePuppet>());
-    _state.graveyard.push_back(std::make_unique<cards::ShieldingNet>());
-    _state.graveyard.push_back(std::make_unique<cards::ShieldingNet>());
-    _state.graveyard.push_back(std::make_unique<cards::CorpsePuppet>());
-    _state.graveyard.push_back(std::make_unique<cards::CorpsePuppet>());
-    _state.graveyard.push_back(std::make_unique<cards::CorpsePuppet>());
-    _state.graveyard.push_back(std::make_unique<cards::HeavySlash>());
-    _state.graveyard.push_back(std::make_unique<cards::CorpsePuppet>());
-    _state.graveyard.push_back(std::make_unique<cards::CorpsePuppet>());
-    _state.graveyard.push_back(std::make_unique<cards::CorpsePuppet>());
-    _state.graveyard.push_back(std::make_unique<cards::CorpsePuppet>());
-
     // Init players
     _state.players.push_back(Player{});
     _state.players[0].health = GAME_STARTING_HEALTH;
@@ -256,14 +195,17 @@ void Core::InitState()
     _state.players[0].actionsLeft = 0;
     _state.players[0].handRevealed = false;
     _state.players[0].index = 0;
-    AddCardToHand(std::make_unique<cards::ElementalDragon>(), 0);
-    AddCardToHand(std::make_unique<cards::HeavySlash>(), 0);
-    AddCardToHand(std::make_unique<cards::ShieldingNet>(), 0);
-    AddCardToHand(std::make_unique<cards::CorpsePuppet>(), 0);
-    AddCardToActiveCards(std::make_unique<cards::ElementalDragon>(), 0);
-    AddCardToActiveCards(std::make_unique<cards::HeavySlash>(), 0);
-    AddCardToActiveCards(std::make_unique<cards::ShieldingNet>(), 0);
-    AddCardToActiveCards(std::make_unique<cards::CorpsePuppet>(), 0);
+    AddCardToHand(std::make_unique<cards::Stab>(), 0);
+    AddCardToHand(std::make_unique<cards::Stab>(), 0);
+    AddCardToHand(std::make_unique<cards::Stab>(), 0);
+    //AddCardToHand(std::make_unique<cards::ElementalDragon>(), 0);
+    //AddCardToHand(std::make_unique<cards::HeavySlash>(), 0);
+    //AddCardToHand(std::make_unique<cards::ShieldingNet>(), 0);
+    //AddCardToHand(std::make_unique<cards::CorpsePuppet>(), 0);
+    //AddCardToActiveCards(std::make_unique<cards::ElementalDragon>(), 0);
+    //AddCardToActiveCards(std::make_unique<cards::HeavySlash>(), 0);
+    //AddCardToActiveCards(std::make_unique<cards::ShieldingNet>(), 0);
+    //AddCardToActiveCards(std::make_unique<cards::CorpsePuppet>(), 0);
 
     _state.players.push_back(Player{});
     _state.players[1].health = GAME_STARTING_HEALTH;
@@ -272,14 +214,14 @@ void Core::InitState()
     _state.players[1].actionsLeft = 0;
     _state.players[1].handRevealed = false;
     _state.players[1].index = 1;
-    AddCardToHand(std::make_unique<cards::ElementalDragon>(), 1);
-    AddCardToHand(std::make_unique<cards::HeavySlash>(), 1);
-    AddCardToHand(std::make_unique<cards::ShieldingNet>(), 1);
-    AddCardToHand(std::make_unique<cards::CorpsePuppet>(), 1);
-    AddCardToActiveCards(std::make_unique<cards::ElementalDragon>(), 1);
-    AddCardToActiveCards(std::make_unique<cards::HeavySlash>(), 1);
-    AddCardToActiveCards(std::make_unique<cards::ShieldingNet>(), 1);
-    AddCardToActiveCards(std::make_unique<cards::CorpsePuppet>(), 1);
+    //AddCardToHand(std::make_unique<cards::ElementalDragon>(), 1);
+    //AddCardToHand(std::make_unique<cards::HeavySlash>(), 1);
+    //AddCardToHand(std::make_unique<cards::ShieldingNet>(), 1);
+    //AddCardToHand(std::make_unique<cards::CorpsePuppet>(), 1);
+    //AddCardToActiveCards(std::make_unique<cards::ElementalDragon>(), 1);
+    //AddCardToActiveCards(std::make_unique<cards::HeavySlash>(), 1);
+    //AddCardToActiveCards(std::make_unique<cards::ShieldingNet>(), 1);
+    //AddCardToActiveCards(std::make_unique<cards::CorpsePuppet>(), 1);
 
     _state.currentPlayer = 0;
     _state.opposingPlayer = 1;
@@ -430,6 +372,8 @@ cards::PlayResult Core::PlayCard(cards::Card* card, std::optional<ActionProperti
                 player.actionsLeft--;
             }
         }
+
+        _events.RaiseEvent(ActionCountChangedEvent{});
     }
 
     // Emit pre play event
@@ -518,6 +462,8 @@ cards::PlayResult Core::_HandlePlayResult(cards::PlayResult result, cards::Card*
         player.actionsLeft += _actionsConsumed;
         for (auto& action : _extraActionsConsumed)
             player.extraActions.push_back(action);
+
+        _events.RaiseEvent(ActionCountChangedEvent{});
     }
     return result;
 }
@@ -571,6 +517,8 @@ cards::Card* Core::DrawCard(cards::CardType type, int playerIndex, bool consumeA
         if (!extraActionUsed)
             player.actionsLeft--;
 
+        _events.RaiseEvent(ActionCountChangedEvent{});
+
         // End turn
         if (player.actionsLeft == 0 && player.extraActions.empty())
         {
@@ -615,6 +563,8 @@ cards::Card* Core::DiscardCard(cards::Card* card, int playerIndex, bool consumeA
             }
             if (!extraActionUsed)
                 player.actionsLeft--;
+
+            _events.RaiseEvent(ActionCountChangedEvent{});
 
             // End turn
             if (player.actionsLeft == 0 && player.extraActions.empty())
@@ -965,16 +915,19 @@ void Core::SetArmor(int target, int value, bool force)
 void Core::SetActionCount(int target, int amount)
 {
     _state.players[target].actionsLeft = amount;
+    _events.RaiseEvent(ActionCountChangedEvent{});
 }
 
 void Core::AddActions(int target, int amount)
 {
     _state.players[target].actionsLeft += amount;
+    _events.RaiseEvent(ActionCountChangedEvent{});
 }
 
 void Core::AddExtraAction(int target, ExtraAction action)
 {
     _state.players[target].extraActions.push_back(action);
+    _events.RaiseEvent(ActionCountChangedEvent{});
 }
 
 void Core::AddCardToHand(std::unique_ptr<cards::Card> card, int playerIndex)

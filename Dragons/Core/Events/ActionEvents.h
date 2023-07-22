@@ -59,3 +59,8 @@ struct CanDrawEvent
     cards::CardType deck;
     bool* canDraw;
 };
+
+struct ActionCountChangedEvent
+{
+    static const char* _NAME_() { return "action_count_changed"; }
+};
