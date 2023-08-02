@@ -196,8 +196,11 @@ void Core::InitState()
     _state.players[0].handRevealed = false;
     _state.players[0].index = 0;
     AddCardToHand(std::make_unique<cards::Stab>(), 0);
-    AddCardToHand(std::make_unique<cards::Stab>(), 0);
-    AddCardToHand(std::make_unique<cards::Stab>(), 0);
+    AddCardToHand(std::make_unique<cards::BloodDonation>(), 0);
+    AddCardToHand(std::make_unique<cards::WeaponScroll>(), 0);
+    AddCardToHand(std::make_unique<cards::Underworld>(), 0);
+    AddCardToHand(std::make_unique<cards::SummonDead>(), 0);
+    AddCardToHand(std::make_unique<cards::DragonFlame>(), 0);
     //AddCardToHand(std::make_unique<cards::ElementalDragon>(), 0);
     //AddCardToHand(std::make_unique<cards::HeavySlash>(), 0);
     //AddCardToHand(std::make_unique<cards::ShieldingNet>(), 0);
@@ -214,6 +217,8 @@ void Core::InitState()
     _state.players[1].actionsLeft = 0;
     _state.players[1].handRevealed = false;
     _state.players[1].index = 1;
+    AddCardToHand(std::make_unique<cards::Barrier>(), 1);
+    AddCardToHand(std::make_unique<cards::Barrier>(), 1);
     //AddCardToHand(std::make_unique<cards::ElementalDragon>(), 1);
     //AddCardToHand(std::make_unique<cards::HeavySlash>(), 1);
     //AddCardToHand(std::make_unique<cards::ShieldingNet>(), 1);
@@ -1289,8 +1294,12 @@ cards::CardSet Core::GetCardSet(cards::Card* cardToFind)
 
 void Core::ShuffleDeck(cards::CardType type)
 {
+    std::mt19937 engineCopy = _rng;
+
     auto& deckRef = _ResolveDeckFromType(type);
     std::shuffle(deckRef.begin(), deckRef.end(), _rng);
+
+    _events.RaiseEvent(DeckShuffledEvent{ type, engineCopy });
 }
 
 int Core::GenerateRandomNumber(int fromInclusive, int toExclusive)
@@ -1301,6 +1310,8 @@ int Core::GenerateRandomNumber(int fromInclusive, int toExclusive)
 
 void Core::RevealHand(int target, std::string revealSource)
 {
+    if (!_state.players[target].handRevealed)
+        _events.RaiseEvent(HandRevealStateChangedEvent{ target, true });
     _state.players[target].handRevealed = true;
     _state.players[target].revealSources.push_back(revealSource);
 }
@@ -1317,7 +1328,11 @@ void Core::HideHand(int target, std::string revealSource)
     }
 
     if (_state.players[target].revealSources.empty())
+    {
+        if (_state.players[target].handRevealed)
+            _events.RaiseEvent(HandRevealStateChangedEvent{ target, false });
         _state.players[target].handRevealed = false;
+    }
 }
 
 std::unique_ptr<cards::Card> Core::CreateCard(CardId cardId)

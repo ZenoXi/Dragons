@@ -8,10 +8,13 @@ namespace cards
 {
     class Stab : public Card
     {
+        bool _waitingForChoice = false;
+
     public:
         Stab() {}
 
         PlayResult Play(Core* core, ActionProperties actionProps, PlayProperties* playProps);
+        PlayResult Resume(UserInputResponse response, Core* core, ActionProperties actionProps, PlayProperties* playProps);
 
         static CardId CARD_ID() { return { "stab" }; }
         CardId GetCardId() const { return CARD_ID(); }

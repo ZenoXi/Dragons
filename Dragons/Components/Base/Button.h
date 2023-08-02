@@ -208,7 +208,10 @@ namespace zcom
             _imageClicked->SetPlacement(ImagePlacement::FIT);
         }
     public:
-        ~Button() {}
+        ~Button()
+        {
+            OnDeselected();
+        }
         Button(Button&&) = delete;
         Button& operator=(Button&&) = delete;
         Button(const Button&) = delete;

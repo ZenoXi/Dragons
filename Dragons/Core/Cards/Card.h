@@ -155,6 +155,12 @@ namespace cards
             _position.playerIndex = -1;
             _OnEnterDestroyedCards(core);
         }
+        void OnEnterInPlayCards(Core* core)
+        {
+            _position.set = CardSets::IN_PLAY;
+            _position.playerIndex = -1;
+            _OnEnterInPlayCards(core);
+        }
 
     private:
         virtual void _OnEnterHand(Core* core, int playerIndex) {}
@@ -162,5 +168,6 @@ namespace cards
         virtual void _OnEnterDeck(Core* core) {}
         virtual void _OnEnterGraveyard(Core* core) {}
         virtual void _OnEnterDestroyedCards(Core* core) {}
+        virtual void _OnEnterInPlayCards(Core* core) {}
     };
 }

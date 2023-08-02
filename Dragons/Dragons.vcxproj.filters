@@ -704,5 +704,8 @@
     <ClInclude Include="Components\Custom\Card.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Helper\ListUtils.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

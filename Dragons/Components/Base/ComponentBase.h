@@ -450,6 +450,8 @@ namespace zcom
                 OnDeselected();
                 OnLeftReleased();
                 OnRightReleased();
+                OnMouseLeave();
+                OnMouseLeaveArea();
             }
             _active = active;
             _redraw = true;

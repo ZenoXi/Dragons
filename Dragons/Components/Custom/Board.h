@@ -13,13 +13,31 @@
 #include "Core/Events/CardStateEvents.h"
 #include "Core/Events/StatsEvents.h"
 
+#include <set>
+
+enum UIElement
+{
+    OFFENSE_DECK = 0x0000001,
+    DEFENSE_DECK = 0x0000001,
+    UTILITY_DECK = 0x0000001,
+    COMBO_DECK = 0x0000001,
+};
+
 struct UIEvent
 {
     enum Type
     {
+        USER_INPUT_REQUEST,
         TURN_BEGIN,
         TURN_END,
         ACTION_COUNT_CHANGED,
+        POST_DAMAGE,
+        POST_HEAL,
+        POST_ADD_ARMOR,
+        POST_DESTROY_ARMOR,
+        POST_HEALTH_CHANGE,
+        POST_MAX_HEALTH_CHANGE,
+        POST_ARMOR_CHANGE,
         CARD_ENTER_HAND,
         CARD_LEAVE_HAND,
         CARD_ENTER_ACTIVES,
@@ -34,14 +52,8 @@ struct UIEvent
         CARD_LEAVE_IN_PLAY_CARDS,
         CARD_ENTER_DISPLAYED_CARDS,
         CARD_LEAVE_DISPLAYED_CARDS,
-        HAND_REAVEAL_STATE_CHANGED,
-        POST_DAMAGE,
-        POST_HEAL,
-        POST_ADD_ARMOR,
-        POST_DESTROY_ARMOR,
-        POST_HEALTH_CHANGE,
-        POST_MAX_HEALTH_CHANGE,
-        POST_ARMOR_CHANGE
+        HAND_REVEAL_STATE_CHANGED,
+        DECK_SHUFFLED
     };
 
     Type type;
@@ -180,6 +192,7 @@ namespace zcom
         EventTargets _OnRightPressed(int x, int y);
 
         void _DetectHoveredCard();
+        void _HandleInputRequest(cards::PlayResult& result);
 
     public:
         const char* GetName() const { return Name(); }
@@ -238,6 +251,40 @@ namespace zcom
         ID2D1Bitmap* _comboCardBitmap = nullptr;
         float shadowRadius = 2.0f;
 
+        // Input modes
+
+        bool _drawCardMode = false;
+        std::vector<cards::CardType> _allowedCardTypesToDraw;
+        std::function<void(cards::Card*)> _drawCardHandler;
+
+        bool _noClickMode = false;
+
+        bool _chooseCardsFromHandMode = false;
+        int _chooseCardsFromHandChoosingPlayerIndex = -1;
+        int _chooseCardsFromHandTargetPlayerIndex = -1;
+        int _chooseCardsFromHandMaxCardCount = -1;
+        std::vector<cards::CardType> _chooseCardsFromHandAllowedTypes;
+        std::set<cards::Card*> _chosenCardsFromHand;
+        std::function<void(cards::Card*)> _selectedCardInHandHandler;
+        std::function<void(cards::Card*)> _deselectedCardInHandHandler;
+
+        bool _chooseCardsFromActiveCardsMode = false;
+        int _chooseCardsFromActiveCardsChoosingPlayerIndex = -1;
+        int _chooseCardsFromActiveCardsTargetPlayerIndex = -1;
+        int _chooseCardsFromActiveCardsMaxCardCount = -1;
+        std::vector<cards::CardType> _chooseCardsFromActiveCardsAllowedTypes;
+        std::set<cards::Card*> _chosenCardsFromActiveCards;
+        std::function<void(cards::Card*)> _selectedCardInActiveCardsHandler;
+        std::function<void(cards::Card*)> _deselectedCardInActiveCardsHandler;
+
+        bool _chooseCardsFromDisplayedCardsMode = false;
+        int _chooseCardsFromDisplayedCardsPlayerIndex = -1;
+        int _chooseCardsFromDisplayedCardsMaxCardCount = -1;
+        std::vector<cards::CardType> _chooseCardsFromDisplayedCardsAllowedTypes;
+        std::set<cards::Card*> _chosenCardsFromDisplayedCards;
+        std::function<void(cards::Card*)> _selectedCardInDisplayedCardsHandler;
+        std::function<void(cards::Card*)> _deselectedCardInDisplayedCardsHandler;
+
         // Stat labels
         std::unique_ptr<zcom::Panel> _p1StatsPanel = nullptr;
         std::unique_ptr<zcom::Label> _p1HealthLabel = nullptr;
@@ -259,6 +306,7 @@ namespace zcom
         std::unique_ptr<zcom::Label> _p2ExtraActionsLabel = nullptr;
 
         // Game event handlers
+        UserInputRequest _pendingUserInputRequest;
         std::vector<UIEvent> _uiEventQueue;
         TimePoint _prevEventTime;
         Duration _minTimeUntilNextEvent;
@@ -288,6 +336,15 @@ namespace zcom
         std::unique_ptr<EventHandler<CardEnterDisplayedCardsEvent>> _cardEnterDisplayedCardsHandler = nullptr;
         std::unique_ptr<EventHandler<CardLeaveDisplayedCardsEvent>> _cardLeaveDisplayedCardsHandler = nullptr;
         std::unique_ptr<EventHandler<HandRevealStateChangedEvent>> _handRevealStateChangedHandler = nullptr;
+        std::unique_ptr<EventHandler<DeckShuffledEvent>> _deckShuffledHandler = nullptr;
+
+        // User input interface
+        bool _userInputRequestAvailable = false;
+        UserInputRequest _userInputRequest;
+    public:
+        UserInputRequest* GetUserInputRequest();
+        void SendUserInputResponse();
+    private:
 
     protected:
         friend class Scene;
@@ -548,7 +605,11 @@ namespace zcom
             });
             _handRevealStateChangedHandler = std::make_unique<EventHandler<HandRevealStateChangedEvent>>(&_core->Events(), [=](HandRevealStateChangedEvent event)
             {
-                _uiEventQueue.push_back({ UIEvent::HAND_REAVEAL_STATE_CHANGED, std::any(event) });
+                _uiEventQueue.push_back({ UIEvent::HAND_REVEAL_STATE_CHANGED, std::any(event) });
+            });
+            _deckShuffledHandler = std::make_unique<EventHandler<DeckShuffledEvent>>(&_core->Events(), [=](DeckShuffledEvent event)
+            {
+                _uiEventQueue.push_back({ UIEvent::DECK_SHUFFLED, std::any(event) });
             });
 
             _SyncCardPositions();
@@ -572,8 +633,21 @@ namespace zcom
         Board(const Board&) = delete;
         Board& operator=(const Board&) = delete;
 
-    private:
+    public:
+        UIState& UIState() { return _uiState; }
 
+        void EnableNoClickMode();
+        void DisableNoClickMode();
+        void EnableChooseCardFromHandMode(int choosingPlayerIndex, int targetPlayerIndex, int maxCards, std::vector<cards::CardType> allowedTypes, std::function<void(cards::Card*)> onCardSelect, std::function<void(cards::Card*)> onCardDeselect);
+        void DisableChooseCardFromHandMode();
+        void EnableChooseCardFromActiveCardsMode(int choosingPlayerIndex, int targetPlayerIndex, int maxCards, std::vector<cards::CardType> allowedTypes, std::function<void(cards::Card*)> onCardSelect, std::function<void(cards::Card*)> onCardDeselect);
+        void DisableChooseCardFromActiveCardsMode();
+        void EnableChooseCardFromDisplayedCardsMode(int playerIndex, int maxCards, std::vector<cards::CardType> allowedTypes, std::function<void(cards::Card*)> onCardSelect, std::function<void(cards::Card*)> onCardDeselect);
+        void DisableChooseCardFromDisplayedCardsMode();
+        void EnableDrawCardMode(std::vector<cards::CardType> allowedTypes, std::function<void(cards::Card*)> onCardDraw);
+        void DisableDrawCardMode();
+
+    private:
         void _GenerateCardBitmap(Graphics g, ID2D1Bitmap** bitmapRef, D2D1_COLOR_F color);
         void _UpdateStatLabels();
         void _CreateMissingCards();

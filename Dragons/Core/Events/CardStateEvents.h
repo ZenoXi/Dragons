@@ -2,6 +2,8 @@
 
 #include "../Cards/Card.h"
 
+#include <random>
+
 struct CardEnterHandEvent
 {
     static const char* _NAME_() { return "card_enter_hand"; }
@@ -96,4 +98,11 @@ struct HandRevealStateChangedEvent
     static const char* _NAME_() { return "hand_reveal_state_changed"; }
     int playerIndex;
     bool isRevealed;
+};
+
+struct DeckShuffledEvent
+{
+    static const char* _NAME_() { return "deck_shuffled"; }
+    cards::CardType deck;
+    std::mt19937 engine;
 };
