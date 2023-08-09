@@ -707,5 +707,8 @@
     <ClInclude Include="Helper\ListUtils.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Components\Property.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

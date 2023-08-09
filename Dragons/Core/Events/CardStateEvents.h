@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../Cards/Card.h"
+#include "../GameState.h"
 
 #include <random>
 
@@ -84,7 +85,7 @@ struct CardLeaveInPlayCardsEvent
 struct CardEnterDisplayedCardsEvent
 {
     static const char* _NAME_() { return "card_enter_displayed_cards"; }
-    cards::Card* card;
+    DisplayInfo displayInfo;
 };
 
 struct CardLeaveDisplayedCardsEvent

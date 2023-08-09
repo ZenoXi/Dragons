@@ -193,11 +193,11 @@ namespace zcom
             SetBackgroundColor(D2D1::ColorF(0.05f, 0.05f, 0.05f));
             SetBorderVisibility(true);
             SetBorderColor(D2D1::ColorF(0.3f, 0.3f, 0.3f));
-            zcom::PROP_Shadow shadow;
+            zcom::attr::Shadow shadow;
             shadow.color = D2D1::ColorF(0);
             shadow.offsetX = 2.0f;
             shadow.offsetY = 2.0f;
-            SetProperty(shadow);
+            SetAttribute(shadow);
             SetVisible(false);
         }
     public:

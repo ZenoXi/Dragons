@@ -23,10 +23,10 @@ void EntryScene::_Init(const SceneOptionsBase* options)
 
     _board = Create<zcom::Board>(&core);
     _board->SetParentSizePercent(1.0f, 1.0f);
-    zcom::PROP_Shadow shadowProp;
-    shadowProp.color = D2D1::ColorF(0.0f, 0.0f, 0.0f, 0.5f);
-    shadowProp.blurStandardDeviation = 5.0f;
-    _board->SetProperty(shadowProp);
+    zcom::attr::Shadow shadowAttr;
+    shadowAttr.color = D2D1::ColorF(0.0f, 0.0f, 0.0f, 0.5f);
+    shadowAttr.blurStandardDeviation = 5.0f;
+    _board->SetAttribute(shadowAttr);
     _board->SetBackgroundColor(D2D1::ColorF(0, 0.0f));
 
     _canvas->AddComponent(_board.get());
@@ -86,10 +86,10 @@ void EntryScene::_ProcessNewInputRequests()
             _confirmationButton->SetBorderWidth(4.0f);
             _confirmationButton->SetBorderColor(D2D1::ColorF(0.8f, 0.8f, 0.8f));
             _confirmationButton->SetBackgroundColor(D2D1::ColorF(0.2f, 0.2f, 0.2f));
-            zcom::PROP_Shadow shadowProp;
-            shadowProp.color = D2D1::ColorF(0.0f, 0.0f, 0.0f, 1.0f);
-            shadowProp.blurStandardDeviation = 25.0f;
-            _confirmationButton->SetProperty(shadowProp);
+            zcom::attr::Shadow shadowAttr;
+            shadowAttr.color = D2D1::ColorF(0.0f, 0.0f, 0.0f, 1.0f);
+            shadowAttr.blurStandardDeviation = 25.0f;
+            _confirmationButton->SetAttribute(shadowAttr);
             _confirmationButton->SetActivation(zcom::ButtonActivation::RELEASE);
             _confirmationButton->SetOnActivated([&]()
             {
@@ -614,8 +614,9 @@ void EntryScene::_ProcessNewInputRequests()
             _chooseCardsFromDisplayedCardsDoneButton->Text()->SetFont(L"Arial");
             _chooseCardsFromDisplayedCardsDoneButton->Text()->SetFontSize(36.0f);
             _chooseCardsFromDisplayedCardsDoneButton->Text()->SetFontWeight(DWRITE_FONT_WEIGHT_BOLD);
-            _chooseCardsFromDisplayedCardsDoneButton->SetBaseSize(150.0f, -60.0f);
+            _chooseCardsFromDisplayedCardsDoneButton->SetBaseSize(150.0f, 60.0f);
             _chooseCardsFromDisplayedCardsDoneButton->SetAlignment(zcom::Alignment::CENTER, zcom::Alignment::END);
+            _chooseCardsFromDisplayedCardsDoneButton->SetVerticalOffsetPixels(-100);
             _chooseCardsFromDisplayedCardsDoneButton->SetZIndex(10);
             _chooseCardsFromDisplayedCardsDoneButton->SetBorderVisibility(true);
             _chooseCardsFromDisplayedCardsDoneButton->SetBorderWidth(4.0f);

@@ -265,6 +265,7 @@
     <ClInclude Include="Components\ComHelper.h" />
     <ClInclude Include="Components\Custom\Board.h" />
     <ClInclude Include="Components\Custom\Card.h" />
+    <ClInclude Include="Components\Property.h" />
     <ClInclude Include="Core\ActionProperties.h" />
     <ClInclude Include="Core\AddArmorProperties.h" />
     <ClInclude Include="Core\Cards\CardPosition.h" />

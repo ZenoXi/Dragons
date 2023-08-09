@@ -197,10 +197,11 @@ void Core::InitState()
     _state.players[0].index = 0;
     AddCardToHand(std::make_unique<cards::Stab>(), 0);
     AddCardToHand(std::make_unique<cards::BloodDonation>(), 0);
-    AddCardToHand(std::make_unique<cards::WeaponScroll>(), 0);
+    AddCardToHand(std::make_unique<cards::WeaponOfChoice>(), 0);
     AddCardToHand(std::make_unique<cards::Underworld>(), 0);
     AddCardToHand(std::make_unique<cards::SummonDead>(), 0);
     AddCardToHand(std::make_unique<cards::DragonFlame>(), 0);
+    AddCardToHand(std::make_unique<cards::DragonSight>(), 0);
     //AddCardToHand(std::make_unique<cards::ElementalDragon>(), 0);
     //AddCardToHand(std::make_unique<cards::HeavySlash>(), 0);
     //AddCardToHand(std::make_unique<cards::ShieldingNet>(), 0);
@@ -1182,7 +1183,7 @@ void Core::AddCardToDisplayedCards(DisplayInfo displayInfo)
     _state.displayedCards.push_back(displayInfo);
 
     CardEnterDisplayedCardsEvent event;
-    event.card = _state.displayedCards.back().card;
+    event.displayInfo = _state.displayedCards.back();
     _events.RaiseEvent(event);
 }
 

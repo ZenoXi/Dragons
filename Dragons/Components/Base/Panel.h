@@ -8,35 +8,38 @@
 
 namespace zcom
 {
-    class PROP_Shadow : public Property
+    namespace attr
     {
-        void _CopyFields(const PROP_Shadow& other)
+        class Shadow : public Attribute
         {
-            valid = other.valid;
-            offsetX = other.offsetX;
-            offsetY = other.offsetY;
-            blurStandardDeviation = other.blurStandardDeviation;
-            color = other.color;
-        }
-    public:
-        static std::string _NAME_() { return "shadow"; }
+            void _CopyFields(const Shadow& other)
+            {
+                valid = other.valid;
+                offsetX = other.offsetX;
+                offsetY = other.offsetY;
+                blurStandardDeviation = other.blurStandardDeviation;
+                color = other.color;
+            }
+        public:
+            static std::string _NAME_() { return "shadow"; }
 
-        PROP_Shadow() {}
-        PROP_Shadow(const PROP_Shadow& other)
-        {
-            _CopyFields(other);
-        }
-        PROP_Shadow& operator=(const PROP_Shadow& other)
-        {
-            _CopyFields(other);
-            return *this;
-        }
+            Shadow() {}
+            Shadow(const Shadow& other)
+            {
+                _CopyFields(other);
+            }
+            Shadow& operator=(const Shadow& other)
+            {
+                _CopyFields(other);
+                return *this;
+            }
 
-        float offsetX = 0.0f;
-        float offsetY = 0.0f;
-        float blurStandardDeviation = 3.0f;
-        D2D1_COLOR_F color = D2D1::ColorF(0, 0.75f);
-    };
+            float offsetX = 0.0f;
+            float offsetY = 0.0f;
+            float blurStandardDeviation = 3.0f;
+            D2D1_COLOR_F color = D2D1::ColorF(0, 0.75f);
+        };
+    }
 
     enum class Scrollbar
     {
@@ -200,7 +203,7 @@ namespace zcom
                     continue;
 
                 // Draw shadow
-                auto prop = it.second.item->GetProperty<PROP_Shadow>();
+                auto prop = it.second.item->GetAttribute<attr::Shadow>();
                 if (prop.valid)
                 {
                     ID2D1Effect* shadowEffect = nullptr;

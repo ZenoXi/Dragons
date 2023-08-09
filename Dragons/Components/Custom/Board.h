@@ -3,6 +3,7 @@
 #include "Components/Base/ComponentBase.h"
 #include "Components/Base/Label.h"
 #include "Components/Base/Panel.h"
+#include "Components/Property.h"
 
 #include "Helper/Event.h"
 
@@ -112,6 +113,17 @@ struct UIState
             return comboDeck;
         }
     }
+    DisplayInfo GetDisplayInfo(cards::Card* card)
+    {
+        for (auto& displayedCard : displayedCards)
+        {
+            if (displayedCard.card == card)
+            {
+                return displayedCard;
+            }
+        }
+        return { nullptr, { false, false } };
+    }
     void AddCardToHand(cards::Card* card, int playerIndex)
     {
         players[playerIndex].hand.push_back(card);
@@ -212,35 +224,41 @@ namespace zcom
             float xPos = 0.0f;
             float yPos = 0.0f;
             float rotation = 0.0f;
-            float scale = 1.0f;
             float opacity = 1.0f;
+            float baseScale = 1.0f;
+            float scale = 1.0f;
             cards::CardSet set = { cards::CardSets::NONE, -1 };
             int zIndex = 0;
+
+            bool displayed = false;
+            bool displayEnding = false;
 
             float targetXPos = 0.0f;
             float targetYPos = 0.0f;
             float targetRotation = 0.0f;
-            float targetOpacity = 0.0f;
+            float targetOpacity = 1.0f;
+            float targetBaseScale = 1.0f;
             cards::CardSet targetSet = { cards::CardSets::NONE, -1 };
             float startXPos = 0.0f;
             float startYPos = 0.0f;
             float startRotation = 0.0f;
-            float startOpacity = 0.0f;
+            float startOpacity = 1.0f;
+            float startBaseScale = 1.0f;
             cards::CardSet startSet = { cards::CardSets::NONE, -1 };
 
             bool moving = false;
             TimePoint moveStartTime = 0;
             Duration moveDuration = 0;
         };
-        std::vector<_Card> _cards;
-        cards::Card* _hoveredCard = nullptr;
-        bool _hoveredCardInHand = false;
-        cards::Card* _heldCard = nullptr;
+        std::vector<std::unique_ptr<_Card>> _cards;
+        _Card* _hoveredCard = nullptr;
+        _Card* _heldCard = nullptr;
 
         static constexpr float CARD_WIDTH = 180;
         static constexpr float CARD_HEIGHT = 240;
         static constexpr float RENDER_CARD_WIDTH = 320;
         static constexpr float RENDER_CARD_HEIGHT = 500;
+        float DISPLAYED_CARD_SCALE = 1.3f;
 
         static constexpr float PI = 3.141592f;
         static constexpr float RADIAN = 57.2958f;
@@ -250,6 +268,9 @@ namespace zcom
         ID2D1Bitmap* _utilityCardBitmap = nullptr;
         ID2D1Bitmap* _comboCardBitmap = nullptr;
         float shadowRadius = 2.0f;
+
+        int _displayedCardScroll = 0;
+        zcom::Property<float> _displayedCardOffset{ 0.0f };
 
         // Input modes
 
@@ -352,6 +373,10 @@ namespace zcom
         Board(Scene* scene) : Base(scene) {}
         void Init(Core* core)
         {
+            _displayedCardOffset.EnableAnimation();
+            _displayedCardOffset.SetAnimationDuration(Duration(150, MILLISECONDS));
+            _displayedCardOffset.SetInterpolationFunction([](float delta) { return 1.0f - std::powf(delta - 1.0f, 2.0f); });
+
             _core = core;
 
             _uiState.players.push_back(UIPlayer());
@@ -617,9 +642,9 @@ namespace zcom
             _CalculateCardTargetPositions();
             for (auto& card : _cards)
             {
-                card.xPos = card.targetXPos;
-                card.yPos = card.targetYPos;
-                card.rotation = card.targetRotation;
+                card->xPos = card->targetXPos;
+                card->yPos = card->targetYPos;
+                card->rotation = card->targetRotation;
             }
         }
     public:
@@ -654,8 +679,8 @@ namespace zcom
         void _SyncCardPositions();
         void _SyncUISets();
         void _CalculateCardTargetPositions();
-        cards::Card* _GetHoveredCard();
-        _Card* _GetCardFromPointer(cards::Card* cardPtr);
+        _Card* _GetHoveredCard();
+        _Card* _GetCardFromPointer(cards::Card* cardPtr, bool displayed = false);
         void _ProcessCardMove(_Card* card, UIEvent pairedEvent);
         void _MoveCardToSet(_Card* card, cards::CardSet newSet);
         void _MoveNewCardToSet(_Card* card, cards::CardSet set);

@@ -14,30 +14,50 @@ void zcom::Board::_OnUpdate()
     _HandleEvents();
 
     // Update moving animations
-    for (auto& card : _cards)
+    for (int i = 0; i < _cards.size(); i++)
     {
+        _Card& card = *_cards[i].get();
+
         if (card.moving)
         {
             float progress = (ztime::Main() - card.moveStartTime).GetTicks() / (float)card.moveDuration.GetTicks();
             if (progress >= 1.0f)
             {
                 card.moving = false;
+
+                if (card.displayEnding)
+                {
+                    for (int j = 0; j < _uiState.displayedCards.size(); j++)
+                    {
+                        if (_uiState.displayedCards[j].card == card.card)
+                        {
+                            _uiState.displayedCards.erase(_uiState.displayedCards.begin() + j);
+                            break;
+                        }
+                    }
+
+                    _cards.erase(_cards.begin() + i);
+                    i--;
+                    continue;
+                }
             }
             else
             {
+                float scaleProgress = -std::powf(progress - 1.0f, 2) + 1.0f;
                 progress = -std::powf(progress - 1.0f, 4) + 1.0f;
                 card.xPos = card.startXPos + (card.targetXPos - card.startXPos) * progress;
                 card.yPos = card.startYPos + (card.targetYPos - card.startYPos) * progress;
                 card.rotation = card.startRotation + (card.targetRotation - card.startRotation) * progress;
+                card.baseScale = card.startBaseScale + (card.targetBaseScale - card.startBaseScale) * scaleProgress;
                 card.opacity = card.startOpacity + (card.targetOpacity - card.startOpacity) * progress;
             }
         }
-
         if (!card.moving)
         {
             card.xPos = card.targetXPos;
             card.yPos = card.targetYPos;
             card.rotation = card.targetRotation;
+            card.baseScale = card.targetBaseScale;
             card.opacity = card.targetOpacity;
         }
     }
@@ -73,60 +93,70 @@ void zcom::Board::_OnDraw(Graphics g)
     _CreateMissingCards();
     _CalculateCardTargetPositions();
 
-    std::sort(_cards.begin(), _cards.end(), [](const _Card& card1, const _Card& card2) { return card1.zIndex < card2.zIndex; });
+    std::sort(_cards.begin(), _cards.end(), [](const std::unique_ptr<_Card>& card1, const std::unique_ptr<_Card>& card2) { return card1->zIndex < card2->zIndex; });
     // Move hovered or held card to end
-    auto it = std::find_if(_cards.begin(), _cards.end(), [&](const _Card& card) { return card.card == _hoveredCard || card.card == _heldCard; });
+    auto it = std::find_if(_cards.begin(), _cards.end(), [&](const std::unique_ptr<_Card>& card) { return card.get() == _hoveredCard || card.get() == _heldCard; });
     if (it != _cards.end())
     {
-        _Card card = *it;
+        auto card = std::move(*it);
         _cards.erase(it);
-        _cards.insert(_cards.end(), card);
+        _cards.insert(_cards.end(), std::move(card));
     }
     //g.target->DrawBitmap(_offenseCardBitmap);
 
     ID2D1SolidColorBrush* selectedBorderBrush = nullptr;
     g.target->CreateSolidColorBrush(D2D1::ColorF(1.0f, 1.0f, 0.5f), &selectedBorderBrush);
 
-    for (auto& card : _cards)
+    for (auto& cardPtr : _cards)
     {
-        if (card.set.set == cards::CardSets::NONE)
+        _Card* card = cardPtr.get();
+
+        if (card->set.set == cards::CardSets::NONE && !card->displayed)
             continue;
 
         // Generate card bitmaps
-        if (!card.faceBitmap)
+        if (!card->faceBitmap)
         {
-            auto cardFaceComponent = Create<Card>(card.card);
-            card.faceBitmap = cardFaceComponent->RenderCardBitmap(g);
-            auto cardBackComponent = Create<Card>(card.card->GetCardType());
-            card.backBitmap = cardBackComponent->RenderCardBitmap(g);
+            auto cardFaceComponent = Create<Card>(card->card);
+            card->faceBitmap = cardFaceComponent->RenderCardBitmap(g);
+            auto cardBackComponent = Create<Card>(card->card->GetCardType());
+            card->backBitmap = cardBackComponent->RenderCardBitmap(g);
         }
 
-        _Card copy = card;
-        if (_hoveredCard == card.card && !card.moving && _hoveredCardInHand && (card.set.playerIndex == _uiState.currentPlayer || _uiState.players[card.set.playerIndex].handRevealed))
+        _Card copy = *card;
+        card->scale = 1.0f;
+        if (card == _hoveredCard &&
+            !card->moving &&
+            (card->set.set == cards::CardSets::HAND) &&
+            (card->set.playerIndex == _uiState.currentPlayer || _uiState.players[card->set.playerIndex].handRevealed))
         {
             float newHeight = CARD_HEIGHT * 1.8f;
-            if (card.set.playerIndex == _uiState.currentPlayer)
-                card.yPos = viewHeight - newHeight / 2 - 50.0f;
+            if (card->set.playerIndex == _uiState.currentPlayer)
+                card->yPos = viewHeight - newHeight / 2 - 50.0f;
             else
-                card.yPos = newHeight / 2 + 50.0f;
-            card.scale = 1.8f;
-            card.rotation = 0.0f;
+                card->yPos = newHeight / 2 + 50.0f;
+            card->scale = 1.8f;
+            card->rotation = 0.0f;
         }
-        else if (_heldCard == card.card)
+        else if (card == _hoveredCard/* && (card->displayed || _uiState.GetDisplayInfo(card->card).card == nullptr)*/)
         {
-            card.xPos = GetMousePosX();
-            card.yPos = GetMousePosY();
-            card.scale = 1.1f;
-            card.rotation = 0.0f;
+            card->scale = 1.1f;
+        }
+        else if (card == _heldCard)
+        {
+            card->xPos = GetMousePosX();
+            card->yPos = GetMousePosY();
+            card->scale = 1.1f;
+            card->rotation = 0.0f;
         }
 
         D2D1_RECT_F rect = D2D1::RectF(
-            card.xPos - (CARD_WIDTH / 2 - padding) * card.scale,
-            card.yPos - (CARD_HEIGHT / 2 - padding) * card.scale,
-            card.xPos + (CARD_WIDTH / 2 + padding) * card.scale,
-            card.yPos + (CARD_HEIGHT / 2 + padding) * card.scale
+            card->xPos - (CARD_WIDTH / 2 - padding) * card->baseScale * card->scale,
+            card->yPos - (CARD_HEIGHT / 2 - padding) * card->baseScale * card->scale,
+            card->xPos + (CARD_WIDTH / 2 + padding) * card->baseScale * card->scale,
+            card->yPos + (CARD_HEIGHT / 2 + padding) * card->baseScale * card->scale
         );
-        float selectedBorderThickness = 6.0f * card.scale;
+        float selectedBorderThickness = 6.0f * card->baseScale * card->scale;
         D2D1_RECT_F selectedBorderRect = D2D1::RectF(
             rect.left + selectedBorderThickness / 2,
             rect.top + selectedBorderThickness / 2,
@@ -135,25 +165,27 @@ void zcom::Board::_OnDraw(Graphics g)
         );
 
         bool cardFaceUp =
-            card.set.set == cards::CardSets::ACTIVE_CARDS ||
-            (card.set.set == cards::CardSets::HAND && card.set.playerIndex == _uiState.currentPlayer) ||
-            (card.set.set == cards::CardSets::HAND && _uiState.players[card.set.playerIndex].handRevealed) ||
-            card.set.set == cards::CardSets::IN_PLAY;
+            card->set.set == cards::CardSets::ACTIVE_CARDS ||
+            (card->set.set == cards::CardSets::HAND && card->set.playerIndex == _uiState.currentPlayer) ||
+            (card->set.set == cards::CardSets::HAND && _uiState.players[card->set.playerIndex].handRevealed) ||
+            card->set.set == cards::CardSets::IN_PLAY ||
+            card->displayed && _uiState.GetDisplayInfo(card->card).visibleTo[_uiState.currentPlayer];
 
         bool cardSelected =
-            (_chooseCardsFromHandMode && _chosenCardsFromHand.find(card.card) != _chosenCardsFromHand.end()) ||
-            (_chooseCardsFromActiveCardsMode && _chosenCardsFromActiveCards.find(card.card) != _chosenCardsFromActiveCards.end());
+            (_chooseCardsFromHandMode && _chosenCardsFromHand.find(card->card) != _chosenCardsFromHand.end()) ||
+            (_chooseCardsFromActiveCardsMode && _chosenCardsFromActiveCards.find(card->card) != _chosenCardsFromActiveCards.end()) ||
+            (_chooseCardsFromDisplayedCardsMode && _chosenCardsFromDisplayedCards.find(card->card) != _chosenCardsFromDisplayedCards.end() && card->displayed);
 
-        g.target->SetTransform(D2D1::Matrix3x2F::Rotation(-card.rotation * RADIAN, { card.xPos, card.yPos }));
+        g.target->SetTransform(D2D1::Matrix3x2F::Rotation(-card->rotation * RADIAN, { card->xPos, card->yPos }));
         if (cardFaceUp)
-            g.target->DrawBitmap(card.faceBitmap, &rect, card.opacity, D2D1_INTERPOLATION_MODE_HIGH_QUALITY_CUBIC);
+            g.target->DrawBitmap(card->faceBitmap, &rect, card->opacity, D2D1_INTERPOLATION_MODE_HIGH_QUALITY_CUBIC);
         else
-            g.target->DrawBitmap(card.backBitmap, &rect, card.opacity, D2D1_INTERPOLATION_MODE_HIGH_QUALITY_CUBIC);
+            g.target->DrawBitmap(card->backBitmap, &rect, card->opacity, D2D1_INTERPOLATION_MODE_HIGH_QUALITY_CUBIC);
         if (cardSelected)
             g.target->DrawRectangle(selectedBorderRect, selectedBorderBrush, selectedBorderThickness);
         g.target->SetTransform(D2D1::Matrix3x2F::Identity());
 
-        card = copy;
+        *card = copy;
     }
 
     selectedBorderBrush->Release();
@@ -265,57 +297,77 @@ void zcom::Board::_OnMouseEnter()
 void zcom::Board::_OnMouseLeave()
 {
     _hoveredCard = nullptr;
-    _hoveredCardInHand = false;
 }
 
 zcom::EventTargets zcom::Board::_OnLeftPressed(int x, int y)
 {
     if (_hoveredCard && !_noClickMode)
     {
-        _Card* card = _GetCardFromPointer(_hoveredCard);
-
         // In draw mode only allow deck cards
         if (_drawCardMode)
         {
-            if (card->set.set != cards::CardSets::DECK)
+            if (_hoveredCard->set.set != cards::CardSets::DECK)
                 return EventTargets().Add(this, x, y);
-            if (!_allowedCardTypesToDraw.empty() && !zutil::Contains(_allowedCardTypesToDraw, card->card->GetCardType()))
+            if (!_allowedCardTypesToDraw.empty() && !zutil::Contains(_allowedCardTypesToDraw, _hoveredCard->card->GetCardType()))
                 return EventTargets().Add(this, x, y);
+        }
+
+        if (_hoveredCard->displayed)
+        {
+            if (_chooseCardsFromDisplayedCardsMode)
+            {
+                if (_chosenCardsFromDisplayedCards.find(_hoveredCard->card) == _chosenCardsFromDisplayedCards.end())
+                {
+                    if (_chosenCardsFromDisplayedCards.size() < _chooseCardsFromDisplayedCardsMaxCardCount)
+                    {
+                        _chosenCardsFromDisplayedCards.insert(_hoveredCard->card);
+                        _selectedCardInDisplayedCardsHandler(_hoveredCard->card);
+                    }
+                }
+                else
+                {
+                    _chosenCardsFromDisplayedCards.erase(_hoveredCard->card);
+                    _selectedCardInDisplayedCardsHandler(_hoveredCard->card);
+                }
+            }
+
+            // Displayed cards cannot be held
+            return EventTargets().Add(this, x, y);
         }
 
         // Special logic for card select modes
         if (_chooseCardsFromHandMode)
         {
-            if (_chosenCardsFromHand.find(_hoveredCard) == _chosenCardsFromHand.end())
+            if (_chosenCardsFromHand.find(_hoveredCard->card) == _chosenCardsFromHand.end())
             {
                 if (_chosenCardsFromHand.size() < _chooseCardsFromHandMaxCardCount)
                 {
-                    _chosenCardsFromHand.insert(_hoveredCard);
-                    _selectedCardInHandHandler(_hoveredCard);
+                    _chosenCardsFromHand.insert(_hoveredCard->card);
+                    _selectedCardInHandHandler(_hoveredCard->card);
                 }
             }
             else
             {
-                _chosenCardsFromHand.erase(_hoveredCard);
-                _deselectedCardInHandHandler(_hoveredCard);
+                _chosenCardsFromHand.erase(_hoveredCard->card);
+                _deselectedCardInHandHandler(_hoveredCard->card);
             }
 
             return EventTargets().Add(this, x, y);
         }
         else if (_chooseCardsFromActiveCardsMode)
         {
-            if (_chosenCardsFromActiveCards.find(_hoveredCard) == _chosenCardsFromActiveCards.end())
+            if (_chosenCardsFromActiveCards.find(_hoveredCard->card) == _chosenCardsFromActiveCards.end())
             {
                 if (_chosenCardsFromActiveCards.size() < _chooseCardsFromActiveCardsMaxCardCount)
                 {
-                    _chosenCardsFromActiveCards.insert(_hoveredCard);
-                    _selectedCardInActiveCardsHandler(_hoveredCard);
+                    _chosenCardsFromActiveCards.insert(_hoveredCard->card);
+                    _selectedCardInActiveCardsHandler(_hoveredCard->card);
                 }
             }
             else
             {
-                _chosenCardsFromActiveCards.erase(_hoveredCard);
-                _deselectedCardInActiveCardsHandler(_hoveredCard);
+                _chosenCardsFromActiveCards.erase(_hoveredCard->card);
+                _deselectedCardInActiveCardsHandler(_hoveredCard->card);
             }
 
             return EventTargets().Add(this, x, y);
@@ -323,7 +375,6 @@ zcom::EventTargets zcom::Board::_OnLeftPressed(int x, int y)
 
         _heldCard = _hoveredCard;
         _hoveredCard = nullptr;
-        _hoveredCardInHand = false;
     }
     return EventTargets().Add(this, x, y);
 }
@@ -334,42 +385,40 @@ zcom::EventTargets zcom::Board::_OnLeftReleased(int x, int y)
 
     if (_heldCard)
     {
-        _Card* card = _GetCardFromPointer(_heldCard);
-
         float viewWidth = GetWidth();
         float viewHeight = GetHeight();
 
         bool returnToStartPos = true;
-        if (card->set.set == cards::CardSets::DECK)
+        if (_heldCard->set.set == cards::CardSets::DECK)
         {
             // Draw
             if (GetMousePosX() > 500.0f)
             {
-                card->xPos = GetMousePosX();
-                card->yPos = GetMousePosY();
-                cards::Card* drawnCard = _core->DrawCard(_heldCard->GetCardType(), _uiState.currentPlayer, !_drawCardMode);
+                _heldCard->xPos = GetMousePosX();
+                _heldCard->yPos = GetMousePosY();
+                cards::Card* drawnCard = _core->DrawCard(_heldCard->card->GetCardType(), _uiState.currentPlayer, !_drawCardMode);
                 returnToStartPos = false;
 
                 if (_drawCardMode)
                     _drawCardHandler(drawnCard);
             }
         }
-        else if (card->set.set == cards::CardSets::HAND && card->set.playerIndex == _uiState.currentPlayer)
+        else if (_heldCard->set.set == cards::CardSets::HAND && _heldCard->set.playerIndex == _uiState.currentPlayer)
         {
             // Discard
             if (GetMousePosX() > viewWidth - 500.0f)
             {
-                card->xPos = GetMousePosX();
-                card->yPos = GetMousePosY();
-                _core->DiscardCard(_heldCard, _uiState.currentPlayer);
+                _heldCard->xPos = GetMousePosX();
+                _heldCard->yPos = GetMousePosY();
+                _core->DiscardCard(_heldCard->card, _uiState.currentPlayer);
                 returnToStartPos = false;
             }
             // Play
             else if (GetMousePosX() > 500.0f && GetMousePosY() < viewHeight - 300.0f)
             {
-                card->xPos = GetMousePosX();
-                card->yPos = GetMousePosY();
-                cards::PlayResult result = _core->PlayCard(_heldCard);
+                _heldCard->xPos = GetMousePosX();
+                _heldCard->yPos = GetMousePosY();
+                cards::PlayResult result = _core->PlayCard(_heldCard->card);
                 if (result.waitForInput)
                     _HandleInputRequest(result);
                 returnToStartPos = false;
@@ -378,15 +427,15 @@ zcom::EventTargets zcom::Board::_OnLeftReleased(int x, int y)
 
         if (returnToStartPos)
         {
-            card->startXPos = GetMousePosX();
-            card->startYPos = GetMousePosY();
-            card->startRotation = 0.0f;
-            card->targetXPos = card->xPos;
-            card->targetYPos = card->yPos;
-            card->targetRotation = card->rotation;
-            card->moving = true;
-            card->moveStartTime = ztime::Main();
-            card->moveDuration = Duration(300, MILLISECONDS);
+            _heldCard->startXPos = GetMousePosX();
+            _heldCard->startYPos = GetMousePosY();
+            _heldCard->startRotation = 0.0f;
+            _heldCard->targetXPos = _heldCard->xPos;
+            _heldCard->targetYPos = _heldCard->yPos;
+            _heldCard->targetRotation = _heldCard->rotation;
+            _heldCard->moving = true;
+            _heldCard->moveStartTime = ztime::Main();
+            _heldCard->moveDuration = Duration(300, MILLISECONDS);
         }
 
         _heldCard = nullptr;
@@ -407,13 +456,6 @@ zcom::EventTargets zcom::Board::_OnRightPressed(int x, int y)
 void zcom::Board::_DetectHoveredCard()
 {
     _hoveredCard = _GetHoveredCard();
-    _hoveredCardInHand = false;
-    if (_hoveredCard)
-    {
-        _Card* card = _GetCardFromPointer(_hoveredCard);
-        if (card->set.set == cards::CardSets::HAND)
-            _hoveredCardInHand = true;
-    }
 }
 
 void zcom::Board::_HandleInputRequest(cards::PlayResult& result)
@@ -620,67 +662,67 @@ void zcom::Board::_CreateMissingCards()
 {
     for (auto& cardPtr : _core->GetState().offenseDeck)
     {
-        auto it = std::find_if(_cards.begin(), _cards.end(), [&](_Card& card) { return card.card == cardPtr.get(); });
+        auto it = std::find_if(_cards.begin(), _cards.end(), [&](const std::unique_ptr<_Card>& card) { return card->card == cardPtr.get(); });
         if (it == _cards.end())
-            _cards.push_back(_Card{ cardPtr.get() });
+            _cards.push_back(std::make_unique<_Card>(_Card{ cardPtr.get() }));
     }
     for (auto& cardPtr : _core->GetState().defenseDeck)
     {
-        auto it = std::find_if(_cards.begin(), _cards.end(), [&](_Card& card) { return card.card == cardPtr.get(); });
+        auto it = std::find_if(_cards.begin(), _cards.end(), [&](const std::unique_ptr<_Card>& card) { return card->card == cardPtr.get(); });
         if (it == _cards.end())
-            _cards.push_back(_Card{ cardPtr.get() });
+            _cards.push_back(std::make_unique<_Card>(_Card{ cardPtr.get() }));
     }
     for (auto& cardPtr : _core->GetState().utilityDeck)
     {
-        auto it = std::find_if(_cards.begin(), _cards.end(), [&](_Card& card) { return card.card == cardPtr.get(); });
+        auto it = std::find_if(_cards.begin(), _cards.end(), [&](const std::unique_ptr<_Card>& card) { return card->card == cardPtr.get(); });
         if (it == _cards.end())
-            _cards.push_back(_Card{ cardPtr.get() });
+            _cards.push_back(std::make_unique<_Card>(_Card{ cardPtr.get() }));
     }
     for (auto& cardPtr : _core->GetState().comboDeck)
     {
-        auto it = std::find_if(_cards.begin(), _cards.end(), [&](_Card& card) { return card.card == cardPtr.get(); });
+        auto it = std::find_if(_cards.begin(), _cards.end(), [&](const std::unique_ptr<_Card>& card) { return card->card == cardPtr.get(); });
         if (it == _cards.end())
-            _cards.push_back(_Card{ cardPtr.get() });
+            _cards.push_back(std::make_unique<_Card>(_Card{ cardPtr.get() }));
     }
     for (auto& player : _core->GetState().players)
     {
         for (auto& cardPtr : player.hand)
         {
-            auto it = std::find_if(_cards.begin(), _cards.end(), [&](_Card& card) { return card.card == cardPtr.get(); });
+            auto it = std::find_if(_cards.begin(), _cards.end(), [&](const std::unique_ptr<_Card>& card) { return card->card == cardPtr.get(); });
             if (it == _cards.end())
-                _cards.push_back(_Card{ cardPtr.get() });
+                _cards.push_back(std::make_unique<_Card>(_Card{ cardPtr.get() }));
         }
         for (auto& cardPtr : player.activeCards)
         {
-            auto it = std::find_if(_cards.begin(), _cards.end(), [&](_Card& card) { return card.card == cardPtr.get(); });
+            auto it = std::find_if(_cards.begin(), _cards.end(), [&](const std::unique_ptr<_Card>& card) { return card->card == cardPtr.get(); });
             if (it == _cards.end())
-                _cards.push_back(_Card{ cardPtr.get() });
+                _cards.push_back(std::make_unique<_Card>(_Card{ cardPtr.get() }));
         }
     }
     for (auto& cardPtr : _core->GetState().graveyard)
     {
-        auto it = std::find_if(_cards.begin(), _cards.end(), [&](_Card& card) { return card.card == cardPtr.get(); });
+        auto it = std::find_if(_cards.begin(), _cards.end(), [&](const std::unique_ptr<_Card>& card) { return card->card == cardPtr.get(); });
         if (it == _cards.end())
-            _cards.push_back(_Card{ cardPtr.get() });
+            _cards.push_back(std::make_unique<_Card>(_Card{ cardPtr.get() }));
     }
     for (auto& cardPtr : _core->GetState().inPlayCards)
     {
-        auto it = std::find_if(_cards.begin(), _cards.end(), [&](_Card& card) { return card.card == cardPtr.get(); });
+        auto it = std::find_if(_cards.begin(), _cards.end(), [&](const std::unique_ptr<_Card>& card) { return card->card == cardPtr.get(); });
         if (it == _cards.end())
-            _cards.push_back(_Card{ cardPtr.get() });
+            _cards.push_back(std::make_unique<_Card>(_Card{ cardPtr.get() }));
     }
     for (auto& cardPtr : _core->GetState().destroyedCards)
     {
-        auto it = std::find_if(_cards.begin(), _cards.end(), [&](_Card& card) { return card.card == cardPtr.get(); });
+        auto it = std::find_if(_cards.begin(), _cards.end(), [&](const std::unique_ptr<_Card>& card) { return card->card == cardPtr.get(); });
         if (it == _cards.end())
-            _cards.push_back(_Card{ cardPtr.get() });
+            _cards.push_back(std::make_unique<_Card>(_Card{ cardPtr.get() }));
     }
 }
 
 void zcom::Board::_SyncCardPositions()
 {
     for (auto& card : _cards)
-        card.set = _core->GetCardSet(card.card);
+        card->set = _core->GetCardSet(card->card);
 }
 
 void zcom::Board::_SyncUISets()
@@ -730,13 +772,6 @@ void zcom::Board::_CalculateCardTargetPositions()
 
     for (auto& card : _cards)
     {
-        if (card.card == _hoveredCard)
-            card.scale = 1.1f;
-        else
-            card.scale = 1.0f;
-
-
-
         float offenseDeckCenterPosX = gapFromScreenEdge + CARD_HEIGHT / 2;
         float offenseDeckCenterPosY = viewHeight / 2 - gapBetweenDecks * 1.5f - CARD_WIDTH * 1.5f;
         float defenseDeckCenterPosX = gapFromScreenEdge + CARD_HEIGHT / 2;
@@ -746,72 +781,72 @@ void zcom::Board::_CalculateCardTargetPositions()
         float comboDeckCenterPosX = gapFromScreenEdge + CARD_HEIGHT / 2;
         float comboDeckCenterPosY = viewHeight / 2 + gapBetweenDecks * 1.5f + CARD_WIDTH * 1.5f;
 
-        if (card.set.set == cards::CardSets::DECK)
+        if (card->set.set == cards::CardSets::DECK)
         {
-            if (card.card->GetCardType() == cards::CardType::OFFENSE)
+            if (card->card->GetCardType() == cards::CardType::OFFENSE)
             {
                 for (int i = 0; i < _uiState.offenseDeck.size(); i++)
                 {
-                    if (card.card == _uiState.offenseDeck[i])
+                    if (card->card == _uiState.offenseDeck[i])
                     {
-                        card.zIndex = i;
-                        card.targetXPos = offenseDeckCenterPosX - i * 1.25f;
-                        card.targetYPos = offenseDeckCenterPosY;
-                        card.targetRotation = PI / 2;
-                        card.targetOpacity = 1.0f;
+                        card->zIndex = i;
+                        card->targetXPos = offenseDeckCenterPosX - i * 1.25f;
+                        card->targetYPos = offenseDeckCenterPosY;
+                        card->targetRotation = PI / 2;
+                        card->targetOpacity = 1.0f;
                         break;
                     }
                 }
             }
-            else if (card.card->GetCardType() == cards::CardType::DEFENSE)
+            else if (card->card->GetCardType() == cards::CardType::DEFENSE)
             {
                 for (int i = 0; i < _uiState.defenseDeck.size(); i++)
                 {
-                    if (card.card == _uiState.defenseDeck[i])
+                    if (card->card == _uiState.defenseDeck[i])
                     {
-                        card.zIndex = i;
-                        card.targetXPos = defenseDeckCenterPosX - i * 1.25f;
-                        card.targetYPos = defenseDeckCenterPosY;
-                        card.targetRotation = PI / 2;
-                        card.targetOpacity = 1.0f;
+                        card->zIndex = i;
+                        card->targetXPos = defenseDeckCenterPosX - i * 1.25f;
+                        card->targetYPos = defenseDeckCenterPosY;
+                        card->targetRotation = PI / 2;
+                        card->targetOpacity = 1.0f;
                         break;
                     }
                 }
             }
-            else if (card.card->GetCardType() == cards::CardType::UTILITY)
+            else if (card->card->GetCardType() == cards::CardType::UTILITY)
             {
                 for (int i = 0; i < _uiState.utilityDeck.size(); i++)
                 {
-                    if (card.card == _uiState.utilityDeck[i])
+                    if (card->card == _uiState.utilityDeck[i])
                     {
-                        card.zIndex = i;
-                        card.targetXPos = utilityDeckCenterPosX - i * 1.25f;
-                        card.targetYPos = utilityDeckCenterPosY;
-                        card.targetRotation = PI / 2;
-                        card.targetOpacity = 1.0f;
+                        card->zIndex = i;
+                        card->targetXPos = utilityDeckCenterPosX - i * 1.25f;
+                        card->targetYPos = utilityDeckCenterPosY;
+                        card->targetRotation = PI / 2;
+                        card->targetOpacity = 1.0f;
                         break;
                     }
                 }
             }
-            else if (card.card->GetCardType() == cards::CardType::COMBO)
+            else if (card->card->GetCardType() == cards::CardType::COMBO)
             {
                 for (int i = 0; i < _uiState.comboDeck.size(); i++)
                 {
-                    if (card.card == _uiState.comboDeck[i])
+                    if (card->card == _uiState.comboDeck[i])
                     {
-                        card.zIndex = i;
-                        card.targetXPos = comboDeckCenterPosX - i * 1.25f;
-                        card.targetYPos = comboDeckCenterPosY;
-                        card.targetRotation = PI / 2;
-                        card.targetOpacity = 1.0f;
+                        card->zIndex = i;
+                        card->targetXPos = comboDeckCenterPosX - i * 1.25f;
+                        card->targetYPos = comboDeckCenterPosY;
+                        card->targetRotation = PI / 2;
+                        card->targetOpacity = 1.0f;
                         break;
                     }
                 }
             }
         }
-        else if (card.set.set == cards::CardSets::HAND)
+        else if (card->set.set == cards::CardSets::HAND)
         {
-            if (card.set.playerIndex == _uiState.currentPlayer)
+            if (card->set.playerIndex == _uiState.currentPlayer)
             {
                 int cardsInHand = _uiState.players[_uiState.currentPlayer].hand.size();
                 float circleCenterOffset = 800.0f + cardsInHand * 100.0f;
@@ -823,16 +858,16 @@ void zcom::Board::_CalculateCardTargetPositions()
 
                 for (int i = 0; i < cardsInHand; i++)
                 {
-                    if (card.card == _uiState.players[_uiState.currentPlayer].hand[i])
+                    if (card->card == _uiState.players[_uiState.currentPlayer].hand[i])
                     {
                         float cardAngle = (gapBetweenCards * (cardsInHand - 1)) / 2 - gapBetweenCards * i;
                         Pos2D<float> cardPos = point_rotated_by(circleCenter, circleTop, cardAngle);
 
-                        card.zIndex = i;
-                        card.targetXPos = cardPos.x;
-                        card.targetYPos = cardPos.y;
-                        card.targetRotation = cardAngle * (0.0f + 0.2f * cardsInHand);
-                        card.targetOpacity = 1.0f;
+                        card->zIndex = i;
+                        card->targetXPos = cardPos.x;
+                        card->targetYPos = cardPos.y;
+                        card->targetRotation = cardAngle * (0.0f + 0.2f * cardsInHand);
+                        card->targetOpacity = 1.0f;
                         break;
                     }
                 }
@@ -850,38 +885,38 @@ void zcom::Board::_CalculateCardTargetPositions()
 
                 for (int i = 0; i < cardsInHand; i++)
                 {
-                    if (card.card == _uiState.players[_uiState.opposingPlayer].hand[i])
+                    if (card->card == _uiState.players[_uiState.opposingPlayer].hand[i])
                     {
                         float cardAngle = (gapBetweenCards * (cardsInHand - 1)) / 2 - gapBetweenCards * i;
                         Pos2D<float> cardPos = point_rotated_by(circleCenter, circleBottom, cardAngle);
 
-                        card.zIndex = i;
-                        card.targetXPos = cardPos.x;
-                        card.targetYPos = cardPos.y;
-                        card.targetRotation = startAngle + cardAngle * (0.0f + 0.2f * cardsInHand);
-                        card.targetOpacity = 1.0f;
+                        card->zIndex = i;
+                        card->targetXPos = cardPos.x;
+                        card->targetYPos = cardPos.y;
+                        card->targetRotation = startAngle + cardAngle * (0.0f + 0.2f * cardsInHand);
+                        card->targetOpacity = 1.0f;
                         break;
                     }
                 }
             }
         }
-        else if (card.set.set == cards::CardSets::ACTIVE_CARDS)
+        else if (card->set.set == cards::CardSets::ACTIVE_CARDS)
         {
             float gapBetweenCards = 30.0f;
             float horizontalGapFromEdge = 500.0f;
             float maxActiveCardWidth = viewWidth - horizontalGapFromEdge * 2;
 
-            if (card.set.playerIndex == _uiState.currentPlayer)
+            if (card->set.playerIndex == _uiState.currentPlayer)
             {
                 for (int i = 0; i < _uiState.players[_uiState.currentPlayer].activeCards.size(); i++)
                 {
-                    if (card.card == _uiState.players[_uiState.currentPlayer].activeCards[i])
+                    if (card->card == _uiState.players[_uiState.currentPlayer].activeCards[i])
                     {
-                        card.zIndex = -100 + i;
-                        card.targetXPos = horizontalGapFromEdge + CARD_WIDTH / 2 + (CARD_WIDTH + gapBetweenCards) * i;
-                        card.targetYPos = viewHeight - 250.0f - CARD_HEIGHT / 2;
-                        card.targetRotation = 0.0f;
-                        card.targetOpacity = 1.0f;
+                        card->zIndex = -100 + i;
+                        card->targetXPos = horizontalGapFromEdge + CARD_WIDTH / 2 + (CARD_WIDTH + gapBetweenCards) * i;
+                        card->targetYPos = viewHeight - 250.0f - CARD_HEIGHT / 2;
+                        card->targetRotation = 0.0f;
+                        card->targetOpacity = 1.0f;
                         break;
                     }
                 }
@@ -890,48 +925,48 @@ void zcom::Board::_CalculateCardTargetPositions()
             {
                 for (int i = 0; i < _uiState.players[_uiState.opposingPlayer].activeCards.size(); i++)
                 {
-                    if (card.card == _uiState.players[_uiState.opposingPlayer].activeCards[i])
+                    if (card->card == _uiState.players[_uiState.opposingPlayer].activeCards[i])
                     {
-                        card.zIndex = -100 + i;
-                        card.targetXPos = viewWidth - horizontalGapFromEdge - CARD_WIDTH / 2 - (CARD_WIDTH + gapBetweenCards) * i;
-                        card.targetYPos = 250.0f + CARD_HEIGHT / 2;
-                        card.targetRotation = PI;
-                        card.targetOpacity = 1.0f;
+                        card->zIndex = -100 + i;
+                        card->targetXPos = viewWidth - horizontalGapFromEdge - CARD_WIDTH / 2 - (CARD_WIDTH + gapBetweenCards) * i;
+                        card->targetYPos = 250.0f + CARD_HEIGHT / 2;
+                        card->targetRotation = PI;
+                        card->targetOpacity = 1.0f;
                         break;
                     }
                 }
             }
         }
-        else if (card.set.set == cards::CardSets::GRAVEYARD)
+        else if (card->set.set == cards::CardSets::GRAVEYARD)
         {
             float graveyardDeckCenterPosX = viewWidth - gapFromScreenEdge - CARD_WIDTH / 2;
             float graveyardDeckCenterPosY = viewHeight / 2;
 
             for (int i = 0; i < _uiState.graveyard.size(); i++)
             {
-                if (card.card == _uiState.graveyard[i])
+                if (card->card == _uiState.graveyard[i])
                 {
-                    card.zIndex = i;
-                    card.targetXPos = graveyardDeckCenterPosX + i * 0.75f;
-                    card.targetYPos = graveyardDeckCenterPosY;
-                    card.targetRotation = 0.0f;
-                    card.targetOpacity = 1.0f;
+                    card->zIndex = i;
+                    card->targetXPos = graveyardDeckCenterPosX + i * 0.75f;
+                    card->targetYPos = graveyardDeckCenterPosY;
+                    card->targetRotation = 0.0f;
+                    card->targetOpacity = 1.0f;
                     break;
                 }
             }
         }
-        else if (card.set.set == cards::CardSets::DESTROYED)
+        else if (card->set.set == cards::CardSets::DESTROYED)
         {
             for (int i = 0; i < _uiState.destroyedCards.size(); i++)
             {
-                if (card.card == _uiState.destroyedCards[i])
+                if (card->card == _uiState.destroyedCards[i])
                 {
-                    card.targetOpacity = 0.0f;
+                    card->targetOpacity = 0.0f;
                     break;
                 }
             }
         }
-        else if (card.set.set == cards::CardSets::IN_PLAY)
+        else if (card->set.set == cards::CardSets::IN_PLAY)
         {
             int cardsInPlay = _uiState.inPlayCards.size();
             float gapBetweenCards = 30.0f;
@@ -939,13 +974,39 @@ void zcom::Board::_CalculateCardTargetPositions()
 
             for (int i = 0; i < cardsInPlay; i++)
             {
-                if (card.card == _uiState.inPlayCards[i])
+                if (card->card == _uiState.inPlayCards[i])
                 {
-                    card.zIndex = i + 100;
-                    card.targetXPos = viewWidth / 2 - layoutWidth / 2 + (CARD_WIDTH + gapBetweenCards) * i;
-                    card.targetYPos = viewHeight / 2;
-                    card.targetRotation = 0.0f;
-                    card.targetOpacity = 1.0f;
+                    card->zIndex = i + 100;
+                    card->targetXPos = viewWidth / 2 - layoutWidth / 2 + (CARD_WIDTH + gapBetweenCards) * i;
+                    card->targetYPos = viewHeight / 2;
+                    card->targetRotation = 0.0f;
+                    card->targetOpacity = 1.0f;
+                    break;
+                }
+            }
+        }
+        else if (card->displayed && !card->displayEnding)
+        {
+            int displayedCardCount = _uiState.displayedCards.size();
+            float gapBetweenCards = 30.0f;
+            float layoutWidth = (displayedCardCount - 1) * (CARD_WIDTH * DISPLAYED_CARD_SCALE + gapBetweenCards);
+            float leftOffset = CARD_WIDTH * DISPLAYED_CARD_SCALE * 2 + gapBetweenCards * 2;
+            if (displayedCardCount < 5)
+            {
+                leftOffset = layoutWidth / 2;
+                _displayedCardScroll = 0;
+                _displayedCardOffset.SetValue(0.0f);
+            }
+
+            for (int i = 0; i < displayedCardCount; i++)
+            {
+                if (card->card == _uiState.displayedCards[i].card)
+                {
+                    card->zIndex = i + 200;
+                    card->targetXPos = viewWidth / 2 - leftOffset + (CARD_WIDTH * DISPLAYED_CARD_SCALE + gapBetweenCards) * i;
+                    card->targetYPos = viewHeight / 2;
+                    card->targetRotation = 0.0f;
+                    card->targetOpacity = 1.0f;
                     break;
                 }
             }
@@ -953,37 +1014,40 @@ void zcom::Board::_CalculateCardTargetPositions()
     }
 }
 
-cards::Card* zcom::Board::_GetHoveredCard()
+zcom::Board::_Card* zcom::Board::_GetHoveredCard()
 {
     if (!GetMouseInside())
         return nullptr;
 
-    std::vector<_Card> sortedCards = _cards;
-    std::sort(sortedCards.begin(), sortedCards.end(), [&](const _Card& card1, const _Card& card2) { return card1.zIndex > card2.zIndex; });
-    // Move hovered card to beggining
-    auto it = std::find_if(sortedCards.begin(), sortedCards.end(), [&](const _Card& card) { return card.card == _hoveredCard && !_hoveredCardInHand; });
+    std::vector<_Card*> sortedCards;
+    for (auto& card : _cards)
+        sortedCards.push_back(card.get());
+
+    std::sort(sortedCards.begin(), sortedCards.end(), [&](_Card* card1, _Card* card2) { return card1->zIndex > card2->zIndex; });
+    // Move hovered card to beginning
+    auto it = std::find_if(sortedCards.begin(), sortedCards.end(), [&](_Card* card) { return card == _hoveredCard && !(card->set.set == cards::CardSets::HAND); });
     if (it != sortedCards.end())
     {
-        _Card card = *it;
+        _Card* card = *it;
         sortedCards.erase(it);
         sortedCards.insert(sortedCards.begin(), card);
     }
 
-    for (auto& card : sortedCards)
+    for (_Card* card : sortedCards)
     {
         // Skip moving cards
-        if (card.moving)
+        if (card->moving)
             continue;
 
         // Skip cards not on top of stacked decks
-        if (card.set.set == cards::CardSets::DECK)
+        if (card->set.set == cards::CardSets::DECK)
         {
-            if (card.card != _uiState.GetDeck(card.card->GetCardType()).back())
+            if (card->card != _uiState.GetDeck(card->card->GetCardType()).back())
                 continue;
         }
-        else if (card.set.set == cards::CardSets::GRAVEYARD)
+        else if (card->set.set == cards::CardSets::GRAVEYARD)
         {
-            if (card.card != _uiState.graveyard.back())
+            if (card->card != _uiState.graveyard.back())
                 continue;
         }
 
@@ -991,47 +1055,47 @@ cards::Card* zcom::Board::_GetHoveredCard()
         {
             if (_uiState.currentPlayer != _chooseCardsFromHandChoosingPlayerIndex)
                 continue;
-            if (card.set.set != cards::CardSets::HAND || card.set.playerIndex != _chooseCardsFromHandTargetPlayerIndex)
+            if (card->set.set != cards::CardSets::HAND || card->set.playerIndex != _chooseCardsFromHandTargetPlayerIndex)
                 continue;
-            if (!_chooseCardsFromHandAllowedTypes.empty() && !zutil::Contains(_chooseCardsFromHandAllowedTypes, card.card->GetCardType()))
+            if (!_chooseCardsFromHandAllowedTypes.empty() && !zutil::Contains(_chooseCardsFromHandAllowedTypes, card->card->GetCardType()))
                 continue;
         }
         if (_chooseCardsFromActiveCardsMode)
         {
             if (_uiState.currentPlayer != _chooseCardsFromActiveCardsChoosingPlayerIndex)
                 continue;
-            if (card.set.set != cards::CardSets::ACTIVE_CARDS || card.set.playerIndex != _chooseCardsFromActiveCardsTargetPlayerIndex)
+            if (card->set.set != cards::CardSets::ACTIVE_CARDS || card->set.playerIndex != _chooseCardsFromActiveCardsTargetPlayerIndex)
                 continue;
-            if (!_chooseCardsFromActiveCardsAllowedTypes.empty() && !zutil::Contains(_chooseCardsFromActiveCardsAllowedTypes, card.card->GetCardType()))
+            if (!_chooseCardsFromActiveCardsAllowedTypes.empty() && !zutil::Contains(_chooseCardsFromActiveCardsAllowedTypes, card->card->GetCardType()))
                 continue;
         }
 
         Pos2D<float> mousePos = { (float)GetMousePosX(), (float)GetMousePosY() };
-        Pos2D<float> cardCenterPos = { card.xPos, card.yPos };
+        Pos2D<float> cardCenterPos = { card->xPos, card->yPos };
         // Rotate mouse position around card center to align relative coordinates to upright card position
-        Pos2D<float> adjustedMousePos = point_rotated_by(cardCenterPos, mousePos, -card.targetRotation);
+        Pos2D<float> adjustedMousePos = point_rotated_by(cardCenterPos, mousePos, -card->targetRotation);
 
-        float cardLeftSide = card.xPos - (CARD_WIDTH / 2) * card.scale;
-        float cardRightSide = card.xPos + (CARD_WIDTH / 2) * card.scale;
-        float cardTopSide = card.yPos - (CARD_HEIGHT / 2) * card.scale;
-        float cardBottomSide = card.yPos + (CARD_HEIGHT / 2) * card.scale;
+        float cardLeftSide = card->xPos - (CARD_WIDTH / 2) * card->baseScale * card->scale;
+        float cardRightSide = card->xPos + (CARD_WIDTH / 2) * card->baseScale * card->scale;
+        float cardTopSide = card->yPos - (CARD_HEIGHT / 2) * card->baseScale * card->scale;
+        float cardBottomSide = card->yPos + (CARD_HEIGHT / 2) * card->baseScale * card->scale;
         if (adjustedMousePos.x >= cardLeftSide && adjustedMousePos.x <= cardRightSide &&
             adjustedMousePos.y >= cardTopSide && adjustedMousePos.y <= cardBottomSide)
         {
-            return card.card;
+            return card;
         }
     }
 
     return nullptr;
 }
 
-zcom::Board::_Card* zcom::Board::_GetCardFromPointer(cards::Card* cardPtr)
+zcom::Board::_Card* zcom::Board::_GetCardFromPointer(cards::Card* cardPtr, bool displayed)
 {
     for (auto& card : _cards)
     {
-        if (card.card == cardPtr)
+        if (card->card == cardPtr && card->displayed == displayed)
         {
-            return &card;
+            return card.get();
         }
     }
     return nullptr;
@@ -1099,12 +1163,12 @@ void zcom::Board::_HandleEvents()
             _CalculateCardTargetPositions();
             for (auto& card : _cards)
             {
-                card.startXPos = card.xPos;
-                card.startYPos = card.yPos;
-                card.startRotation = card.rotation;
-                card.moving = true;
-                card.moveStartTime = ztime::Main();
-                card.moveDuration = Duration(600, MILLISECONDS);
+                card->startXPos = card->xPos;
+                card->startYPos = card->yPos;
+                card->startRotation = card->rotation;
+                card->moving = true;
+                card->moveStartTime = ztime::Main();
+                card->moveDuration = Duration(600, MILLISECONDS);
             }
 
             break;
@@ -1253,6 +1317,22 @@ void zcom::Board::_HandleEvents()
             _ProcessCardMove(card, pairedEvent);
             break;
         }
+        case UIEvent::CARD_LEAVE_DISPLAYED_CARDS:
+        {
+            CardLeaveDisplayedCardsEvent cardLeaveDisplayedCardsEvent = std::any_cast<CardLeaveDisplayedCardsEvent>(event.event);
+            _Card* card = _GetCardFromPointer(cardLeaveDisplayedCardsEvent.card, true);
+            if (!card)
+                break;
+
+            card->displayEnding = true;
+            card->startBaseScale = card->baseScale;
+            card->targetBaseScale = 0.0f;
+            card->moving = true;
+            card->moveStartTime = ztime::Main();
+            card->moveDuration = Duration(300, MILLISECONDS);
+
+            break;
+        }
         case UIEvent::CARD_ENTER_HAND:
         {
             _CreateMissingCards();
@@ -1331,6 +1411,29 @@ void zcom::Board::_HandleEvents()
             _MoveNewCardToSet(card, { cards::CardSets::IN_PLAY, -1 });
             break;
         }
+        case UIEvent::CARD_ENTER_DISPLAYED_CARDS:
+        {
+            CardEnterDisplayedCardsEvent cardEnterDisplayedCardsEvent = std::any_cast<CardEnterDisplayedCardsEvent>(event.event);
+
+            _cards.push_back(std::make_unique<_Card>(_Card{ cardEnterDisplayedCardsEvent.displayInfo.card }));
+            _uiState.displayedCards.push_back(cardEnterDisplayedCardsEvent.displayInfo);
+            _Card* card = _cards.back().get();
+
+            card->set = { cards::CardSets::NONE, -1 };
+            card->displayed = true;
+            card->startOpacity = 1.0f;
+            card->startBaseScale = 0.0f;
+            card->targetBaseScale = DISPLAYED_CARD_SCALE;
+            card->moving = true;
+            card->moveStartTime = ztime::Main();
+            card->moveDuration = Duration(600, MILLISECONDS);
+            _CalculateCardTargetPositions();
+            // Set start layout after target layout is calculated
+            card->startXPos = card->targetXPos;
+            card->startYPos = card->targetYPos;
+            card->startRotation = card->targetRotation;
+            break;
+        }
         case UIEvent::HAND_REVEAL_STATE_CHANGED:
         {
             HandRevealStateChangedEvent handRevealStateChangedEvent = std::any_cast<HandRevealStateChangedEvent>(event.event);
@@ -1394,6 +1497,7 @@ void zcom::Board::_MoveCardToSet(_Card* card, cards::CardSet newSet)
     card->startXPos = card->xPos;
     card->startYPos = card->yPos;
     card->startRotation = card->rotation;
+    card->startBaseScale = card->baseScale;
     card->startOpacity = card->opacity;
     card->moving = true;
     card->moveStartTime = ztime::Main();
@@ -1421,16 +1525,15 @@ void zcom::Board::EnableNoClickMode()
     _noClickMode = true;
     if (_heldCard)
     {
-        _Card* card = _GetCardFromPointer(_heldCard);
-        card->startXPos = GetMousePosX();
-        card->startYPos = GetMousePosY();
-        card->startRotation = 0.0f;
-        card->targetXPos = card->xPos;
-        card->targetYPos = card->yPos;
-        card->targetRotation = card->rotation;
-        card->moving = true;
-        card->moveStartTime = ztime::Main();
-        card->moveDuration = Duration(300, MILLISECONDS);
+        _heldCard->startXPos = GetMousePosX();
+        _heldCard->startYPos = GetMousePosY();
+        _heldCard->startRotation = 0.0f;
+        _heldCard->targetXPos = _heldCard->xPos;
+        _heldCard->targetYPos = _heldCard->yPos;
+        _heldCard->targetRotation = _heldCard->rotation;
+        _heldCard->moving = true;
+        _heldCard->moveStartTime = ztime::Main();
+        _heldCard->moveDuration = Duration(300, MILLISECONDS);
         _heldCard = nullptr;
     }
 }
@@ -1452,16 +1555,15 @@ void zcom::Board::EnableChooseCardFromHandMode(int choosingPlayerIndex, int targ
 
     if (_heldCard)
     {
-        _Card* card = _GetCardFromPointer(_heldCard);
-        card->startXPos = GetMousePosX();
-        card->startYPos = GetMousePosY();
-        card->startRotation = 0.0f;
-        card->targetXPos = card->xPos;
-        card->targetYPos = card->yPos;
-        card->targetRotation = card->rotation;
-        card->moving = true;
-        card->moveStartTime = ztime::Main();
-        card->moveDuration = Duration(300, MILLISECONDS);
+        _heldCard->startXPos = GetMousePosX();
+        _heldCard->startYPos = GetMousePosY();
+        _heldCard->startRotation = 0.0f;
+        _heldCard->targetXPos = _heldCard->xPos;
+        _heldCard->targetYPos = _heldCard->yPos;
+        _heldCard->targetRotation = _heldCard->rotation;
+        _heldCard->moving = true;
+        _heldCard->moveStartTime = ztime::Main();
+        _heldCard->moveDuration = Duration(300, MILLISECONDS);
         _heldCard = nullptr;
         _DetectHoveredCard();
     }
@@ -1485,16 +1587,15 @@ void zcom::Board::EnableChooseCardFromActiveCardsMode(int choosingPlayerIndex, i
 
     if (_heldCard)
     {
-        _Card* card = _GetCardFromPointer(_heldCard);
-        card->startXPos = GetMousePosX();
-        card->startYPos = GetMousePosY();
-        card->startRotation = 0.0f;
-        card->targetXPos = card->xPos;
-        card->targetYPos = card->yPos;
-        card->targetRotation = card->rotation;
-        card->moving = true;
-        card->moveStartTime = ztime::Main();
-        card->moveDuration = Duration(300, MILLISECONDS);
+        _heldCard->startXPos = GetMousePosX();
+        _heldCard->startYPos = GetMousePosY();
+        _heldCard->startRotation = 0.0f;
+        _heldCard->targetXPos = _heldCard->xPos;
+        _heldCard->targetYPos = _heldCard->yPos;
+        _heldCard->targetRotation = _heldCard->rotation;
+        _heldCard->moving = true;
+        _heldCard->moveStartTime = ztime::Main();
+        _heldCard->moveDuration = Duration(300, MILLISECONDS);
         _heldCard = nullptr;
         _DetectHoveredCard();
     }
@@ -1517,16 +1618,15 @@ void zcom::Board::EnableChooseCardFromDisplayedCardsMode(int playerIndex, int ma
 
     if (_heldCard)
     {
-        _Card* card = _GetCardFromPointer(_heldCard);
-        card->startXPos = GetMousePosX();
-        card->startYPos = GetMousePosY();
-        card->startRotation = 0.0f;
-        card->targetXPos = card->xPos;
-        card->targetYPos = card->yPos;
-        card->targetRotation = card->rotation;
-        card->moving = true;
-        card->moveStartTime = ztime::Main();
-        card->moveDuration = Duration(300, MILLISECONDS);
+        _heldCard->startXPos = GetMousePosX();
+        _heldCard->startYPos = GetMousePosY();
+        _heldCard->startRotation = 0.0f;
+        _heldCard->targetXPos = _heldCard->xPos;
+        _heldCard->targetYPos = _heldCard->yPos;
+        _heldCard->targetRotation = _heldCard->rotation;
+        _heldCard->moving = true;
+        _heldCard->moveStartTime = ztime::Main();
+        _heldCard->moveDuration = Duration(300, MILLISECONDS);
         _heldCard = nullptr;
         _DetectHoveredCard();
     }
@@ -1545,19 +1645,18 @@ void zcom::Board::EnableDrawCardMode(std::vector<cards::CardType> allowedTypes, 
 
     if (_heldCard)
     {
-        _Card* card = _GetCardFromPointer(_heldCard);
-        if (card->set.set == cards::CardSets::DECK)
+        if (_heldCard->set.set == cards::CardSets::DECK)
             return;
 
-        card->startXPos = GetMousePosX();
-        card->startYPos = GetMousePosY();
-        card->startRotation = 0.0f;
-        card->targetXPos = card->xPos;
-        card->targetYPos = card->yPos;
-        card->targetRotation = card->rotation;
-        card->moving = true;
-        card->moveStartTime = ztime::Main();
-        card->moveDuration = Duration(300, MILLISECONDS);
+        _heldCard->startXPos = GetMousePosX();
+        _heldCard->startYPos = GetMousePosY();
+        _heldCard->startRotation = 0.0f;
+        _heldCard->targetXPos = _heldCard->xPos;
+        _heldCard->targetYPos = _heldCard->yPos;
+        _heldCard->targetRotation = _heldCard->rotation;
+        _heldCard->moving = true;
+        _heldCard->moveStartTime = ztime::Main();
+        _heldCard->moveDuration = Duration(300, MILLISECONDS);
         _heldCard = nullptr;
     }
     _DetectHoveredCard();

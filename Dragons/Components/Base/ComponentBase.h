@@ -29,17 +29,17 @@ namespace zcom
     // Releases the resource
     void SafeRelease(IUnknown** res);
 
-    // Base class for component properties.
-    // Used to give components properties which can be used by specific objects without adding the property to 'Base'.
+    // Base class for component attributes.
+    // Used to give components attributes which can be used by other specific objects without adding additional properties to 'Base'.
     // Derived classes should implement (if necessary):
     //  - Default constructor
     //  - Copy assignment operator
     // MUST IMPLEMENT:
     //  - static std::string _NAME_();
-    class Property
+    class Attribute
     {
     public:
-        virtual ~Property() {};
+        virtual ~Attribute() {};
         bool valid;
     };
 
@@ -205,7 +205,7 @@ namespace zcom
         float _cornerRounding = 0.0f;
 
         // Other properties
-        std::unordered_map<std::string, std::unique_ptr<Property>> _properties;
+        std::unordered_map<std::string, std::unique_ptr<Attribute>> _attributes;
 
         // Mouse events
         bool _mouseInside = false;
@@ -595,53 +595,53 @@ namespace zcom
             _redraw = true;
         }
 
-        // Other properties
-        template<class _Prop>
-        void SetProperty(_Prop prop)
+        // Attributes
+        template<class _Attr>
+        void SetAttribute(_Attr attr)
         {
-            auto entry = _properties.find(_Prop::_NAME_());
-            if (entry != _properties.end())
+            auto entry = _attributes.find(_Attr::_NAME_());
+            if (entry != _attributes.end())
             {
-                // The cast only fails when two properties have same names
-                *dynamic_cast<_Prop*>(entry->second.get()) = prop;
+                // The cast only fails when multiple attributes have the same name
+                *dynamic_cast<_Attr*>(entry->second.get()) = attr;
             }
             else
             {
-                auto propPtr = std::make_unique<_Prop>();
-                *propPtr = prop;
-                _properties.insert({ _Prop::_NAME_(), std::move(propPtr) });
+                auto attrPtr = std::make_unique<_Attr>();
+                *attrPtr = attr;
+                _attributes.insert({ _Attr::_NAME_(), std::move(attrPtr) });
             }
 
-            // Properties might not change the visuals,
+            // Attributes might not change the visuals,
             // but optimising for that scenario is unnecessary
             _redraw = true;
         }
 
-        template<class _Prop>
-        _Prop GetProperty()
+        template<class _Attr>
+        _Attr GetAttribute()
         {
-            auto entry = _properties.find(_Prop::_NAME_());
-            if (entry != _properties.end())
+            auto entry = _attributes.find(_Attr::_NAME_());
+            if (entry != _attributes.end())
             {
                 // The cast only fails when two properties have same names
-                _Prop prop = *dynamic_cast<_Prop*>(entry->second.get());
-                prop.valid = true;
-                return prop;
+                _Attr attr = *dynamic_cast<_Attr*>(entry->second.get());
+                attr.valid = true;
+                return attr;
             }
             else
             {
-                _Prop prop;
-                prop.valid = false;
-                return prop;
+                _Attr attr;
+                attr.valid = false;
+                return attr;
             }
         }
 
-        template<class _Prop>
-        void RemoveProperty()
+        template<class _Attr>
+        void RemoveAttribute()
         {
-            _properties.erase(_Prop::_NAME_());
+            _attributes.erase(_Attr::_NAME_());
 
-            // Properties might not change the visuals,
+            // Attributes might not change the visuals,
             // but optimising for that scenario is unnecessary
             _redraw = true;
         }
