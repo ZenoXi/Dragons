@@ -667,6 +667,172 @@ void EntryScene::_ProcessNewInputRequests()
 
             break;
         }
+        case UserInputType::CHOOSE_CARD_FROM_GRAVEYARD:
+        {
+            auto params = reinterpret_cast<UserInputParams_ChooseCardFromGraveyard*>(request->inputParams.get());
+
+            if (params->maxCardCount <= 0)
+            {
+                _board->SendUserInputResponse();
+                break;
+            }
+
+            _waitingToChooseCardsFromGraveyard = true;
+            _gettingUserInput = true;
+
+            _chooseCardsFromGraveyardLabel = Create<zcom::Label>(request->inputPrompt);
+            _chooseCardsFromGraveyardLabel->SetBaseSize(600, 180);
+            _chooseCardsFromGraveyardLabel->SetVerticalOffsetPixels(60);
+            _chooseCardsFromGraveyardLabel->SetAlignment(zcom::Alignment::CENTER, zcom::Alignment::START);
+            _chooseCardsFromGraveyardLabel->SetVerticalTextAlignment(zcom::Alignment::CENTER);
+            _chooseCardsFromGraveyardLabel->SetHorizontalTextAlignment(zcom::TextAlignment::CENTER);
+            _chooseCardsFromGraveyardLabel->SetFont(L"Arial");
+            _chooseCardsFromGraveyardLabel->SetFontSize(36.0f);
+            _chooseCardsFromGraveyardLabel->SetWordWrap(true);
+            _chooseCardsFromGraveyardLabel->SetBackgroundColor(D2D1::ColorF(0.0f, 0.0f, 0.0f, 0.5f));
+            _chooseCardsFromGraveyardLabel->Resize(_chooseCardsFromGraveyardLabel->GetBaseWidth(), 100);
+            _chooseCardsFromGraveyardLabel->SetBaseHeight(_chooseCardsFromGraveyardLabel->GetTextHeight() + 100);
+
+            _chooseCardsFromGraveyardDoneButton = Create<zcom::Button>(L"Done");
+            _chooseCardsFromGraveyardDoneButton->Text()->SetFont(L"Arial");
+            _chooseCardsFromGraveyardDoneButton->Text()->SetFontSize(36.0f);
+            _chooseCardsFromGraveyardDoneButton->Text()->SetFontWeight(DWRITE_FONT_WEIGHT_BOLD);
+            _chooseCardsFromGraveyardDoneButton->SetBaseSize(150.0f, 60.0f);
+            _chooseCardsFromGraveyardDoneButton->SetAlignment(zcom::Alignment::CENTER, zcom::Alignment::END);
+            _chooseCardsFromGraveyardDoneButton->SetVerticalOffsetPixels(-100);
+            _chooseCardsFromGraveyardDoneButton->SetZIndex(10);
+            _chooseCardsFromGraveyardDoneButton->SetBorderVisibility(true);
+            _chooseCardsFromGraveyardDoneButton->SetBorderWidth(4.0f);
+            _chooseCardsFromGraveyardDoneButton->SetBorderColor(D2D1::ColorF(0.8f, 0.8f, 0.8f));
+            _chooseCardsFromGraveyardDoneButton->SetBackgroundColor(D2D1::ColorF(0.2f, 0.2f, 0.2f));
+            _chooseCardsFromGraveyardDoneButton->SetOnActivated([&, request]()
+            {
+                _waitingToChooseCardsFromGraveyard = false;
+                _gettingUserInput = false;
+
+                auto params = reinterpret_cast<UserInputParams_ChooseCardFromGraveyard*>(request->inputParams.get());
+                params->chosenCards.clear();
+                for (auto card : _chosenCardsFromGraveyard)
+                    params->chosenCards.push_back(card);
+                _board->SendUserInputResponse();
+                _board->DisableChooseCardFromGraveyardMode();
+
+                _canvas->RemoveComponent(_chooseCardsFromGraveyardLabel.get());
+                _canvas->RemoveComponent(_chooseCardsFromGraveyardDoneButton.get());
+            });
+            _chooseCardsFromGraveyardDoneButton->SetVisible(params->minCardCount <= 0);
+
+            _canvas->AddComponent(_chooseCardsFromGraveyardLabel.get());
+            _canvas->AddComponent(_chooseCardsFromGraveyardDoneButton.get());
+
+            _chosenCardsFromGraveyard.clear();
+            _board->EnableChooseCardFromGraveyardMode(
+                params->playerIndex,
+                params->maxCardCount,
+                params->allowedTypes,
+                [&, request](cards::Card* selectedCard)
+                {
+                    auto params = reinterpret_cast<UserInputParams_ChooseCardFromGraveyard*>(request->inputParams.get());
+
+                    _chosenCardsFromGraveyard.insert(selectedCard);
+                    if (_chosenCardsFromGraveyard.size() >= params->minCardCount)
+                        _chooseCardsFromGraveyardDoneButton->SetVisible(true);
+                },
+                [&, request](cards::Card* deselectedCard)
+                {
+                    auto params = reinterpret_cast<UserInputParams_ChooseCardFromGraveyard*>(request->inputParams.get());
+
+                    _chosenCardsFromGraveyard.erase(deselectedCard);
+                    if (_chosenCardsFromGraveyard.size() < params->minCardCount)
+                        _chooseCardsFromGraveyardDoneButton->SetVisible(false);
+                }
+            );
+
+            break;
+        }
+        case UserInputType::CHOOSE_DECK:
+        {
+            auto params = reinterpret_cast<UserInputParams_ChooseDeck*>(request->inputParams.get());
+
+            if (params->maxDeckCount <= 0)
+            {
+                _board->SendUserInputResponse();
+                break;
+            }
+
+            _waitingToChooseDecks = true;
+            _gettingUserInput = true;
+
+            _chooseDecksLabel = Create<zcom::Label>(request->inputPrompt);
+            _chooseDecksLabel->SetBaseSize(600, 180);
+            _chooseDecksLabel->SetVerticalOffsetPixels(60);
+            _chooseDecksLabel->SetAlignment(zcom::Alignment::CENTER, zcom::Alignment::START);
+            _chooseDecksLabel->SetVerticalTextAlignment(zcom::Alignment::CENTER);
+            _chooseDecksLabel->SetHorizontalTextAlignment(zcom::TextAlignment::CENTER);
+            _chooseDecksLabel->SetFont(L"Arial");
+            _chooseDecksLabel->SetFontSize(36.0f);
+            _chooseDecksLabel->SetWordWrap(true);
+            _chooseDecksLabel->SetBackgroundColor(D2D1::ColorF(0.0f, 0.0f, 0.0f, 0.5f));
+            _chooseDecksLabel->Resize(_chooseDecksLabel->GetBaseWidth(), 100);
+            _chooseDecksLabel->SetBaseHeight(_chooseDecksLabel->GetTextHeight() + 100);
+
+            _chooseDecksDoneButton = Create<zcom::Button>(L"Done");
+            _chooseDecksDoneButton->Text()->SetFont(L"Arial");
+            _chooseDecksDoneButton->Text()->SetFontSize(36.0f);
+            _chooseDecksDoneButton->Text()->SetFontWeight(DWRITE_FONT_WEIGHT_BOLD);
+            _chooseDecksDoneButton->SetBaseSize(150.0f, 60.0f);
+            _chooseDecksDoneButton->SetAlignment(zcom::Alignment::CENTER, zcom::Alignment::END);
+            _chooseDecksDoneButton->SetVerticalOffsetPixels(-100);
+            _chooseDecksDoneButton->SetZIndex(10);
+            _chooseDecksDoneButton->SetBorderVisibility(true);
+            _chooseDecksDoneButton->SetBorderWidth(4.0f);
+            _chooseDecksDoneButton->SetBorderColor(D2D1::ColorF(0.8f, 0.8f, 0.8f));
+            _chooseDecksDoneButton->SetBackgroundColor(D2D1::ColorF(0.2f, 0.2f, 0.2f));
+            _chooseDecksDoneButton->SetOnActivated([&, request]()
+            {
+                _waitingToChooseDecks = false;
+                _gettingUserInput = false;
+
+                auto params = reinterpret_cast<UserInputParams_ChooseDeck*>(request->inputParams.get());
+                params->chosenDecks.clear();
+                for (auto card : _chosenDecks)
+                    params->chosenDecks.push_back(card);
+                _board->SendUserInputResponse();
+                _board->DisableChooseDeckMode();
+
+                _canvas->RemoveComponent(_chooseDecksLabel.get());
+                _canvas->RemoveComponent(_chooseDecksDoneButton.get());
+            });
+            _chooseDecksDoneButton->SetVisible(params->minDeckCount <= 0);
+
+            _canvas->AddComponent(_chooseDecksLabel.get());
+            _canvas->AddComponent(_chooseDecksDoneButton.get());
+
+            _chosenDecks.clear();
+            _board->EnableChooseDeckMode(
+                params->playerIndex,
+                params->maxDeckCount,
+                params->allowedDecks,
+                [&, request](cards::CardType selectedCard)
+                {
+                    auto params = reinterpret_cast<UserInputParams_ChooseDeck*>(request->inputParams.get());
+
+                    _chosenDecks.insert(selectedCard);
+                    if (_chosenDecks.size() >= params->minDeckCount)
+                        _chooseDecksDoneButton->SetVisible(true);
+                },
+                [&, request](cards::CardType deselectedCard)
+                {
+                    auto params = reinterpret_cast<UserInputParams_ChooseDeck*>(request->inputParams.get());
+
+                    _chosenDecks.erase(deselectedCard);
+                    if (_chosenDecks.size() < params->minDeckCount)
+                        _chooseDecksDoneButton->SetVisible(false);
+                }
+            );
+
+            break;
+        }
         case UserInputType::DRAW_CARD:
         {
             auto params = reinterpret_cast<UserInputParams_DrawCard*>(request->inputParams.get());

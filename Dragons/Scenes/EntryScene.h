@@ -73,6 +73,16 @@ class EntryScene : public Scene
     std::unique_ptr<zcom::Label> _chooseCardsFromDisplayedCardsLabel;
     std::unique_ptr<zcom::Button> _chooseCardsFromDisplayedCardsDoneButton;
 
+    bool _waitingToChooseCardsFromGraveyard = false;
+    std::set<cards::Card*> _chosenCardsFromGraveyard;
+    std::unique_ptr<zcom::Label> _chooseCardsFromGraveyardLabel;
+    std::unique_ptr<zcom::Button> _chooseCardsFromGraveyardDoneButton;
+
+    bool _waitingToChooseDecks = false;
+    std::set<cards::CardType> _chosenDecks;
+    std::unique_ptr<zcom::Label> _chooseDecksLabel;
+    std::unique_ptr<zcom::Button> _chooseDecksDoneButton;
+
     bool _waitingForCardDraw = false;
     std::unique_ptr<zcom::Label> _drawCardsLabel;
     std::unique_ptr<zcom::Button> _drawCardsDoneButton;

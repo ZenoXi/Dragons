@@ -202,6 +202,8 @@ namespace zcom
         EventTargets _OnLeftPressed(int x, int y);
         EventTargets _OnLeftReleased(int x, int y);
         EventTargets _OnRightPressed(int x, int y);
+        EventTargets _OnWheelUp(int x, int y);
+        EventTargets _OnWheelDown(int x, int y);
 
         void _DetectHoveredCard();
         void _HandleInputRequest(cards::PlayResult& result);
@@ -270,6 +272,7 @@ namespace zcom
         float shadowRadius = 2.0f;
 
         int _displayedCardScroll = 0;
+        int _maxDisplayedCardScroll = 0;
         zcom::Property<float> _displayedCardOffset{ 0.0f };
 
         // Input modes
@@ -305,6 +308,23 @@ namespace zcom
         std::set<cards::Card*> _chosenCardsFromDisplayedCards;
         std::function<void(cards::Card*)> _selectedCardInDisplayedCardsHandler;
         std::function<void(cards::Card*)> _deselectedCardInDisplayedCardsHandler;
+
+        bool _chooseCardsFromGraveyardMode = false;
+        int _chooseCardsFromGraveyardPlayerIndex = -1;
+        int _chooseCardsFromGraveyardMaxCardCount = -1;
+        std::vector<cards::CardType> _chooseCardsFromGraveyardAllowedTypes;
+        std::set<cards::Card*> _chosenCardsFromGraveyard;
+        std::function<void(cards::Card*)> _selectedCardInGraveyardHandler;
+        std::function<void(cards::Card*)> _deselectedCardInGraveyardHandler;
+        std::vector<DisplayInfo> _displayedCardStash;
+
+        bool _chooseDecksMode = false;
+        int _chooseDecksPlayerIndex = -1;
+        int _chooseDecksMaxDeckCount = -1;
+        std::vector<cards::CardType> _chooseDecksAllowedTypes;
+        std::set<cards::CardType> _chosenDecks;
+        std::function<void(cards::CardType)> _selectedDeckHandler;
+        std::function<void(cards::CardType)> _deselectedDeckHandler;
 
         // Stat labels
         std::unique_ptr<zcom::Panel> _p1StatsPanel = nullptr;
@@ -669,6 +689,10 @@ namespace zcom
         void DisableChooseCardFromActiveCardsMode();
         void EnableChooseCardFromDisplayedCardsMode(int playerIndex, int maxCards, std::vector<cards::CardType> allowedTypes, std::function<void(cards::Card*)> onCardSelect, std::function<void(cards::Card*)> onCardDeselect);
         void DisableChooseCardFromDisplayedCardsMode();
+        void EnableChooseCardFromGraveyardMode(int playerIndex, int maxCards, std::vector<cards::CardType> allowedTypes, std::function<void(cards::Card*)> onCardSelect, std::function<void(cards::Card*)> onCardDeselect);
+        void DisableChooseCardFromGraveyardMode();
+        void EnableChooseDeckMode(int playerIndex, int maxDecks, std::vector<cards::CardType> allowedTypes, std::function<void(cards::CardType)> onDeckSelect, std::function<void(cards::CardType)> onDeckDeselect);
+        void DisableChooseDeckMode();
         void EnableDrawCardMode(std::vector<cards::CardType> allowedTypes, std::function<void(cards::Card*)> onCardDraw);
         void DisableDrawCardMode();
 

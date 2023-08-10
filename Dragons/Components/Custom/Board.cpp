@@ -150,10 +150,14 @@ void zcom::Board::_OnDraw(Graphics g)
             card->rotation = 0.0f;
         }
 
+        float horizontalOffset = 0.0f;
+        if (card->displayed)
+            horizontalOffset = -_displayedCardOffset.GetValue();
+
         D2D1_RECT_F rect = D2D1::RectF(
-            card->xPos - (CARD_WIDTH / 2 - padding) * card->baseScale * card->scale,
+            card->xPos - (CARD_WIDTH / 2 - padding) * card->baseScale * card->scale + horizontalOffset,
             card->yPos - (CARD_HEIGHT / 2 - padding) * card->baseScale * card->scale,
-            card->xPos + (CARD_WIDTH / 2 + padding) * card->baseScale * card->scale,
+            card->xPos + (CARD_WIDTH / 2 + padding) * card->baseScale * card->scale + horizontalOffset,
             card->yPos + (CARD_HEIGHT / 2 + padding) * card->baseScale * card->scale
         );
         float selectedBorderThickness = 6.0f * card->baseScale * card->scale;
@@ -174,7 +178,9 @@ void zcom::Board::_OnDraw(Graphics g)
         bool cardSelected =
             (_chooseCardsFromHandMode && _chosenCardsFromHand.find(card->card) != _chosenCardsFromHand.end()) ||
             (_chooseCardsFromActiveCardsMode && _chosenCardsFromActiveCards.find(card->card) != _chosenCardsFromActiveCards.end()) ||
-            (_chooseCardsFromDisplayedCardsMode && _chosenCardsFromDisplayedCards.find(card->card) != _chosenCardsFromDisplayedCards.end() && card->displayed);
+            (_chooseCardsFromDisplayedCardsMode && _chosenCardsFromDisplayedCards.find(card->card) != _chosenCardsFromDisplayedCards.end() && card->displayed) ||
+            (_chooseCardsFromGraveyardMode && _chosenCardsFromGraveyard.find(card->card) != _chosenCardsFromGraveyard.end() && card->displayed) ||
+            (_chooseDecksMode && _chosenDecks.find(card->card->GetCardType()) != _chosenDecks.end() && card->card == _uiState.GetDeck(card->card->GetCardType()).back());
 
         g.target->SetTransform(D2D1::Matrix3x2F::Rotation(-card->rotation * RADIAN, { card->xPos, card->yPos }));
         if (cardFaceUp)
@@ -327,7 +333,23 @@ zcom::EventTargets zcom::Board::_OnLeftPressed(int x, int y)
                 else
                 {
                     _chosenCardsFromDisplayedCards.erase(_hoveredCard->card);
-                    _selectedCardInDisplayedCardsHandler(_hoveredCard->card);
+                    _deselectedCardInDisplayedCardsHandler(_hoveredCard->card);
+                }
+            }
+            if (_chooseCardsFromGraveyardMode)
+            {
+                if (_chosenCardsFromGraveyard.find(_hoveredCard->card) == _chosenCardsFromGraveyard.end())
+                {
+                    if (_chosenCardsFromGraveyard.size() < _chooseCardsFromGraveyardMaxCardCount)
+                    {
+                        _chosenCardsFromGraveyard.insert(_hoveredCard->card);
+                        _selectedCardInGraveyardHandler(_hoveredCard->card);
+                    }
+                }
+                else
+                {
+                    _chosenCardsFromGraveyard.erase(_hoveredCard->card);
+                    _deselectedCardInGraveyardHandler(_hoveredCard->card);
                 }
             }
 
@@ -368,6 +390,24 @@ zcom::EventTargets zcom::Board::_OnLeftPressed(int x, int y)
             {
                 _chosenCardsFromActiveCards.erase(_hoveredCard->card);
                 _deselectedCardInActiveCardsHandler(_hoveredCard->card);
+            }
+
+            return EventTargets().Add(this, x, y);
+        }
+        else if (_chooseDecksMode)
+        {
+            if (!zutil::Contains(_chosenDecks, _hoveredCard->card->GetCardType()))
+            {
+                if (_chosenDecks.size() < _chooseDecksMaxDeckCount)
+                {
+                    _chosenDecks.insert(_hoveredCard->card->GetCardType());
+                    _selectedDeckHandler(_hoveredCard->card->GetCardType());
+                }
+            }
+            else
+            {
+                _chosenDecks.erase(_hoveredCard->card->GetCardType());
+                _deselectedDeckHandler(_hoveredCard->card->GetCardType());
             }
 
             return EventTargets().Add(this, x, y);
@@ -451,6 +491,28 @@ zcom::EventTargets zcom::Board::_OnRightPressed(int x, int y)
     props.amount = 1;
     _core->Damage(props);
     return EventTargets().Add(this, x, y);
+}
+
+zcom::EventTargets zcom::Board::_OnWheelUp(int x, int y)
+{
+    if (_displayedCardScroll > 0)
+    {
+        _displayedCardScroll--;
+        _displayedCardOffset.SetValue(_displayedCardScroll * (CARD_WIDTH * DISPLAYED_CARD_SCALE + 30.0f));
+    }
+
+    return EventTargets();
+}
+
+zcom::EventTargets zcom::Board::_OnWheelDown(int x, int y)
+{
+    if (_displayedCardScroll < _maxDisplayedCardScroll)
+    {
+        _displayedCardScroll++;
+        _displayedCardOffset.SetValue(_displayedCardScroll * (CARD_WIDTH * DISPLAYED_CARD_SCALE + 30.0f));
+    }
+
+    return EventTargets();
 }
 
 void zcom::Board::_DetectHoveredCard()
@@ -962,6 +1024,7 @@ void zcom::Board::_CalculateCardTargetPositions()
                 if (card->card == _uiState.destroyedCards[i])
                 {
                     card->targetOpacity = 0.0f;
+                    card->targetBaseScale = 1.5f;
                     break;
                 }
             }
@@ -991,10 +1054,12 @@ void zcom::Board::_CalculateCardTargetPositions()
             float gapBetweenCards = 30.0f;
             float layoutWidth = (displayedCardCount - 1) * (CARD_WIDTH * DISPLAYED_CARD_SCALE + gapBetweenCards);
             float leftOffset = CARD_WIDTH * DISPLAYED_CARD_SCALE * 2 + gapBetweenCards * 2;
+            _maxDisplayedCardScroll = displayedCardCount - 5;
             if (displayedCardCount < 5)
             {
                 leftOffset = layoutWidth / 2;
                 _displayedCardScroll = 0;
+                _maxDisplayedCardScroll = 0;
                 _displayedCardOffset.SetValue(0.0f);
             }
 
@@ -1069,14 +1134,28 @@ zcom::Board::_Card* zcom::Board::_GetHoveredCard()
             if (!_chooseCardsFromActiveCardsAllowedTypes.empty() && !zutil::Contains(_chooseCardsFromActiveCardsAllowedTypes, card->card->GetCardType()))
                 continue;
         }
+        if (_chooseCardsFromDisplayedCardsMode || _chooseCardsFromGraveyardMode)
+        {
+            if (!card->displayed && card->set.set != cards::CardSets::HAND)
+                continue;
+        }
+        if (_chooseDecksMode)
+        {
+            if (card->set.set == cards::CardSets::DECK && !_chooseDecksAllowedTypes.empty() && !zutil::Contains(_chooseDecksAllowedTypes, card->card->GetCardType()))
+                continue;
+        }
+
+        float horizontalOffset = 0.0f;
+        if (card->displayed)
+            horizontalOffset = -_displayedCardOffset.GetValue();
 
         Pos2D<float> mousePos = { (float)GetMousePosX(), (float)GetMousePosY() };
-        Pos2D<float> cardCenterPos = { card->xPos, card->yPos };
+        Pos2D<float> cardCenterPos = { card->xPos + horizontalOffset, card->yPos };
         // Rotate mouse position around card center to align relative coordinates to upright card position
         Pos2D<float> adjustedMousePos = point_rotated_by(cardCenterPos, mousePos, -card->targetRotation);
 
-        float cardLeftSide = card->xPos - (CARD_WIDTH / 2) * card->baseScale * card->scale;
-        float cardRightSide = card->xPos + (CARD_WIDTH / 2) * card->baseScale * card->scale;
+        float cardLeftSide = card->xPos - (CARD_WIDTH / 2) * card->baseScale * card->scale + horizontalOffset;
+        float cardRightSide = card->xPos + (CARD_WIDTH / 2) * card->baseScale * card->scale + horizontalOffset;
         float cardTopSide = card->yPos - (CARD_HEIGHT / 2) * card->baseScale * card->scale;
         float cardBottomSide = card->yPos + (CARD_HEIGHT / 2) * card->baseScale * card->scale;
         if (adjustedMousePos.x >= cardLeftSide && adjustedMousePos.x <= cardRightSide &&
@@ -1635,6 +1714,153 @@ void zcom::Board::EnableChooseCardFromDisplayedCardsMode(int playerIndex, int ma
 void zcom::Board::DisableChooseCardFromDisplayedCardsMode()
 {
     _chooseCardsFromActiveCardsMode = false;
+    _DetectHoveredCard();
+}
+
+void zcom::Board::EnableChooseCardFromGraveyardMode(int playerIndex, int maxCards, std::vector<cards::CardType> allowedTypes, std::function<void(cards::Card*)> onCardSelect, std::function<void(cards::Card*)> onCardDeselect)
+{
+    _chooseCardsFromGraveyardMode = true;
+    _chooseCardsFromGraveyardPlayerIndex = playerIndex;
+    _chooseCardsFromGraveyardMaxCardCount = maxCards;
+    _chooseCardsFromGraveyardAllowedTypes = allowedTypes;
+    _selectedCardInGraveyardHandler = onCardSelect;
+    _deselectedCardInGraveyardHandler = onCardDeselect;
+
+    if (_heldCard)
+    {
+        _heldCard->startXPos = GetMousePosX();
+        _heldCard->startYPos = GetMousePosY();
+        _heldCard->startRotation = 0.0f;
+        _heldCard->targetXPos = _heldCard->xPos;
+        _heldCard->targetYPos = _heldCard->yPos;
+        _heldCard->targetRotation = _heldCard->rotation;
+        _heldCard->moving = true;
+        _heldCard->moveStartTime = ztime::Main();
+        _heldCard->moveDuration = Duration(300, MILLISECONDS);
+        _heldCard = nullptr;
+        _DetectHoveredCard();
+    }
+
+    // Stash currently displayed hands and reveal them when this mode is disabled
+    _displayedCardStash = _uiState.displayedCards;
+
+    // Hide currently displayed cards
+    for (auto& displayInfo : _uiState.displayedCards)
+    {
+        _Card* card = _GetCardFromPointer(displayInfo.card, true);
+        if (!card || card->displayEnding)
+            continue;
+
+        card->displayEnding = true;
+        card->startBaseScale = card->baseScale;
+        card->targetBaseScale = 0.0f;
+        card->moving = true;
+        card->moveStartTime = ztime::Main();
+        card->moveDuration = Duration(300, MILLISECONDS);
+    }
+
+    // Show cards from graveyard
+    std::array<bool, 2> displayedTo;
+    displayedTo[0] = false;
+    displayedTo[1] = false;
+    displayedTo[playerIndex] = true;
+    for (auto& graveyardCard : _uiState.graveyard)
+    {
+        if (!allowedTypes.empty() && std::find(allowedTypes.begin(), allowedTypes.end(), graveyardCard->GetCardType()) == allowedTypes.end())
+            continue;
+
+        _cards.push_back(std::make_unique<_Card>(_Card{ graveyardCard }));
+        _uiState.displayedCards.push_back({ graveyardCard, displayedTo });
+        _Card* card = _cards.back().get();
+
+        card->set = { cards::CardSets::NONE, -1 };
+        card->displayed = true;
+        card->startOpacity = 1.0f;
+        card->startBaseScale = 0.0f;
+        card->targetBaseScale = DISPLAYED_CARD_SCALE;
+        card->moving = true;
+        card->moveStartTime = ztime::Main();
+        card->moveDuration = Duration(600, MILLISECONDS);
+        _CalculateCardTargetPositions(); // Wildly inefficient to call this every iteration, but likely doesn't matter
+        // Set start layout after target layout is calculated
+        card->startXPos = card->targetXPos;
+        card->startYPos = card->targetYPos;
+        card->startRotation = card->targetRotation;
+    }
+}
+
+void zcom::Board::DisableChooseCardFromGraveyardMode()
+{
+    _chooseCardsFromGraveyardMode = false;
+
+    // Hide currently displayed cards
+    for (auto& displayInfo : _uiState.displayedCards)
+    {
+        _Card* card = _GetCardFromPointer(displayInfo.card, true);
+        if (!card || card->displayEnding)
+            continue;
+
+        card->displayEnding = true;
+        card->startBaseScale = card->baseScale;
+        card->targetBaseScale = 0.0f;
+        card->moving = true;
+        card->moveStartTime = ztime::Main();
+        card->moveDuration = Duration(300, MILLISECONDS);
+    }
+
+    // Show previously displayed cards
+    for (auto& displayInfo : _displayedCardStash)
+    {
+        _cards.push_back(std::make_unique<_Card>(_Card{ displayInfo.card }));
+        _uiState.displayedCards.push_back(displayInfo);
+        _Card* card = _cards.back().get();
+
+        card->set = { cards::CardSets::NONE, -1 };
+        card->displayed = true;
+        card->startOpacity = 1.0f;
+        card->startBaseScale = 0.0f;
+        card->targetBaseScale = DISPLAYED_CARD_SCALE;
+        card->moving = true;
+        card->moveStartTime = ztime::Main();
+        card->moveDuration = Duration(600, MILLISECONDS);
+        _CalculateCardTargetPositions();
+        // Set start layout after target layout is calculated
+        card->startXPos = card->targetXPos;
+        card->startYPos = card->targetYPos;
+        card->startRotation = card->targetRotation;
+    }
+
+    _DetectHoveredCard();
+}
+
+void zcom::Board::EnableChooseDeckMode(int playerIndex, int maxDecks, std::vector<cards::CardType> allowedTypes, std::function<void(cards::CardType)> onDeckSelect, std::function<void(cards::CardType)> onDeckDeselect)
+{
+    _chooseDecksMode = true;
+    _chooseDecksPlayerIndex = playerIndex;
+    _chooseDecksMaxDeckCount = maxDecks;
+    _chooseDecksAllowedTypes = allowedTypes;
+    _selectedDeckHandler = onDeckSelect;
+    _deselectedDeckHandler = onDeckDeselect;
+
+    if (_heldCard)
+    {
+        _heldCard->startXPos = GetMousePosX();
+        _heldCard->startYPos = GetMousePosY();
+        _heldCard->startRotation = 0.0f;
+        _heldCard->targetXPos = _heldCard->xPos;
+        _heldCard->targetYPos = _heldCard->yPos;
+        _heldCard->targetRotation = _heldCard->rotation;
+        _heldCard->moving = true;
+        _heldCard->moveStartTime = ztime::Main();
+        _heldCard->moveDuration = Duration(300, MILLISECONDS);
+        _heldCard = nullptr;
+        _DetectHoveredCard();
+    }
+}
+
+void zcom::Board::DisableChooseDeckMode()
+{
+    _chooseDecksMode = false;
     _DetectHoveredCard();
 }
 
