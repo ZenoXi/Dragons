@@ -30,6 +30,7 @@ class EntryScene : public Scene
     void _ProcessNewInputRequests();
     void _UpdateInputRequests();
     bool _gettingUserInput = false;
+    int _currentInputRequestId = -1;
 
     bool _waitingForConfirmation = false;
     std::unique_ptr<zcom::Button> _confirmationButton = nullptr;
@@ -82,6 +83,11 @@ class EntryScene : public Scene
     std::set<cards::CardType> _chosenDecks;
     std::unique_ptr<zcom::Label> _chooseDecksLabel;
     std::unique_ptr<zcom::Button> _chooseDecksDoneButton;
+
+    bool _waitingForCardPlay = false;
+    std::unique_ptr<zcom::Label> _playCardsLabel;
+    std::unique_ptr<zcom::Button> _playCardsDoneButton;
+    bool _PlayEndStateReached(UserInputParams_PlayCard* params);
 
     bool _waitingForCardDraw = false;
     std::unique_ptr<zcom::Label> _drawCardsLabel;

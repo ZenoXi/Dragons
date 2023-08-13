@@ -277,7 +277,14 @@ namespace zcom
 
         // Input modes
 
+        bool _playCardMode = false;
+        int _playCardPlayerIndex = -1;
+        int _playCardOpponentIndex = -1;
+        std::vector<cards::CardType> _allowedCardTypesToPlay;
+        std::function<void(cards::Card*)> _playCardHandler;
+
         bool _drawCardMode = false;
+        int _drawCardPlayerIndex = -1;
         std::vector<cards::CardType> _allowedCardTypesToDraw;
         std::function<void(cards::Card*)> _drawCardHandler;
 
@@ -380,10 +387,13 @@ namespace zcom
         std::unique_ptr<EventHandler<DeckShuffledEvent>> _deckShuffledHandler = nullptr;
 
         // User input interface
-        bool _userInputRequestAvailable = false;
-        UserInputRequest _userInputRequest;
+        //bool _userInputRequestAvailable = false;
+        //UserInputRequest _userInputRequest;
+        std::vector<UserInputRequest> _userInputRequests;
+        int _requestCounter = 0;
     public:
         UserInputRequest* GetUserInputRequest();
+        int GetRequestCounter();
         void SendUserInputResponse();
     private:
 
@@ -693,7 +703,9 @@ namespace zcom
         void DisableChooseCardFromGraveyardMode();
         void EnableChooseDeckMode(int playerIndex, int maxDecks, std::vector<cards::CardType> allowedTypes, std::function<void(cards::CardType)> onDeckSelect, std::function<void(cards::CardType)> onDeckDeselect);
         void DisableChooseDeckMode();
-        void EnableDrawCardMode(std::vector<cards::CardType> allowedTypes, std::function<void(cards::Card*)> onCardDraw);
+        void EnablePlayCardMode(int playerIndex, int opponentIndex, std::vector<cards::CardType> allowedTypes, std::function<void(cards::Card*)> onCardDraw);
+        void DisablePlayCardMode();
+        void EnableDrawCardMode(int playerIndex, std::vector<cards::CardType> allowedTypes, std::function<void(cards::Card*)> onCardDraw);
         void DisableDrawCardMode();
 
     private:

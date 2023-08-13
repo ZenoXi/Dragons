@@ -3,6 +3,7 @@
 
 #include "Core/GameConstants.h"
 #include "Helper/Functions.h"
+#include "Helper/ListUtils.h"
 
 #include <fstream>
 #include <filesystem>
@@ -64,8 +65,18 @@ void EntryScene::_Resize(int width, int height)
 void EntryScene::_ProcessNewInputRequests()
 {
     UserInputRequest* request = _board->GetUserInputRequest();
-    if (!_gettingUserInput && request)
+    int counter = _board->GetRequestCounter();
+    if (request && (!_gettingUserInput || counter != _currentInputRequestId))
     {
+        // Getting extra user input requests is only possible while playing cards
+        if (_gettingUserInput)
+        {
+            _canvas->RemoveComponent(_playCardsLabel.get());
+            _canvas->RemoveComponent(_playCardsDoneButton.get());
+            _board->DisablePlayCardMode();
+        }
+
+        _currentInputRequestId = counter;
         switch (request->inputType)
         {
         case UserInputType::WAIT_FOR_CONFIRMATION:
@@ -833,6 +844,84 @@ void EntryScene::_ProcessNewInputRequests()
 
             break;
         }
+        case UserInputType::PLAY_CARD:
+        {
+            auto params = reinterpret_cast<UserInputParams_PlayCard*>(request->inputParams.get());
+            params->playedCards.clear();
+
+            if (_PlayEndStateReached(params))
+            {
+                _board->SendUserInputResponse();
+                break;
+            }
+
+            _waitingForCardPlay = true;
+            _gettingUserInput = true;
+
+            _playCardsLabel = Create<zcom::Label>(request->inputPrompt);
+            _playCardsLabel->SetBaseSize(600, 180);
+            _playCardsLabel->SetVerticalOffsetPixels(60);
+            _playCardsLabel->SetAlignment(zcom::Alignment::CENTER, zcom::Alignment::START);
+            _playCardsLabel->SetVerticalTextAlignment(zcom::Alignment::CENTER);
+            _playCardsLabel->SetHorizontalTextAlignment(zcom::TextAlignment::CENTER);
+            _playCardsLabel->SetFont(L"Arial");
+            _playCardsLabel->SetFontSize(36.0f);
+            _playCardsLabel->SetWordWrap(true);
+            _playCardsLabel->SetBackgroundColor(D2D1::ColorF(0.0f, 0.0f, 0.0f, 0.5f));
+            _playCardsLabel->Resize(_playCardsLabel->GetBaseWidth(), 100);
+            _playCardsLabel->SetBaseHeight(_playCardsLabel->GetTextHeight() + 100);
+
+            _playCardsDoneButton = Create<zcom::Button>(L"Done");
+            _playCardsDoneButton->Text()->SetFont(L"Arial");
+            _playCardsDoneButton->Text()->SetFontSize(36.0f);
+            _playCardsDoneButton->Text()->SetFontWeight(DWRITE_FONT_WEIGHT_BOLD);
+            _playCardsDoneButton->SetBaseSize(150.0f, 60.0f);
+            _playCardsDoneButton->SetAlignment(zcom::Alignment::CENTER, zcom::Alignment::END);
+            _playCardsDoneButton->SetZIndex(10);
+            _playCardsDoneButton->SetVerticalOffsetPixels(-20.0f);
+            _playCardsDoneButton->SetBorderVisibility(true);
+            _playCardsDoneButton->SetBorderWidth(4.0f);
+            _playCardsDoneButton->SetBorderColor(D2D1::ColorF(0.8f, 0.8f, 0.8f));
+            _playCardsDoneButton->SetBackgroundColor(D2D1::ColorF(0.2f, 0.2f, 0.2f));
+            _playCardsDoneButton->SetOnActivated([&, request]()
+            {
+                _waitingForCardPlay = false;
+                _gettingUserInput = false;
+
+                _board->SendUserInputResponse();
+                _board->DisablePlayCardMode();
+
+                _canvas->RemoveComponent(_playCardsLabel.get());
+                _canvas->RemoveComponent(_playCardsDoneButton.get());
+            });
+            _playCardsDoneButton->SetVisible(params->playedCards.size() >= params->minCardCount);
+
+            _canvas->AddComponent(_playCardsLabel.get());
+            _canvas->AddComponent(_playCardsDoneButton.get());
+
+            _board->EnablePlayCardMode(params->playerIndex, params->opponentIndex, params->allowedTypes, [&, request](cards::Card* playedCard)
+            {
+                auto params = reinterpret_cast<UserInputParams_PlayCard*>(request->inputParams.get());
+                params->playedCards.push_back(playedCard);
+
+                if (params->playedCards.size() >= params->minCardCount)
+                    _playCardsDoneButton->SetVisible(true);
+
+                if (_PlayEndStateReached(params))
+                {
+                    _waitingForCardPlay = false;
+                    _gettingUserInput = false;
+
+                    _board->SendUserInputResponse();
+                    _board->DisablePlayCardMode();
+
+                    _canvas->RemoveComponent(_playCardsLabel.get());
+                    _canvas->RemoveComponent(_playCardsDoneButton.get());
+                }
+            });
+
+            break;
+        }
         case UserInputType::DRAW_CARD:
         {
             auto params = reinterpret_cast<UserInputParams_DrawCard*>(request->inputParams.get());
@@ -888,7 +977,7 @@ void EntryScene::_ProcessNewInputRequests()
             _canvas->AddComponent(_drawCardsLabel.get());
             _canvas->AddComponent(_drawCardsDoneButton.get());
 
-            _board->EnableDrawCardMode(params->allowedTypes, [&, request](cards::Card* drawnCard)
+            _board->EnableDrawCardMode(params->playerIndex, params->allowedTypes, [&, request](cards::Card* drawnCard)
             {
                 auto params = reinterpret_cast<UserInputParams_DrawCard*>(request->inputParams.get());
                 params->drawnCards.push_back(drawnCard);
@@ -959,6 +1048,21 @@ void EntryScene::_CleanUpAfterChoice()
 {
     _canvas->RemoveComponent(_choicePanel.get());
     _choicePanel->ClearItems();
+}
+
+bool EntryScene::_PlayEndStateReached(UserInputParams_PlayCard* params)
+{
+    if (params->playedCards.size() >= params->maxCardCount)
+        return true;
+    auto& hand = core.GetState().players[params->playerIndex].hand;
+    if (hand.empty())
+        return true;
+    if (!params->allowedTypes.empty() &&
+        std::find_if(hand.begin(), hand.end(), [&](auto& card) {
+            return zutil::Contains(params->allowedTypes, card->GetCardType());
+        }) == hand.end())
+        return true;
+    return false;
 }
 
 bool EntryScene::_DrawEndStateReached(UserInputParams_DrawCard* params)

@@ -189,13 +189,16 @@ void Core::InitState()
 
     // Init players
     _state.players.push_back(Player{});
-    _state.players[0].health = GAME_STARTING_HEALTH;
+    //_state.players[0].health = GAME_STARTING_HEALTH;
+    _state.players[0].health = 9;
     _state.players[0].maxHealth = GAME_STARTING_MAX_HEALTH;
     _state.players[0].armor = GAME_STARTING_ARMOR;
     _state.players[0].actionsLeft = 0;
     _state.players[0].handRevealed = false;
     _state.players[0].index = 0;
     AddCardToHand(std::make_unique<cards::Stab>(), 0);
+    AddCardToHand(std::make_unique<cards::Stab>(), 0);
+    AddCardToHand(std::make_unique<cards::LastBreath>(), 0);
     AddCardToHand(std::make_unique<cards::BloodDonation>(), 0);
     AddCardToHand(std::make_unique<cards::WeaponOfChoice>(), 0);
     AddCardToHand(std::make_unique<cards::DragonSight>(), 0);

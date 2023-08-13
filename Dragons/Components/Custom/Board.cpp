@@ -309,7 +309,13 @@ zcom::EventTargets zcom::Board::_OnLeftPressed(int x, int y)
 {
     if (_hoveredCard && !_noClickMode)
     {
-        // In draw mode only allow deck cards
+        if (_playCardMode)
+        {
+            if (_hoveredCard->set.set != cards::CardSets::HAND || _hoveredCard->set.playerIndex != _playCardPlayerIndex)
+                return EventTargets().Add(this, x, y);
+            if (!_allowedCardTypesToPlay.empty() && !zutil::Contains(_allowedCardTypesToPlay, _hoveredCard->card->GetCardType()))
+                return EventTargets().Add(this, x, y);
+        }
         if (_drawCardMode)
         {
             if (_hoveredCard->set.set != cards::CardSets::DECK)
@@ -443,24 +449,41 @@ zcom::EventTargets zcom::Board::_OnLeftReleased(int x, int y)
                     _drawCardHandler(drawnCard);
             }
         }
-        else if (_heldCard->set.set == cards::CardSets::HAND && _heldCard->set.playerIndex == _uiState.currentPlayer)
+        else if (_heldCard->set.set == cards::CardSets::HAND && (_heldCard->set.playerIndex == _uiState.currentPlayer || _playCardMode))
         {
             // Discard
             if (GetMousePosX() > viewWidth - 500.0f)
             {
-                _heldCard->xPos = GetMousePosX();
-                _heldCard->yPos = GetMousePosY();
-                _core->DiscardCard(_heldCard->card, _uiState.currentPlayer);
-                returnToStartPos = false;
+                if (!_playCardMode)
+                {
+                    _heldCard->xPos = GetMousePosX();
+                    _heldCard->yPos = GetMousePosY();
+                    _core->DiscardCard(_heldCard->card, _uiState.currentPlayer);
+                    returnToStartPos = false;
+                }
             }
             // Play
             else if (GetMousePosX() > 500.0f && GetMousePosY() < viewHeight - 300.0f)
             {
                 _heldCard->xPos = GetMousePosX();
                 _heldCard->yPos = GetMousePosY();
-                cards::PlayResult result = _core->PlayCard(_heldCard->card);
+                cards::PlayResult result;
+                if (_playCardMode)
+                {
+                    ActionProperties actionProps;
+                    actionProps.player = _playCardPlayerIndex;
+                    actionProps.opponent = _playCardOpponentIndex;
+                    actionProps.freeAction = true;
+                    result = _core->PlayCard(_heldCard->card, std::optional(actionProps), nullptr);
+                }
+                else
+                {
+                    result = _core->PlayCard(_heldCard->card);
+                }
                 if (result.waitForInput)
                     _HandleInputRequest(result);
+                else if (_playCardMode)
+                    _playCardHandler(_heldCard->card);
                 returnToStartPos = false;
             }
         }
@@ -530,6 +553,8 @@ void zcom::Board::_HandleInputRequest(cards::PlayResult& result)
 
         if (resumeResult.waitForInput)
             _HandleInputRequest(resumeResult);
+        else if (_playCardMode)
+            _playCardHandler(_heldCard->card);
     }
     else
     {
@@ -540,24 +565,31 @@ void zcom::Board::_HandleInputRequest(cards::PlayResult& result)
 
 UserInputRequest* zcom::Board::GetUserInputRequest()
 {
-    if (_userInputRequestAvailable)
-        return &_userInputRequest;
+    if (!_userInputRequests.empty())
+        return &_userInputRequests.back();
     else
         return nullptr;
 }
 
+int zcom::Board::GetRequestCounter()
+{
+    return _requestCounter;
+}
+
 void zcom::Board::SendUserInputResponse()
 {
-    if (!_userInputRequestAvailable)
+    if (_userInputRequests.empty())
         return;
 
-    _userInputRequestAvailable = false;
     UserInputResponse response;
-    response.inputParams = std::move(_userInputRequest.inputParams);
+    response.inputParams = std::move(_userInputRequests.back().inputParams);
+    _userInputRequests.pop_back();
     auto resumeResult = _core->ResumePlay(std::move(response));
 
     if (resumeResult.waitForInput)
         _HandleInputRequest(resumeResult);
+    else if (_playCardMode)
+        _playCardHandler(_heldCard->card);
 }
 
 void zcom::Board::_GenerateCardBitmap(Graphics g, ID2D1Bitmap** bitmapRef, D2D1_COLOR_F color)
@@ -1229,8 +1261,11 @@ void zcom::Board::_HandleEvents()
         {
         case UIEvent::USER_INPUT_REQUEST:
         {
-            _userInputRequest = std::move(_pendingUserInputRequest);
-            _userInputRequestAvailable = true;
+            
+            _userInputRequests.push_back(std::move(_pendingUserInputRequest));
+            _requestCounter++;
+            //_userInputRequest = std::move(_pendingUserInputRequest);
+            //_userInputRequestAvailable = true;
             break;
         }
         case UIEvent::TURN_BEGIN:
@@ -1864,9 +1899,45 @@ void zcom::Board::DisableChooseDeckMode()
     _DetectHoveredCard();
 }
 
-void zcom::Board::EnableDrawCardMode(std::vector<cards::CardType> allowedTypes, std::function<void(cards::Card*)> onCardDraw)
+void zcom::Board::EnablePlayCardMode(int playerIndex, int opponentIndex, std::vector<cards::CardType> allowedTypes, std::function<void(cards::Card*)> onCardPlay)
+{
+    _playCardMode = true;
+    _playCardPlayerIndex = playerIndex;
+    _playCardOpponentIndex = opponentIndex;
+    _playCardHandler = onCardPlay;
+
+    if (_heldCard)
+    {
+        if (_heldCard->set.set == cards::CardSets::HAND && _heldCard->set.playerIndex == playerIndex)
+            return;
+
+        _heldCard->startXPos = GetMousePosX();
+        _heldCard->startYPos = GetMousePosY();
+        _heldCard->startRotation = 0.0f;
+        _heldCard->targetXPos = _heldCard->xPos;
+        _heldCard->targetYPos = _heldCard->yPos;
+        _heldCard->targetRotation = _heldCard->rotation;
+        _heldCard->moving = true;
+        _heldCard->moveStartTime = ztime::Main();
+        _heldCard->moveDuration = Duration(300, MILLISECONDS);
+        _heldCard = nullptr;
+    }
+    _DetectHoveredCard();
+}
+
+void zcom::Board::DisablePlayCardMode()
+{
+    _playCardMode = false;
+    _playCardHandler = {};
+
+    if (!_heldCard)
+        _DetectHoveredCard();
+}
+
+void zcom::Board::EnableDrawCardMode(int playerIndex, std::vector<cards::CardType> allowedTypes, std::function<void(cards::Card*)> onCardDraw)
 {
     _drawCardMode = true;
+    _drawCardPlayerIndex = playerIndex;
     _drawCardHandler = onCardDraw;
 
     if (_heldCard)

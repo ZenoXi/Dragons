@@ -5,7 +5,7 @@
 
 bool cards::LastBreath::CanPlay(Core* core, ActionProperties actionProps, PlayProperties* playProps)
 {
-    return core->GetState().players[actionProps.player].hand.size() < core->GetState().players[actionProps.opponent].hand.size()
+    return core->GetState().players[actionProps.player].health < core->GetState().players[actionProps.opponent].health
         && core->GetState().players[actionProps.player].CardsInHand(CardType::OFFENSE) > 0;
 }
 
