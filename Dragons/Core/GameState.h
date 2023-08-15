@@ -55,6 +55,8 @@ struct GameState
             return utilityDeck;
         case cards::CardType::COMBO:
             return comboDeck;
+        default:
+            return offenseDeck;
         }
     }
 };

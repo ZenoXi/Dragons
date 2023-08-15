@@ -111,6 +111,8 @@ struct UIState
             return utilityDeck;
         case cards::CardType::COMBO:
             return comboDeck;
+        default:
+            return offenseDeck;
         }
     }
     DisplayInfo GetDisplayInfo(cards::Card* card)

@@ -5,6 +5,7 @@
 
 #include "Constants.h"
 
+#include <string>
 #include <cmath>
 #include <unordered_map>
 

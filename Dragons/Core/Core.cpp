@@ -189,21 +189,21 @@ void Core::InitState()
 
     // Init players
     _state.players.push_back(Player{});
-    //_state.players[0].health = GAME_STARTING_HEALTH;
-    _state.players[0].health = 9;
+    _state.players[0].health = GAME_STARTING_HEALTH;
+    //_state.players[0].health = 9;
     _state.players[0].maxHealth = GAME_STARTING_MAX_HEALTH;
     _state.players[0].armor = GAME_STARTING_ARMOR;
     _state.players[0].actionsLeft = 0;
     _state.players[0].handRevealed = false;
     _state.players[0].index = 0;
-    AddCardToHand(std::make_unique<cards::Stab>(), 0);
-    AddCardToHand(std::make_unique<cards::Stab>(), 0);
-    AddCardToHand(std::make_unique<cards::LastBreath>(), 0);
-    AddCardToHand(std::make_unique<cards::BloodDonation>(), 0);
-    AddCardToHand(std::make_unique<cards::WeaponOfChoice>(), 0);
-    AddCardToHand(std::make_unique<cards::DragonSight>(), 0);
-    AddCardToHand(std::make_unique<cards::SummonDead>(), 0);
-    AddCardToHand(std::make_unique<cards::FrostFire>(), 0);
+    //AddCardToHand(std::make_unique<cards::Stab>(), 0);
+    //AddCardToHand(std::make_unique<cards::Stab>(), 0);
+    //AddCardToHand(std::make_unique<cards::LastBreath>(), 0);
+    //AddCardToHand(std::make_unique<cards::BloodDonation>(), 0);
+    //AddCardToHand(std::make_unique<cards::WeaponOfChoice>(), 0);
+    //AddCardToHand(std::make_unique<cards::DragonSight>(), 0);
+    //AddCardToHand(std::make_unique<cards::SummonDead>(), 0);
+    //AddCardToHand(std::make_unique<cards::FrostFire>(), 0);
     //AddCardToHand(std::make_unique<cards::ElementalDragon>(), 0);
     //AddCardToHand(std::make_unique<cards::HeavySlash>(), 0);
     //AddCardToHand(std::make_unique<cards::ShieldingNet>(), 0);
@@ -220,8 +220,8 @@ void Core::InitState()
     _state.players[1].actionsLeft = 0;
     _state.players[1].handRevealed = false;
     _state.players[1].index = 1;
-    AddCardToHand(std::make_unique<cards::Barrier>(), 1);
-    AddCardToHand(std::make_unique<cards::Barrier>(), 1);
+    //AddCardToHand(std::make_unique<cards::Barrier>(), 1);
+    //AddCardToHand(std::make_unique<cards::Barrier>(), 1);
     //AddCardToHand(std::make_unique<cards::ElementalDragon>(), 1);
     //AddCardToHand(std::make_unique<cards::HeavySlash>(), 1);
     //AddCardToHand(std::make_unique<cards::ShieldingNet>(), 1);
@@ -231,19 +231,28 @@ void Core::InitState()
     //AddCardToActiveCards(std::make_unique<cards::ShieldingNet>(), 1);
     //AddCardToActiveCards(std::make_unique<cards::CorpsePuppet>(), 1);
 
-    AddCardToGraveyard(std::make_unique<cards::Stab>());
-    AddCardToGraveyard(std::make_unique<cards::BloodDonation>());
-    AddCardToGraveyard(std::make_unique<cards::WeaponOfChoice>());
-    AddCardToGraveyard(std::make_unique<cards::Underworld>());
-    AddCardToGraveyard(std::make_unique<cards::SummonDead>());
-    AddCardToGraveyard(std::make_unique<cards::DragonFlame>());
-    AddCardToGraveyard(std::make_unique<cards::DragonSight>());
-    AddCardToGraveyard(std::make_unique<cards::SummonDead>());
-    AddCardToGraveyard(std::make_unique<cards::DragonFlame>());
-    AddCardToGraveyard(std::make_unique<cards::DragonSight>());
-    AddCardToGraveyard(std::make_unique<cards::SummonDead>());
-    AddCardToGraveyard(std::make_unique<cards::DragonFlame>());
-    AddCardToGraveyard(std::make_unique<cards::DragonSight>());
+    //AddCardToGraveyard(std::make_unique<cards::Stab>());
+    //AddCardToGraveyard(std::make_unique<cards::BloodDonation>());
+    //AddCardToGraveyard(std::make_unique<cards::WeaponOfChoice>());
+    //AddCardToGraveyard(std::make_unique<cards::Underworld>());
+    //AddCardToGraveyard(std::make_unique<cards::SummonDead>());
+    //AddCardToGraveyard(std::make_unique<cards::DragonFlame>());
+    //AddCardToGraveyard(std::make_unique<cards::DragonSight>());
+    //AddCardToGraveyard(std::make_unique<cards::SummonDead>());
+    //AddCardToGraveyard(std::make_unique<cards::DragonFlame>());
+    //AddCardToGraveyard(std::make_unique<cards::DragonSight>());
+    //AddCardToGraveyard(std::make_unique<cards::SummonDead>());
+    //AddCardToGraveyard(std::make_unique<cards::DragonFlame>());
+    //AddCardToGraveyard(std::make_unique<cards::DragonSight>());
+
+    DrawCard(cards::CardType::OFFENSE, 0, false);
+    DrawCard(cards::CardType::DEFENSE, 0, false);
+    DrawCard(cards::CardType::UTILITY, 0, false);
+    DrawCard(cards::CardType::COMBO, 0, false);
+    DrawCard(cards::CardType::OFFENSE, 1, false);
+    DrawCard(cards::CardType::DEFENSE, 1, false);
+    DrawCard(cards::CardType::UTILITY, 1, false);
+    DrawCard(cards::CardType::COMBO, 1, false);
 
     _state.currentPlayer = 0;
     _state.opposingPlayer = 1;
@@ -1394,5 +1403,7 @@ std::vector<std::unique_ptr<cards::Card>>& Core::_ResolveDeckFromType(cards::Car
         return _state.utilityDeck;
     case cards::CardType::COMBO:
         return _state.comboDeck;
+    default:
+        return _state.offenseDeck;
     }
 }
