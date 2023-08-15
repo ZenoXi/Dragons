@@ -25,6 +25,7 @@ namespace cards
 
         CardType GetCardType() const { return CardType::OFFENSE; }
         std::wstring GetCardName() const { return L"Devils Deal"; }
-        std::wstring GetCardDescription() const { return L""; }
+        std::wstring GetCardDescription() const { return L"Force enemy to play one of his offensive cards on himself.\nIf enemy has no offensive cards he has to draw and play one on himself."; }
+        std::wstring GetCardFlavorText() const { return L"Asking for devils help can cost a lot"; }
     };
 }

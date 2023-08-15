@@ -38,6 +38,7 @@ namespace cards
 
         CardType GetCardType() const { return CardType::COMBO; }
         std::wstring GetCardName() const { return L"Astro Influence"; }
-        std::wstring GetCardDescription() const { return L""; }
+        std::wstring GetCardDescription() const { return L"Dragon Equation effect\nFair Fight effect\nTree of Life effect\nOpponent does not get the heal and armor."; }
+        std::wstring GetCardFlavorText() const { return L"The stars were against it"; }
     };
 }

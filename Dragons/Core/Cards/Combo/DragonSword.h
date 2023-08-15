@@ -35,7 +35,8 @@ namespace cards
 
         CardType GetCardType() const { return CardType::COMBO; }
         std::wstring GetCardName() const { return L"Dragon Sword"; }
-        std::wstring GetCardDescription() const { return L""; }
+        std::wstring GetCardDescription() const { return L"Hellfire Sword effect\nHeavy Slash effect\nYou also destroy opponents armor at the start of your next turn"; }
+        std::wstring GetCardFlavorText() const { return L"A sword imbued with dragon blood"; }
 
     private:
         void _OnEnterHand(Core* core, int playerIndex);

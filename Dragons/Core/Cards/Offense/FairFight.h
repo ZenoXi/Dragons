@@ -33,7 +33,8 @@ namespace cards
 
         CardType GetCardType() const { return CardType::OFFENSE; }
         std::wstring GetCardName() const { return L"Fair Fight"; }
-        std::wstring GetCardDescription() const { return L""; }
+        std::wstring GetCardDescription() const { return L"Give your opponent 4 armor. At the end of your turn deal 4 damage."; }
+        std::wstring GetCardFlavorText() const { return L"It's a seemingly fair fight"; }
 
     private:
         void _OnEnterHand(Core* core, int playerIndex);

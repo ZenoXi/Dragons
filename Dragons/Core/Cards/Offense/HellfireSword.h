@@ -24,6 +24,7 @@ namespace cards
 
         CardType GetCardType() const { return CardType::OFFENSE; }
         std::wstring GetCardName() const { return L"Hellfire Sword"; }
-        std::wstring GetCardDescription() const { return L""; }
+        std::wstring GetCardDescription() const { return L"Destroy enemy armor."; }
+        std::wstring GetCardFlavorText() const { return L"Just a touch from this sword will melt any metal"; }
     };
 }

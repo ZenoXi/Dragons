@@ -23,6 +23,7 @@ namespace cards
 
         CardType GetCardType() const { return CardType::UTILITY; }
         std::wstring GetCardName() const { return L"Summon Dead"; }
-        std::wstring GetCardDescription() const { return L""; }
+        std::wstring GetCardDescription() const { return L"Take one card from the graveyard."; }
+        std::wstring GetCardFlavorText() const { return L"Dead - does not mean gone"; }
     };
 }

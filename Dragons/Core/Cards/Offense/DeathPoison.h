@@ -29,7 +29,8 @@ namespace cards
 
         CardType GetCardType() const { return CardType::OFFENSE; }
         std::wstring GetCardName() const { return L"Death Poison"; }
-        std::wstring GetCardDescription() const { return L""; }
+        std::wstring GetCardDescription() const { return L"Every offensive card this turn will deal 1 bonus damage to opponent."; }
+        std::wstring GetCardFlavorText() const { return L"Everything becomes deadly with this on it"; }
 
     private:
         void _OnEnterHand(Core* core, int playerIndex);

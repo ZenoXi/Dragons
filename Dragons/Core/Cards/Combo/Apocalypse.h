@@ -39,6 +39,7 @@ namespace cards
 
         CardType GetCardType() const { return CardType::COMBO; }
         std::wstring GetCardName() const { return L"Apocalypse"; }
-        std::wstring GetCardDescription() const { return L""; }
+        std::wstring GetCardDescription() const { return L"Life Exchange effect\nFrost Fire effect\nDraw 10 cards\nDiscard cards until you have 10 or less cards."; }
+        std::wstring GetCardFlavorText() const { return L"With the power to kill dragons"; }
     };
 }

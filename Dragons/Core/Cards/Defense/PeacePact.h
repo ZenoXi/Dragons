@@ -24,6 +24,7 @@ namespace cards
 
         CardType GetCardType() const { return CardType::DEFENSE; }
         std::wstring GetCardName() const { return L"Peace Pact"; }
-        std::wstring GetCardDescription() const { return L""; }
+        std::wstring GetCardDescription() const { return L"Both players reshuffle their offensive cards into the deck."; }
+        std::wstring GetCardFlavorText() const { return L"World is better in peace"; }
     };
 }

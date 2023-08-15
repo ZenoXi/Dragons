@@ -40,6 +40,7 @@ namespace cards
 
         CardType GetCardType() const { return CardType::COMBO; }
         std::wstring GetCardName() const { return L"Swap Pact"; }
-        std::wstring GetCardDescription() const { return L""; }
+        std::wstring GetCardDescription() const { return L"Mind Steal effect\nStar Curse effect\nWar Blessing effect\nAfter swapping cards, you choose if you want to swap maximum health with your opponent before applying Star Curse and War Blessing."; }
+        std::wstring GetCardFlavorText() const { return L"With signature from the god of death himself"; }
     };
 }

@@ -50,6 +50,7 @@ namespace cards
 
         CardType GetCardType() const { return CardType::COMBO; }
         std::wstring GetCardName() const { return L"Vampirism"; }
-        std::wstring GetCardDescription() const { return L""; }
+        std::wstring GetCardDescription() const { return L"Devils Deal effect\nBlood Donation effect\nYou draw a card for each health lost and also for the damage opponent deals to himself."; }
+        std::wstring GetCardFlavorText() const { return L"How much blood is enough blood?"; }
     };
 }

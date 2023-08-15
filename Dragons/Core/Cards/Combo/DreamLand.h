@@ -33,6 +33,7 @@ namespace cards
 
         CardType GetCardType() const { return CardType::COMBO; }
         std::wstring GetCardName() const { return L"Dream Land"; }
-        std::wstring GetCardDescription() const { return L""; }
+        std::wstring GetCardDescription() const { return L"Set Up effect\nVital Spot effect\nSpirit Shelter effect\nSet Up effect increased to 6. Vital Spot triggers for next two attacks."; }
+        std::wstring GetCardFlavorText() const { return L"It's a different place for everyone"; }
     };
 }

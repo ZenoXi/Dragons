@@ -20,6 +20,7 @@ namespace cards
 
         CardType GetCardType() const { return CardType::UTILITY; }
         std::wstring GetCardName() const { return L"Dragon Equation"; }
-        std::wstring GetCardDescription() const { return L""; }
+        std::wstring GetCardDescription() const { return L"Swap both players active cards."; }
+        std::wstring GetCardFlavorText() const { return L"Taking from the strong, giving to the stronger"; }
     };
 }

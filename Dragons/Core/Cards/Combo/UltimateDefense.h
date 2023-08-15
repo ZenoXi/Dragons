@@ -30,6 +30,7 @@ namespace cards
 
         CardType GetCardType() const { return CardType::COMBO; }
         std::wstring GetCardName() const { return L"Ultimate Defense"; }
-        std::wstring GetCardDescription() const { return L""; }
+        std::wstring GetCardDescription() const { return L"War Blessing effect\nBarrier effect\nDraw a defense card."; }
+        std::wstring GetCardFlavorText() const { return L"The best offense is good defense"; }
     };
 }

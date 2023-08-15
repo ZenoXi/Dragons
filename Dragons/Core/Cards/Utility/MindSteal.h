@@ -23,6 +23,7 @@ namespace cards
 
         CardType GetCardType() const { return CardType::UTILITY; }
         std::wstring GetCardName() const { return L"Mind Steal"; }
-        std::wstring GetCardDescription() const { return L""; }
+        std::wstring GetCardDescription() const { return L"Swap any amount of cards with the enemy."; }
+        std::wstring GetCardFlavorText() const { return L"Works best on smart players"; }
     };
 }

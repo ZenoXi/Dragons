@@ -22,6 +22,7 @@ namespace cards
 
         CardType GetCardType() const { return CardType::OFFENSE; }
         std::wstring GetCardName() const { return L"Stab"; }
-        std::wstring GetCardDescription() const { return L""; }
+        std::wstring GetCardDescription() const { return L"Deal 2 damage to enemy."; }
+        std::wstring GetCardFlavorText() const { return L"A sneaky and silent attack"; }
     };
 }

@@ -30,6 +30,7 @@ namespace cards
 
         CardType GetCardType() const { return CardType::COMBO; }
         std::wstring GetCardName() const { return L"Double Strike"; }
-        std::wstring GetCardDescription() const { return L""; }
+        std::wstring GetCardDescription() const { return L"Sacrificial Attack effect\nStab effect\nYou don't receive 3 damage."; }
+        std::wstring GetCardFlavorText() const { return L"A special attack known only to the best assassins"; }
     };
 }

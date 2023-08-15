@@ -32,6 +32,7 @@ namespace cards
 
         CardType GetCardType() const { return CardType::UTILITY; }
         std::wstring GetCardName() const { return L"Dragon Sight"; }
-        std::wstring GetCardDescription() const { return L""; }
+        std::wstring GetCardDescription() const { return L"Look at the top cards of the decks.\nIf one or more decks are empty, you can check 2 or more top cards of the decks up to 4 cards."; }
+        std::wstring GetCardFlavorText() const { return L"One could sacrifice anything to gain sight of a dragon"; }
     };
 }

@@ -38,7 +38,8 @@ namespace cards
 
         CardType GetCardType() const { return CardType::COMBO; }
         std::wstring GetCardName() const { return L"Omniclaustra"; }
-        std::wstring GetCardDescription() const { return L""; }
+        std::wstring GetCardDescription() const { return L"Soothing Spell effect\nDivine Protection effect\nYou can also not be reduced below 1 health by offensive cards."; }
+        std::wstring GetCardFlavorText() const { return L"A barrier spell for the ascended ones"; }
 
     private:
         void _OnEnterHand(Core* core, int playerIndex);

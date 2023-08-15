@@ -36,6 +36,7 @@ namespace cards
 
         CardType GetCardType() const { return CardType::COMBO; }
         std::wstring GetCardName() const { return L"Underworld"; }
-        std::wstring GetCardDescription() const { return L""; }
+        std::wstring GetCardDescription() const { return L"Summon Dead effect\nDragon Flame effect\nYou can also take the cards you just destroyed with Dragon Flame."; }
+        std::wstring GetCardFlavorText() const { return L"You have a few buddies there"; }
     };
 }

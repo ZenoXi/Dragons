@@ -122,6 +122,7 @@ namespace cards
         virtual CardType GetCardType() const = 0;
         virtual std::wstring GetCardName() const = 0;
         virtual std::wstring GetCardDescription() const = 0;
+        virtual std::wstring GetCardFlavorText() const = 0;
 
         // Card position
         CardSet GetPosition() const { return _position; }

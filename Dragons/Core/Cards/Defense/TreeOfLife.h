@@ -24,6 +24,7 @@ namespace cards
 
         CardType GetCardType() const { return CardType::DEFENSE; }
         std::wstring GetCardName() const { return L"Tree of Life"; }
-        std::wstring GetCardDescription() const { return L""; }
+        std::wstring GetCardDescription() const { return L"Heal 4 health to both players."; }
+        std::wstring GetCardFlavorText() const { return L"Everyone is equal before the power of nature"; }
     };
 }

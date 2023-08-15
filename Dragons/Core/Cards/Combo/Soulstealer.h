@@ -42,6 +42,7 @@ namespace cards
 
         CardType GetCardType() const { return CardType::COMBO; }
         std::wstring GetCardName() const { return L"Soulstealer"; }
-        std::wstring GetCardDescription() const { return L""; }
+        std::wstring GetCardDescription() const { return L"The Thief effect\nStab effect\nCure effect\nInstead of damaging and healing, you steal health equal to cure from opponent. (Damages through all defenses)"; }
+        std::wstring GetCardFlavorText() const { return L"A stab from this sword will leave a wound in your soul"; }
     };
 }

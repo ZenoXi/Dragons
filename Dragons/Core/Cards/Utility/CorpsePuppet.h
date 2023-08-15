@@ -27,7 +27,8 @@ namespace cards
 
         CardType GetCardType() const { return CardType::UTILITY; }
         std::wstring GetCardName() const { return L"Corpse Puppet"; }
-        std::wstring GetCardDescription() const { return L""; }
+        std::wstring GetCardDescription() const { return L"For the next combo you can use a card from the graveyard."; }
+        std::wstring GetCardFlavorText() const { return L"No dead man is useless"; }
 
     private:
         void _OnEnterHand(Core* core, int playerIndex);

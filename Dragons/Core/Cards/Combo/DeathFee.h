@@ -39,6 +39,7 @@ namespace cards
 
         CardType GetCardType() const { return CardType::COMBO; }
         std::wstring GetCardName() const { return L"Death Fee"; }
-        std::wstring GetCardDescription() const { return L""; }
+        std::wstring GetCardDescription() const { return L"Summon Dead effect\nDeath Poison effect\nHelping Hand effect\nYou can give your opponent any amount oof cards including cards from graveyard. Deal 1 damage for each card given."; }
+        std::wstring GetCardFlavorText() const { return L"It ain't cheap"; }
     };
 }

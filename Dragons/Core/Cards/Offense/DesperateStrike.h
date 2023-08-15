@@ -25,6 +25,7 @@ namespace cards
 
         CardType GetCardType() const { return CardType::OFFENSE; }
         std::wstring GetCardName() const { return L"Desperate Strike"; }
-        std::wstring GetCardDescription() const { return L""; }
+        std::wstring GetCardDescription() const { return L"Deal 3 damage if you have less cards than your opponent."; }
+        std::wstring GetCardFlavorText() const { return L"Having no options can put anyone in despair"; }
     };
 }

@@ -27,6 +27,7 @@ namespace cards
 
         CardType GetCardType() const { return CardType::UTILITY; }
         std::wstring GetCardName() const { return L"Weapon of Choice"; }
-        std::wstring GetCardDescription() const { return L""; }
+        std::wstring GetCardDescription() const { return L"Look at the top thre combo cards, take one, discard the other two."; }
+        std::wstring GetCardFlavorText() const { return L"\"Best\" is a matter of perspective"; }
     };
 }

@@ -25,6 +25,7 @@ namespace cards
 
         CardType GetCardType() const { return CardType::UTILITY; }
         std::wstring GetCardName() const { return L"Dragon Flame"; }
-        std::wstring GetCardDescription() const { return L""; }
+        std::wstring GetCardDescription() const { return L"Destroy all active enemy cards."; }
+        std::wstring GetCardFlavorText() const { return L"Nothing can survive the flames of the dragon"; }
     };
 }

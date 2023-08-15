@@ -26,6 +26,7 @@ namespace cards
 
         CardType GetCardType() const { return CardType::DEFENSE; }
         std::wstring GetCardName() const { return L"Life Flower"; }
-        std::wstring GetCardDescription() const { return L""; }
+        std::wstring GetCardDescription() const { return L"Gain 1 health, 1 armor, and 1 maximum health."; }
+        std::wstring GetCardFlavorText() const { return L"Even the smell can make you feel better"; }
     };
 }

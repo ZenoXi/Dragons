@@ -45,6 +45,7 @@ namespace cards
 
         CardType GetCardType() const { return CardType::COMBO; }
         std::wstring GetCardName() const { return L"Three Gods Strike"; }
-        std::wstring GetCardDescription() const { return L""; }
+        std::wstring GetCardDescription() const { return L"Dragon Sight effect\nSacrificial Attack effect\nBarrier effect\nChoose one:\n- Dragon Sight draws 4 top cards instead.\n- Sacrificial Attack steals health instead.\n- Barrier blocks twice and blocks Dragon Flame."; }
+        std::wstring GetCardFlavorText() const { return L"You can ask one of the gods for a favor"; }
     };
 }

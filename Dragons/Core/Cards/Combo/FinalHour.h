@@ -36,6 +36,7 @@ namespace cards
 
         CardType GetCardType() const { return CardType::COMBO; }
         std::wstring GetCardName() const { return L"Final Hour"; }
-        std::wstring GetCardDescription() const { return L""; }
+        std::wstring GetCardDescription() const { return L"Rapid Attack effect\nLast Breath\nYou don't have to discard any cards after using all offensive cards. If your hand is empty after using offensive cards, you win."; }
+        std::wstring GetCardFlavorText() const { return L"This is it, the moment you've been waiting for"; }
     };
 }

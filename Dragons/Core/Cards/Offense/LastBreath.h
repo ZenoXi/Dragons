@@ -29,6 +29,7 @@ namespace cards
 
         CardType GetCardType() const { return CardType::OFFENSE; }
         std::wstring GetCardName() const { return L"Last Breath"; }
-        std::wstring GetCardDescription() const { return L""; }
+        std::wstring GetCardDescription() const { return L"If you have less health than your opponent, you have to play all of your offensive cards. Discard the rest of your hand afterwards. Playing this card counts as 2 cards."; }
+        std::wstring GetCardFlavorText() const { return L"No one is as strong as someone who is about to die"; }
     };
 }

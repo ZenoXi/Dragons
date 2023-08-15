@@ -24,6 +24,7 @@ namespace cards
 
         CardType GetCardType() const { return CardType::DEFENSE; }
         std::wstring GetCardName() const { return L"Armor Up"; }
-        std::wstring GetCardDescription() const { return L""; }
+        std::wstring GetCardDescription() const { return L"Gain 2 armor."; }
+        std::wstring GetCardFlavorText() const { return L"Blessed titanium armor set"; }
     };
 }

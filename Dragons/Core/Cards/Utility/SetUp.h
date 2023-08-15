@@ -32,7 +32,8 @@ namespace cards
 
         CardType GetCardType() const { return CardType::UTILITY; }
         std::wstring GetCardName() const { return L"Set Up"; }
-        std::wstring GetCardDescription() const { return L""; }
+        std::wstring GetCardDescription() const { return L"Next turn you can perform 4 actions instead of 2. (Doesn't stack with each other)"; }
+        std::wstring GetCardFlavorText() const { return L"Preparing for the sacrifice, calm before the storm"; }
 
     private:
         void _OnEnterHand(Core* core, int playerIndex);

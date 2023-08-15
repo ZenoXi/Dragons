@@ -44,6 +44,7 @@ namespace cards
 
         CardType GetCardType() const { return CardType::COMBO; }
         std::wstring GetCardName() const { return L"Elemental Dragon"; }
-        std::wstring GetCardDescription() const { return L""; }
+        std::wstring GetCardDescription() const { return L"Corpse Puppet effect\nHeavy Slash effect\nShielding Net effect\nYou can destroy all your active cards to activate another combo for free."; }
+        std::wstring GetCardFlavorText() const { return L"It will help you for a price"; }
     };
 }

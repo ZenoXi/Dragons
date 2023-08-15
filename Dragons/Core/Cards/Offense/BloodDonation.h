@@ -29,6 +29,7 @@ namespace cards
 
         CardType GetCardType() const { return CardType::OFFENSE; }
         std::wstring GetCardName() const { return L"Blood Donation"; }
-        std::wstring GetCardDescription() const { return L""; }
+        std::wstring GetCardDescription() const { return L"Deal any amount of damage to yourself. Draw a card for each two health lost."; }
+        std::wstring GetCardFlavorText() const { return L"The more blood, the bigger the payment"; }
     };
 }

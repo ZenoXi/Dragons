@@ -30,7 +30,8 @@ namespace cards
 
         CardType GetCardType() const { return CardType::DEFENSE; }
         std::wstring GetCardName() const { return L"Divine Protection"; }
-        std::wstring GetCardDescription() const { return L""; }
+        std::wstring GetCardDescription() const { return L"You cannot be reduced below 1 health next turn."; }
+        std::wstring GetCardFlavorText() const { return L"A godly protective spell"; }
 
     private:
         void _OnEnterHand(Core* core, int playerIndex);

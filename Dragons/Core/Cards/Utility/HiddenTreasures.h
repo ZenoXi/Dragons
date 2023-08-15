@@ -22,6 +22,7 @@ namespace cards
 
         CardType GetCardType() const { return CardType::UTILITY; }
         std::wstring GetCardName() const { return L"Hidden Treasures"; }
-        std::wstring GetCardDescription() const { return L""; }
+        std::wstring GetCardDescription() const { return L"Draw 2 cards."; }
+        std::wstring GetCardFlavorText() const { return L"Being a good treasure hunter can put you at risk"; }
     };
 }

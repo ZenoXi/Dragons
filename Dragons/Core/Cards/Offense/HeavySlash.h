@@ -28,7 +28,8 @@ namespace cards
 
         CardType GetCardType() const { return CardType::OFFENSE; }
         std::wstring GetCardName() const { return L"Heavy Slash"; }
-        std::wstring GetCardDescription() const { return L""; }
+        std::wstring GetCardDescription() const { return L"At the start of your next turn, deal 3 damage to your opponent. If he has armor, deal only 1 damage instead."; }
+        std::wstring GetCardFlavorText() const { return L"You would definitely want some defense against this"; }
 
     private:
         void _OnEnterHand(Core* core, int playerIndex);

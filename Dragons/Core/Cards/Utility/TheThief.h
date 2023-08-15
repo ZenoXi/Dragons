@@ -23,6 +23,7 @@ namespace cards
 
         CardType GetCardType() const { return CardType::UTILITY; }
         std::wstring GetCardName() const { return L"The Thief"; }
-        std::wstring GetCardDescription() const { return L""; }
+        std::wstring GetCardDescription() const { return L"Take a random card from enemy."; }
+        std::wstring GetCardFlavorText() const { return L"She is as rich as everyone around her"; }
     };
 }

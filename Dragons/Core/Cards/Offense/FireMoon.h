@@ -34,7 +34,8 @@ namespace cards
 
         CardType GetCardType() const { return CardType::OFFENSE; }
         std::wstring GetCardName() const { return L"Fire Moon"; }
-        std::wstring GetCardDescription() const { return L""; }
+        std::wstring GetCardDescription() const { return L"Your opponent can't play any defensive cards."; }
+        std::wstring GetCardFlavorText() const { return L"Radiating hate and thirst for power"; }
 
     private:
         void _OnEnterHand(Core* core, int playerIndex);

@@ -45,6 +45,7 @@ namespace cards
 
         CardType GetCardType() const { return CardType::COMBO; }
         std::wstring GetCardName() const { return L"Ritual"; }
-        std::wstring GetCardDescription() const { return L""; }
+        std::wstring GetCardDescription() const { return L"Life Exchange effect\nLast Breath effect\nLife Flower effect\nYou don't have to discard anything. Life flower effect for each offensive card played."; }
+        std::wstring GetCardFlavorText() const { return L"Beneficial for both sides"; }
     };
 }

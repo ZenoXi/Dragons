@@ -19,6 +19,7 @@ namespace cards
 
         CardType GetCardType() const { return CardType::DEFENSE; }
         std::wstring GetCardName() const { return L"Preparations"; }
-        std::wstring GetCardDescription() const { return L""; }
+        std::wstring GetCardDescription() const { return L"Gain 1 armor for each enemy offensive card."; }
+        std::wstring GetCardFlavorText() const { return L"Being prepared can give you a huge advantage"; }
     };
 }

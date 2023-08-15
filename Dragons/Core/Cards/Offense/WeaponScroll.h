@@ -23,6 +23,7 @@ namespace cards
 
         CardType GetCardType() const { return CardType::OFFENSE; }
         std::wstring GetCardName() const { return L"Weapon Scroll"; }
-        std::wstring GetCardDescription() const { return L""; }
+        std::wstring GetCardDescription() const { return L"Discard as many offensive cards as you want, draw that many offensive cards."; }
+        std::wstring GetCardFlavorText() const { return L"Even the strongest warriors can use some magic"; }
     };
 }

@@ -24,6 +24,7 @@ namespace cards
 
         CardType GetCardType() const { return CardType::UTILITY; }
         std::wstring GetCardName() const { return L"Life Exchange"; }
-        std::wstring GetCardDescription() const { return L""; }
+        std::wstring GetCardDescription() const { return L"Draw three cards, then discard two cards."; }
+        std::wstring GetCardFlavorText() const { return L"Everything has it's price"; }
     };
 }

@@ -30,7 +30,8 @@ namespace cards
 
         CardType GetCardType() const { return CardType::DEFENSE; }
         std::wstring GetCardName() const { return L"Soothing Spell"; }
-        std::wstring GetCardDescription() const { return L""; }
+        std::wstring GetCardDescription() const { return L"Your opponent can't play offensive cards next turn. You can play one more card this turn."; }
+        std::wstring GetCardFlavorText() const { return L"A spell that can shut a war down"; }
 
     private:
         void _OnEnterHand(Core* core, int playerIndex);

@@ -37,6 +37,7 @@ namespace cards
 
         CardType GetCardType() const { return CardType::COMBO; }
         std::wstring GetCardName() const { return L"Total Entanglement"; }
-        std::wstring GetCardDescription() const { return L""; }
+        std::wstring GetCardDescription() const { return L"Absolute Zero effect\nFire Moon effect\nSoothing Spell effect\nYour opponent discards his hand. You can draw and play one more card this turn."; }
+        std::wstring GetCardFlavorText() const { return L"Death awaits"; }
     };
 }

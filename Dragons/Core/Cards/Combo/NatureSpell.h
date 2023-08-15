@@ -34,6 +34,7 @@ namespace cards
 
         CardType GetCardType() const { return CardType::COMBO; }
         std::wstring GetCardName() const { return L"Nature Spell"; }
-        std::wstring GetCardDescription() const { return L""; }
+        std::wstring GetCardDescription() const { return L"Cure effect\nLife Flower effect\nLife Flower armor and maximum health are increased to cure power."; }
+        std::wstring GetCardFlavorText() const { return L"As powerful as you let it grow"; }
     };
 }

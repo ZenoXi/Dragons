@@ -1242,6 +1242,7 @@ EventTimings GetEventTimings(UIEvent::Type event)
     case UIEvent::CARD_ENTER_DISPLAYED_CARDS:   return { Duration(100, MILLISECONDS), Duration(100, MILLISECONDS) };
     case UIEvent::CARD_LEAVE_DISPLAYED_CARDS:   return { Duration(0, MILLISECONDS), Duration(100, MILLISECONDS) };
     case UIEvent::HAND_REVEAL_STATE_CHANGED:    return { Duration(500, MILLISECONDS), Duration(500, MILLISECONDS) };
+    case UIEvent::DECK_SHUFFLED:                return { Duration(500, MILLISECONDS), Duration(500, MILLISECONDS) };
     }
 }
 

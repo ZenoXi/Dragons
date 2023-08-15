@@ -32,7 +32,8 @@ namespace cards
 
         CardType GetCardType() const { return CardType::OFFENSE; }
         std::wstring GetCardName() const { return L"Vital Spot"; }
-        std::wstring GetCardDescription() const { return L""; }
+        std::wstring GetCardDescription() const { return L"Your next damage passes through all defenses."; }
+        std::wstring GetCardFlavorText() const { return L"Everything is deadly is aimed correctly"; }
 
     private:
         void _OnEnterHand(Core* core, int playerIndex);

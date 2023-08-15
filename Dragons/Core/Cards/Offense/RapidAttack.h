@@ -34,6 +34,7 @@ namespace cards
 
         CardType GetCardType() const { return CardType::OFFENSE; }
         std::wstring GetCardName() const { return L"Rapid Attack"; }
-        std::wstring GetCardDescription() const { return L""; }
+        std::wstring GetCardDescription() const { return L"Deal 1 damage to enemy.\nYou don't discard this card.\nThis card can only be played once per turn."; }
+        std::wstring GetCardFlavorText() const { return L"Frequency can cancel weakness"; }
     };
 }

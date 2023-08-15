@@ -40,6 +40,7 @@ namespace cards
 
         CardType GetCardType() const { return CardType::COMBO; }
         std::wstring GetCardName() const { return L"Shadow Assassin"; }
-        std::wstring GetCardDescription() const { return L""; }
+        std::wstring GetCardDescription() const { return L"Vital Spot effect\nDeath Poison effect\nEvery damage this turn will go through all defenses without triggering Vital Spot. You can play one more card this turn."; }
+        std::wstring GetCardFlavorText() const { return L"You will never see her coming"; }
     };
 }

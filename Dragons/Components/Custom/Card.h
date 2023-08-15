@@ -95,7 +95,7 @@ namespace zcom
             _image->SetBorderColor(D2D1::ColorF(1.0f, 1.0f, 1.0f, 0.8f));
 
             //_flavorText = Create<Label>(L"Flavor text goes here and is very tasty");
-            _flavorText = Create<Label>(L"A stab from this sword, will leave a wound in your soul");
+            _flavorText = Create<Label>(_card->GetCardFlavorText());
             _flavorText->SetVerticalOffsetPixels(484.0f);
             _flavorText->SetParentWidthPercent(1.0f);
             _flavorText->SetBaseWidth(-BORDER_WIDTH * 2);
@@ -108,7 +108,7 @@ namespace zcom
             _flavorText->SetVerticalTextAlignment(zcom::Alignment::CENTER);
             _flavorText->SetBackgroundColor(D2D1::ColorF(1.0f, 1.0f, 1.0f, 0.4f));
 
-            _description = Create<Label>(L"Descriptions goes here\nMultiple lines aswell lmao");
+            _description = Create<Label>(_card->GetCardDescription());
             _description->SetOffsetPixels(5.0f, 537.0f);
             _description->SetBaseSize(590, 240);
             _description->SetBorderVisibility(true);
@@ -118,6 +118,7 @@ namespace zcom
             _description->SetFontSize(26.0f);
             _description->SetFontColor(textColor);
             _description->SetFontStyle(DWRITE_FONT_STYLE_ITALIC);
+            _description->SetWordWrap(true);
             _description->SetMargins({ 15.0f, 10.0f, 10.0f, 10.0f });
             _description->SetBackgroundColor(D2D1::ColorF(1.0f, 1.0f, 1.0f, 0.4f));
 

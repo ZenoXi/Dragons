@@ -22,6 +22,7 @@ namespace cards
 
         CardType GetCardType() const { return CardType::UTILITY; }
         std::wstring GetCardName() const { return L"Frost Fire"; }
-        std::wstring GetCardDescription() const { return L""; }
+        std::wstring GetCardDescription() const { return L"Destroy top 5 cards of any deck."; }
+        std::wstring GetCardFlavorText() const { return L"Burning with the dragon frost"; }
     };
 }

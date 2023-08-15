@@ -36,6 +36,7 @@ namespace cards
 
         CardType GetCardType() const { return CardType::COMBO; }
         std::wstring GetCardName() const { return L"Magic Trick"; }
-        std::wstring GetCardDescription() const { return L""; }
+        std::wstring GetCardDescription() const { return L"Cheating effect\nThe Thief effect\nYou can now choose a card from enemy hand. If opponent has two copies of your chosen card - take both, if he doesn't - draw a card"; }
+        std::wstring GetCardFlavorText() const { return L"Rumor has it, that she stole the ankh staff herself"; }
     };
 }

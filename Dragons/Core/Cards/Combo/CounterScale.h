@@ -38,6 +38,7 @@ namespace cards
 
         CardType GetCardType() const { return CardType::COMBO; }
         std::wstring GetCardName() const { return L"Counter Scale"; }
-        std::wstring GetCardDescription() const { return L""; }
+        std::wstring GetCardDescription() const { return L"Dragon Power effect\nRapid Attack effect\nPreparations effect\nGain 1 armor for each offensive card your opponent has, deal 1 damage for each defensive card your opponent has, combo effect for each deck that is empty."; }
+        std::wstring GetCardFlavorText() const { return L"To find the perfect balance"; }
     };
 }

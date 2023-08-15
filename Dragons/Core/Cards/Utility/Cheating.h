@@ -22,6 +22,7 @@ namespace cards
 
         CardType GetCardType() const { return CardType::UTILITY; }
         std::wstring GetCardName() const { return L"Cheating"; }
-        std::wstring GetCardDescription() const { return L""; }
+        std::wstring GetCardDescription() const { return L"Reveal enemy hand."; }
+        std::wstring GetCardFlavorText() const { return L"A professional cheater is a professional at everything"; }
     };
 }

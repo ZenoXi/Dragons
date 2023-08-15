@@ -49,7 +49,8 @@ namespace cards
 
         CardType GetCardType() const { return CardType::COMBO; }
         std::wstring GetCardName() const { return L"Shackling"; }
-        std::wstring GetCardDescription() const { return L""; }
+        std::wstring GetCardDescription() const { return L"Dragon Flame effect\nDevils Deal effect\nRecreation effect\nDestroy every active card your opponent has, your opponent can't play actives and offensive cards damage himself while Recreation isn't triggered."; }
+        std::wstring GetCardFlavorText() const { return L"You hope he can never break free"; }
 
     private:
         void _OnEnterHand(Core* core, int playerIndex);

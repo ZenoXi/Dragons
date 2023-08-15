@@ -37,6 +37,7 @@ namespace cards
 
         CardType GetCardType() const { return CardType::COMBO; }
         std::wstring GetCardName() const { return L"Different Sides"; }
-        std::wstring GetCardDescription() const { return L""; }
+        std::wstring GetCardDescription() const { return L"Hidden Treasure effect\nDesperate Strike effect\nHealer effect\nIf you have less cards than your opponent, damage increased to 5. If after drawing you have more cards than your opponent, heal increased to 5."; }
+        std::wstring GetCardFlavorText() const { return L"Which side will win?"; }
     };
 }

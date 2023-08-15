@@ -23,6 +23,7 @@ namespace cards
 
         CardType GetCardType() const { return CardType::UTILITY; }
         std::wstring GetCardName() const { return L"Dragon Power"; }
-        std::wstring GetCardDescription() const { return L""; }
+        std::wstring GetCardDescription() const { return L"If a deck is empty:\nOffensive - Deal 1 damage\nDefensive - Heal 1 health\nUtility - Draw a card\nCombo - All effects"; }
+        std::wstring GetCardFlavorText() const { return L"3 most powerful dragons and one controlling them all"; }
     };
 }

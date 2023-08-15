@@ -26,7 +26,8 @@ namespace cards
 
         CardType GetCardType() const { return CardType::DEFENSE; }
         std::wstring GetCardName() const { return L"Shielding Net"; }
-        std::wstring GetCardDescription() const { return L""; }
+        std::wstring GetCardDescription() const { return L"Reduces all damage by one down to a minimum of 1 damage."; }
+        std::wstring GetCardFlavorText() const { return L"Even the slightest defense can go a long way"; }
 
     private:
         void _OnEnterHand(Core* core, int playerIndex);

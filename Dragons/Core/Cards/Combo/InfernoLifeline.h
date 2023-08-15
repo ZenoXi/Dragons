@@ -45,6 +45,7 @@ namespace cards
 
         CardType GetCardType() const { return CardType::COMBO; }
         std::wstring GetCardName() const { return L"Inferno Lifeline"; }
-        std::wstring GetCardDescription() const { return L""; }
+        std::wstring GetCardDescription() const { return L"Frost Fire effect\nBlood Donation effect\nDivine Protection effect\nReduce your health to one. Search and draw any amount of cards from one deck. Discard the rest of the deck afterwards."; }
+        std::wstring GetCardFlavorText() const { return L"What doesn't kill you, makes you stronger"; }
     };
 }

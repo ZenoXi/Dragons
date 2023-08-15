@@ -50,6 +50,7 @@ namespace cards
 
         CardType GetCardType() const { return CardType::COMBO; }
         std::wstring GetCardName() const { return L"Re-Equip"; }
-        std::wstring GetCardDescription() const { return L""; }
+        std::wstring GetCardDescription() const { return L"Weapon of Choice effect\nWeapon Scroll effect\nPeace Pact effect\nYou can redraw every offensive card you discarded using Weapon of Choice effect."; }
+        std::wstring GetCardFlavorText() const { return L"Some pacts are deemed to be broken"; }
     };
 }

@@ -24,6 +24,7 @@ namespace cards
 
         CardType GetCardType() const { return CardType::DEFENSE; }
         std::wstring GetCardName() const { return L"Healer"; }
-        std::wstring GetCardDescription() const { return L""; }
+        std::wstring GetCardDescription() const { return L"Heal 2 health."; }
+        std::wstring GetCardFlavorText() const { return L"She was wll known for her healing skills"; }
     };
 }

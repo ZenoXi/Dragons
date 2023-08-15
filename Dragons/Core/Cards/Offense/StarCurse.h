@@ -19,6 +19,7 @@ namespace cards
 
         CardType GetCardType() const { return CardType::OFFENSE; }
         std::wstring GetCardName() const { return L"Star Curse"; }
-        std::wstring GetCardDescription() const { return L""; }
+        std::wstring GetCardDescription() const { return L"Set enemy current health to be their maximum health."; }
+        std::wstring GetCardFlavorText() const { return L"No medicine can cure a curse of the fire stars"; }
     };
 }

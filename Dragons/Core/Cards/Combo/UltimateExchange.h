@@ -36,6 +36,7 @@ namespace cards
 
         CardType GetCardType() const { return CardType::COMBO; }
         std::wstring GetCardName() const { return L"Ultimate Exchange"; }
-        std::wstring GetCardDescription() const { return L""; }
+        std::wstring GetCardDescription() const { return L"Mind Swap effect\nDragon Equation effect\nYou can also swap health with your opponent."; }
+        std::wstring GetCardFlavorText() const { return L"You don't even know if it's you anymore"; }
     };
 }

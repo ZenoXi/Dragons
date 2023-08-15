@@ -26,7 +26,8 @@ namespace cards
 
         CardType GetCardType() const { return CardType::UTILITY; }
         std::wstring GetCardName() const { return L"Absolute Zero"; }
-        std::wstring GetCardDescription() const { return L""; }
+        std::wstring GetCardDescription() const { return L"Your opponent skips his next turn."; }
+        std::wstring GetCardFlavorText() const { return L"No life form can survive it"; }
 
     private:
         void _OnEnterHand(Core* core, int playerIndex);

@@ -39,7 +39,8 @@ namespace cards
 
         CardType GetCardType() const { return CardType::COMBO; }
         std::wstring GetCardName() const { return L"Superiority"; }
-        std::wstring GetCardDescription() const { return L""; }
+        std::wstring GetCardDescription() const { return L"Cheating effect\nHellfire Sword effect\nArmor Up effect\nYou steal enemy armor instead of destroying it. Cheating remains active as long as you have armor."; }
+        std::wstring GetCardFlavorText() const { return L"Overpower your enemies, mentally then physically"; }
 
     private:
         void _OnEnterHand(Core* core, int playerIndex);

@@ -42,7 +42,8 @@ namespace cards
 
         CardType GetCardType() const { return CardType::COMBO; }
         std::wstring GetCardName() const { return L"Fake Out"; }
-        std::wstring GetCardDescription() const { return L""; }
+        std::wstring GetCardDescription() const { return L"Peace Pact effect\nPreparations effect\nOnly opponent discards his offensive cards. Opponent can't draw offensive cards next turn."; }
+        std::wstring GetCardFlavorText() const { return L"Little did he know, you were not defenseless"; }
 
     private:
         void _OnEnterHand(Core* core, int playerIndex);

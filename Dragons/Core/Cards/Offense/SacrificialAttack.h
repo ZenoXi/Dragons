@@ -25,6 +25,7 @@ namespace cards
 
         CardType GetCardType() const { return CardType::OFFENSE; }
         std::wstring GetCardName() const { return L"Sacrificial Attack"; }
-        std::wstring GetCardDescription() const { return L""; }
+        std::wstring GetCardDescription() const { return L"Deal 3 damage to both players."; }
+        std::wstring GetCardFlavorText() const { return L"Everything requires a sacrifice"; }
     };
 }

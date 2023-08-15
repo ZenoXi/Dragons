@@ -39,7 +39,8 @@ namespace cards
 
         CardType GetCardType() const { return CardType::DEFENSE; }
         std::wstring GetCardName() const { return L"Barrier"; }
-        std::wstring GetCardDescription() const { return L""; }
+        std::wstring GetCardDescription() const { return L"Block next damage."; }
+        std::wstring GetCardFlavorText() const { return L"A powerful speucium shield"; }
 
     private:
         void _OnEnterHand(Core* core, int playerIndex);

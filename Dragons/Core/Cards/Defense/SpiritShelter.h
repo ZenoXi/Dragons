@@ -26,7 +26,8 @@ namespace cards
 
         CardType GetCardType() const { return CardType::DEFENSE; }
         std::wstring GetCardName() const { return L"Spirit Shelter"; }
-        std::wstring GetCardDescription() const { return L""; }
+        std::wstring GetCardDescription() const { return L"You don't take fatigue damage."; }
+        std::wstring GetCardFlavorText() const { return L"You realise, you finally found a place to rest"; }
 
     private:
         void _OnEnterHand(Core* core, int playerIndex);

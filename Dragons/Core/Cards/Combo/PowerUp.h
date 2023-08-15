@@ -30,6 +30,7 @@ namespace cards
 
         CardType GetCardType() const { return CardType::COMBO; }
         std::wstring GetCardName() const { return L"Power Up"; }
-        std::wstring GetCardDescription() const { return L""; }
+        std::wstring GetCardDescription() const { return L"Armor Up effect\nHealer effect\nValues of Armor Up and Healer increased to 4."; }
+        std::wstring GetCardFlavorText() const { return L"Designed for warriors who need it the most"; }
     };
 }

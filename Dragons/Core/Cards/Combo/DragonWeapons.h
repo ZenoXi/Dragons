@@ -40,6 +40,7 @@ namespace cards
 
         CardType GetCardType() const { return CardType::COMBO; }
         std::wstring GetCardName() const { return L"Dragon Weapons"; }
-        std::wstring GetCardDescription() const { return L""; }
+        std::wstring GetCardDescription() const { return L"Dragon Sight effect\nWeapon of Choice effect\nRepeat Weapon of Choice effect up to 4 times for each deck."; }
+        std::wstring GetCardFlavorText() const { return L"Ah, the things you could do with such power"; }
     };
 }

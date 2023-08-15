@@ -23,6 +23,7 @@ namespace cards
 
         CardType GetCardType() const { return CardType::DEFENSE; }
         std::wstring GetCardName() const { return L"Helping Hand"; }
-        std::wstring GetCardDescription() const { return L""; }
+        std::wstring GetCardDescription() const { return L"Draw a defense card, then give a defense card to your opponent."; }
+        std::wstring GetCardFlavorText() const { return L"Always give a hand to those in need"; }
     };
 }
