@@ -4,15 +4,15 @@
 
 cards::PlayResult cards::FairFight::Play(Core* core, ActionProperties actionProps, PlayProperties* playProps)
 {
-    _playerIndex = actionProps.player;
-    _opponentIndex = actionProps.opponent;
+    if (actionProps.opponent == actionProps.player)
+        _opponent = _RelativeTarget::OWNER;
 
     auto playPropsValue = GetPlayProperties<FairFightPlayProperties>(playProps);
 
     if (playPropsValue.giveOpponentArmor)
     {
         AddArmorProperties addArmorProps;
-        addArmorProps.target = _opponentIndex;
+        addArmorProps.target = _TargetPlayerIndex(_opponent);
         addArmorProps.amount = 4;
         addArmorProps.sourceCard = this;
         core->AddArmor(addArmorProps);
@@ -33,17 +33,17 @@ void cards::FairFight::_OnEnterActiveCards(Core* core, int playerIndex)
 
     _turnEndHandler = std::make_unique<EventHandler<TurnEndEvent>>(&core->Events(), [=](TurnEndEvent event)
     {
-        if (event.playerIndex != _playerIndex)
+        if (event.playerIndex != _TargetPlayerIndex(_player))
             return;
 
         DamageProperties damageProps;
-        damageProps.source = _playerIndex;
-        damageProps.target = _opponentIndex;
+        damageProps.source = _TargetPlayerIndex(_player);
+        damageProps.target = _TargetPlayerIndex(_opponent);
         damageProps.sourceCard = this;
         damageProps.amount = 4;
         core->Damage(damageProps);
 
-        auto cardPtr = core->RemoveCardFromActiveCards(this, _playerIndex);
+        auto cardPtr = core->RemoveCardFromActiveCards(this, GetPosition().playerIndex);
         core->AddCardToGraveyard(std::move(cardPtr));
     });
 }

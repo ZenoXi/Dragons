@@ -6,6 +6,7 @@
 #include "Components/Property.h"
 
 #include "Helper/Event.h"
+#include "Helper/Navigation.h"
 
 #include "Core/Core.h"
 #include "Core/Cards/CardPosition.h"
@@ -183,6 +184,16 @@ struct UIState
     }
 };
 
+struct StatChangeLabel
+{
+    std::wstring text;
+    D2D1_COLOR_F color;
+    Pos2D<float> startPosition;
+    Pos2D<float> endPosition;
+    Duration moveDuration;
+    TimePoint creationTime;
+};
+
 namespace zcom
 {
     class Board : public Base
@@ -354,6 +365,8 @@ namespace zcom
 
         std::unique_ptr<zcom::Label> _p1ExtraActionsLabel = nullptr;
         std::unique_ptr<zcom::Label> _p2ExtraActionsLabel = nullptr;
+
+        std::vector<StatChangeLabel> _statChangeLabels;
 
         // Game event handlers
         UserInputRequest _pendingUserInputRequest;

@@ -57,7 +57,7 @@ void cards::FakeOut::_OnEnterActiveCards(Core* core, int playerIndex)
         if (!_activated)
             return;
 
-        auto cardPtr = core->RemoveCardFromActiveCards(this, event.opponentIndex);
+        auto cardPtr = core->RemoveCardFromActiveCards(this, GetPosition().playerIndex);
         core->AddCardToGraveyard(std::move(cardPtr));
     });
     _canDrawHandler = std::make_unique<EventHandler<CanDrawEvent>>(&core->Events(), [=](CanDrawEvent event)

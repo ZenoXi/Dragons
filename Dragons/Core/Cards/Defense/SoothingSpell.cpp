@@ -33,7 +33,7 @@ void cards::SoothingSpell::_OnEnterActiveCards(Core* core, int playerIndex)
         if (!_activated)
             return;
 
-        auto cardPtr = core->RemoveCardFromActiveCards(this, event.opponentIndex);
+        auto cardPtr = core->RemoveCardFromActiveCards(this, GetPosition().playerIndex);
         core->AddCardToGraveyard(std::move(cardPtr));
     });
     _canPlayHandler = std::make_unique<EventHandler<CanPlayEvent>>(&core->Events(), [=](CanPlayEvent event)

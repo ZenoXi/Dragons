@@ -106,6 +106,8 @@ void zcom::Board::_OnDraw(Graphics g)
 
     ID2D1SolidColorBrush* selectedBorderBrush = nullptr;
     g.target->CreateSolidColorBrush(D2D1::ColorF(1.0f, 1.0f, 0.5f), &selectedBorderBrush);
+    ID2D1SolidColorBrush* dimmedCardMaskBrush = nullptr;
+    g.target->CreateSolidColorBrush(D2D1::ColorF(0.0f, 0.0f, 0.0f, 0.4f), &dimmedCardMaskBrush);
 
     for (auto& cardPtr : _cards)
     {
@@ -125,6 +127,7 @@ void zcom::Board::_OnDraw(Graphics g)
 
         _Card copy = *card;
         card->scale = 1.0f;
+        bool cardEnlarged = false;
         if (card == _hoveredCard &&
             !card->moving &&
             (card->set.set == cards::CardSets::HAND) &&
@@ -137,6 +140,7 @@ void zcom::Board::_OnDraw(Graphics g)
                 card->yPos = newHeight / 2 + 50.0f;
             card->scale = 1.8f;
             card->rotation = 0.0f;
+            cardEnlarged = true;
         }
         else if (card == _hoveredCard/* && (card->displayed || _uiState.GetDisplayInfo(card->card).card == nullptr)*/)
         {
@@ -182,11 +186,42 @@ void zcom::Board::_OnDraw(Graphics g)
             (_chooseCardsFromGraveyardMode && _chosenCardsFromGraveyard.find(card->card) != _chosenCardsFromGraveyard.end() && card->displayed) ||
             (_chooseDecksMode && _chosenDecks.find(card->card->GetCardType()) != _chosenDecks.end() && card->card == _uiState.GetDeck(card->card->GetCardType()).back());
 
+        bool dimCard = false;
+        if (card->set.set == cards::CardSets::HAND)
+        {
+            if (!_playCardMode && card->set.playerIndex == _uiState.currentPlayer)
+            {
+                dimCard = !_core->CanPlayCard(card->card);
+            }
+            else
+            {
+                ActionProperties actionProps;
+                actionProps.player = _playCardPlayerIndex;
+                actionProps.opponent = _playCardOpponentIndex;
+                dimCard = !_core->CanPlayCard(card->card, actionProps, nullptr) || (!_allowedCardTypesToPlay.empty() && !zutil::Contains(_allowedCardTypesToPlay, card->card->GetCardType()));
+            }
+            if (cardEnlarged)
+                dimCard = false;
+        }
+        else if (card->set.set == cards::CardSets::DECK && card->card != _uiState.GetDeck(card->card->GetCardType()).back())
+        {
+            if (!_drawCardMode)
+            {
+                dimCard = !_core->CanDrawCard(card->card->GetCardType(), _uiState.currentPlayer);
+            }
+            else
+            {
+                dimCard = !_core->CanDrawCard(card->card->GetCardType(), _drawCardPlayerIndex) || (!_allowedCardTypesToDraw.empty() && !zutil::Contains(_allowedCardTypesToDraw, card->card->GetCardType()));
+            }
+        }
+
         g.target->SetTransform(D2D1::Matrix3x2F::Rotation(-card->rotation * RADIAN, { card->xPos, card->yPos }));
         if (cardFaceUp)
             g.target->DrawBitmap(card->faceBitmap, &rect, card->opacity, D2D1_INTERPOLATION_MODE_HIGH_QUALITY_CUBIC);
         else
             g.target->DrawBitmap(card->backBitmap, &rect, card->opacity, D2D1_INTERPOLATION_MODE_HIGH_QUALITY_CUBIC);
+        if (dimCard)
+            g.target->FillRectangle(rect, dimmedCardMaskBrush);
         if (cardSelected)
             g.target->DrawRectangle(selectedBorderRect, selectedBorderBrush, selectedBorderThickness);
         g.target->SetTransform(D2D1::Matrix3x2F::Identity());
@@ -195,6 +230,7 @@ void zcom::Board::_OnDraw(Graphics g)
     }
 
     selectedBorderBrush->Release();
+    dimmedCardMaskBrush->Release();
 
     // Draw stats
     //_UpdateStatLabels();
@@ -279,6 +315,42 @@ void zcom::Board::_OnDraw(Graphics g)
         g.target->DrawBitmap(_p1ExtraActionsLabel->Image(), p1ActionsLabelRect);
     else
         g.target->DrawBitmap(_p2ExtraActionsLabel->Image(), p2ActionsLabelRect);
+
+    // Draw stat change labels
+    auto label = Create<zcom::Label>(L"");
+    label->SetHorizontalTextAlignment(zcom::TextAlignment::TRAILING);
+    label->SetBaseSize(50, 40);
+    label->SetFont(L"Arial");
+    label->SetFontSize(36.0f);
+    label->SetFontWeight(DWRITE_FONT_WEIGHT_BOLD);
+    label->Resize(50, 40);
+    for (int i = 0; i < _statChangeLabels.size(); i++)
+    {
+        auto& labelDesc = _statChangeLabels[i];
+
+        float delta = (ztime::Main() - labelDesc.creationTime).GetTicks() / (float)labelDesc.moveDuration.GetTicks();
+        if (delta > 1.0f)
+        {
+            _statChangeLabels.erase(_statChangeLabels.begin() + i);
+            i--;
+            continue;
+        }
+
+        label->SetText(labelDesc.text);
+        label->SetFontColor(labelDesc.color);
+
+        Pos2D<float> currentPosition = labelDesc.startPosition + (labelDesc.endPosition - labelDesc.startPosition) * std::powf(delta, 0.5f);
+        D2D1_RECT_F rect = {
+            currentPosition.x,
+            currentPosition.y,
+            currentPosition.x + 50.0f,
+            currentPosition.y + 40.0f
+        };
+        float opacity = delta > 0.5f ? 1.0f - std::powf((delta - 0.5f) * 2, 0.5f) : 1.0f;
+
+        label->Draw(g);
+        g.target->DrawBitmap(label->Image(), rect, opacity);
+    }
 }
 
 void zcom::Board::_OnResize(int width, int height)
@@ -451,6 +523,19 @@ zcom::EventTargets zcom::Board::_OnLeftReleased(int x, int y)
         }
         else if (_heldCard->set.set == cards::CardSets::HAND && (_heldCard->set.playerIndex == _uiState.currentPlayer || _playCardMode))
         {
+            bool canPlay = true;
+            if (!_playCardMode)
+            {
+                canPlay = _core->CanPlayCard(_heldCard->card);
+            }
+            else
+            {
+                ActionProperties actionProps;
+                actionProps.player = _playCardPlayerIndex;
+                actionProps.opponent = _playCardOpponentIndex;
+                canPlay = _core->CanPlayCard(_heldCard->card, actionProps, nullptr) && (_allowedCardTypesToPlay.empty() || zutil::Contains(_allowedCardTypesToPlay, _heldCard->card->GetCardType()));
+            }
+
             // Discard
             if (GetMousePosX() > viewWidth - 500.0f)
             {
@@ -463,7 +548,7 @@ zcom::EventTargets zcom::Board::_OnLeftReleased(int x, int y)
                 }
             }
             // Play
-            else if (GetMousePosX() > 500.0f && GetMousePosY() < viewHeight - 300.0f)
+            else if (canPlay && GetMousePosX() > 500.0f && GetMousePosY() < viewHeight - 300.0f)
             {
                 _heldCard->xPos = GetMousePosX();
                 _heldCard->yPos = GetMousePosY();
@@ -1148,6 +1233,22 @@ zcom::Board::_Card* zcom::Board::_GetHoveredCard()
                 continue;
         }
 
+        else if (card->set.set == cards::CardSets::DECK)
+        {
+            if (!_drawCardMode)
+            {
+                if (!_core->CanDrawCard(card->card->GetCardType(), _uiState.currentPlayer))
+                    continue;
+            }
+            else
+            {
+                if (!_core->CanDrawCard(card->card->GetCardType(), _drawCardPlayerIndex))
+                    continue;
+                if (!_allowedCardTypesToDraw.empty() && !zutil::Contains(_allowedCardTypesToDraw, card->card->GetCardType()))
+                    continue;
+            }
+        }
+
         if (_chooseCardsFromHandMode)
         {
             if (_uiState.currentPlayer != _chooseCardsFromHandChoosingPlayerIndex)
@@ -1329,22 +1430,151 @@ void zcom::Board::_HandleEvents()
         }
         case UIEvent::POST_HEALTH_CHANGE:
         {
-            _uiState.players[0].health = _core->GetState().players[0].health;
-            _uiState.players[1].health = _core->GetState().players[1].health;
+            PostHealthChangeEvent ev = std::any_cast<PostHealthChangeEvent>(event.event);
+            if (ev.newValue > ev.oldValue)
+            {
+                StatChangeLabel label;
+                label.text = std::wstring(L"+") + string_to_wstring(int_to_str(ev.newValue - ev.oldValue));
+                label.color = D2D1::ColorF(0.0f, 0.847f, 0.0f);
+                label.creationTime = ztime::Main();
+                label.moveDuration = Duration(1200, MILLISECONDS);
+                if (ev.target == _uiState.currentPlayer)
+                {
+                    label.startPosition = { GetWidth() - 135.0f, GetHeight() - 145.0f };
+                    label.endPosition = label.startPosition;
+                    label.endPosition.x -= 50.0f;
+                }
+                else
+                {
+                    label.startPosition = { GetWidth() - 135.0f, 25.0f };
+                    label.endPosition = label.startPosition;
+                    label.endPosition.x -= 50.0f;
+                }
+                _statChangeLabels.push_back(label);
+            }
+            else if (ev.newValue < ev.oldValue)
+            {
+                StatChangeLabel label;
+                label.text = std::wstring(L"-") + string_to_wstring(int_to_str(ev.oldValue - ev.newValue));
+                label.color = D2D1::ColorF(0.847f, 0.0f, 0.0f);
+                label.creationTime = ztime::Main();
+                label.moveDuration = Duration(1200, MILLISECONDS);
+                if (ev.target == _uiState.currentPlayer)
+                {
+                    label.startPosition = { GetWidth() - 135.0f, GetHeight() - 145.0f };
+                    label.endPosition = label.startPosition;
+                    label.endPosition.x -= 50.0f;
+                }
+                else
+                {
+                    label.startPosition = { GetWidth() - 135.0f, 25.0f };
+                    label.endPosition = label.startPosition;
+                    label.endPosition.x -= 50.0f;
+                }
+                _statChangeLabels.push_back(label);
+            }
+
+            _uiState.players[ev.target].health = ev.newValue;
             _UpdateStatLabels();
             break;
         }
         case UIEvent::POST_MAX_HEALTH_CHANGE:
         {
-            _uiState.players[0].maxHealth = _core->GetState().players[0].maxHealth;
-            _uiState.players[1].maxHealth = _core->GetState().players[1].maxHealth;
+            PostMaxHealthChangeEvent ev = std::any_cast<PostMaxHealthChangeEvent>(event.event);
+            if (ev.newValue > ev.oldValue)
+            {
+                StatChangeLabel label;
+                label.text = std::wstring(L"+") + string_to_wstring(int_to_str(ev.newValue - ev.oldValue));
+                label.color = D2D1::ColorF(0.0f, 0.847f, 0.0f);
+                label.creationTime = ztime::Main();
+                label.moveDuration = Duration(1200, MILLISECONDS);
+                if (ev.target == _uiState.currentPlayer)
+                {
+                    label.startPosition = { GetWidth() - 135.0f, GetHeight() - 105.0f };
+                    label.endPosition = label.startPosition;
+                    label.endPosition.x -= 50.0f;
+                }
+                else
+                {
+                    label.startPosition = { GetWidth() - 135.0f, 65.0f };
+                    label.endPosition = label.startPosition;
+                    label.endPosition.x -= 50.0f;
+                }
+                _statChangeLabels.push_back(label);
+            }
+            else if (ev.newValue < ev.oldValue)
+            {
+                StatChangeLabel label;
+                label.text = std::wstring(L"-") + string_to_wstring(int_to_str(ev.oldValue - ev.newValue));
+                label.color = D2D1::ColorF(0.847f, 0.0f, 0.0f);
+                label.creationTime = ztime::Main();
+                label.moveDuration = Duration(1200, MILLISECONDS);
+                if (ev.target == _uiState.currentPlayer)
+                {
+                    label.startPosition = { GetWidth() - 135.0f, GetHeight() - 105.0f };
+                    label.endPosition = label.startPosition;
+                    label.endPosition.x -= 50.0f;
+                }
+                else
+                {
+                    label.startPosition = { GetWidth() - 135.0f, 65.0f };
+                    label.endPosition = label.startPosition;
+                    label.endPosition.x -= 50.0f;
+                }
+                _statChangeLabels.push_back(label);
+            }
+
+            _uiState.players[ev.target].maxHealth = ev.newValue;
             _UpdateStatLabels();
             break;
         }
         case UIEvent::POST_ARMOR_CHANGE:
         {
-            _uiState.players[0].armor = _core->GetState().players[0].armor;
-            _uiState.players[1].armor = _core->GetState().players[1].armor;
+            PostArmorChangeEvent ev = std::any_cast<PostArmorChangeEvent>(event.event);
+            if (ev.newValue > ev.oldValue)
+            {
+                StatChangeLabel label;
+                label.text = std::wstring(L"+") + string_to_wstring(int_to_str(ev.newValue - ev.oldValue));
+                label.color = D2D1::ColorF(0.0f, 0.847f, 0.0f);
+                label.creationTime = ztime::Main();
+                label.moveDuration = Duration(1200, MILLISECONDS);
+                if (ev.target == _uiState.currentPlayer)
+                {
+                    label.startPosition = { GetWidth() - 135.0f, GetHeight() - 65.0f };
+                    label.endPosition = label.startPosition;
+                    label.endPosition.x -= 50.0f;
+                }
+                else
+                {
+                    label.startPosition = { GetWidth() - 135.0f, 105.0f };
+                    label.endPosition = label.startPosition;
+                    label.endPosition.x -= 50.0f;
+                }
+                _statChangeLabels.push_back(label);
+            }
+            else if (ev.newValue < ev.oldValue)
+            {
+                StatChangeLabel label;
+                label.text = std::wstring(L"-") + string_to_wstring(int_to_str(ev.oldValue - ev.newValue));
+                label.color = D2D1::ColorF(0.847f, 0.0f, 0.0f);
+                label.creationTime = ztime::Main();
+                label.moveDuration = Duration(1200, MILLISECONDS);
+                if (ev.target == _uiState.currentPlayer)
+                {
+                    label.startPosition = { GetWidth() - 135.0f, GetHeight() - 65.0f };
+                    label.endPosition = label.startPosition;
+                    label.endPosition.x -= 50.0f;
+                }
+                else
+                {
+                    label.startPosition = { GetWidth() - 135.0f, 105.0f };
+                    label.endPosition = label.startPosition;
+                    label.endPosition.x -= 50.0f;
+                }
+                _statChangeLabels.push_back(label);
+            }
+
+            _uiState.players[ev.target].armor = ev.newValue;
             _UpdateStatLabels();
             break;
         }

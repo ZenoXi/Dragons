@@ -196,6 +196,7 @@ void Core::InitState()
     _state.players[0].actionsLeft = 0;
     _state.players[0].handRevealed = false;
     _state.players[0].index = 0;
+    //AddCardToHand(std::make_unique<cards::FireMoon>(), 0);
     //AddCardToHand(std::make_unique<cards::Stab>(), 0);
     //AddCardToHand(std::make_unique<cards::Stab>(), 0);
     //AddCardToHand(std::make_unique<cards::LastBreath>(), 0);
@@ -220,6 +221,7 @@ void Core::InitState()
     _state.players[1].actionsLeft = 0;
     _state.players[1].handRevealed = false;
     _state.players[1].index = 1;
+    //AddCardToHand(std::make_unique<cards::DeathPoison>(), 1);
     //AddCardToHand(std::make_unique<cards::Barrier>(), 1);
     //AddCardToHand(std::make_unique<cards::Barrier>(), 1);
     //AddCardToHand(std::make_unique<cards::ElementalDragon>(), 1);

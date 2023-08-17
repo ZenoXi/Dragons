@@ -95,7 +95,7 @@ void GameEvents::_Unsubscribe(EventSubscriber<_Event>* sub)
                     if (event.name != _Event::_NAME_())
                         continue;
 
-                    if (event.subIndex <= i)
+                    if (event.subIndex >= i)
                         event.subIndex--;
                 }
 
@@ -131,12 +131,11 @@ void GameEvents::RaiseEvent(_Event ev)
             event.eventErased = false;
 
             _eventsInProgress.push_back(event);
-            auto& eventInProgress = _eventsInProgress.back();
 
             // Send event to subscribers
-            for (eventInProgress.subIndex = 0; eventInProgress.subIndex < _events[i].subscribers.size(); eventInProgress.subIndex++)
+            for (_eventsInProgress.back().subIndex = 0; _eventsInProgress.back().subIndex < _events[i].subscribers.size(); _eventsInProgress.back().subIndex++)
             {
-                EventSubscriber<_Event>* subscriber = std::any_cast<EventSubscriber<_Event>*>(_events[i].subscribers[eventInProgress.subIndex]);
+                EventSubscriber<_Event>* subscriber = std::any_cast<EventSubscriber<_Event>*>(_events[i].subscribers[_eventsInProgress.back().subIndex]);
                 if (!subscriber)
                 {
                     _eventsInProgress.pop_back();
@@ -145,21 +144,22 @@ void GameEvents::RaiseEvent(_Event ev)
                 }
                 subscriber->_OnEvent(ev);
 
-                if (eventInProgress.eventErased)
+                if (_eventsInProgress.back().eventErased)
                     break;
             }
 
+            event = _eventsInProgress.back();
             _eventsInProgress.pop_back();
-            if (eventInProgress.eventErased)
+            if (event.eventErased)
             {
-                eventInProgress.eventErased = false;
+                event.eventErased = false;
                 break;
             }
 
             // Move often called events closer to vector start
-            _events[i].eventsRaised++;
-            if (i > 0 && _events[i].eventsRaised > _events[i - 1].eventsRaised)
-                std::swap(_events[i], _events[i - 1]);
+            //_events[i].eventsRaised++;
+            //if (i > 0 && _events[i].eventsRaised > _events[i - 1].eventsRaised)
+            //    std::swap(_events[i], _events[i - 1]);
 
             break;
         }

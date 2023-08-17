@@ -17,7 +17,7 @@ namespace cards
         std::unique_ptr<EventHandler<TurnEndEvent>> _turnEndHandler = nullptr;
         std::unique_ptr<EventHandler<CanPlayEvent>> _canPlayHandler = nullptr;
         bool _activated = false;
-        int _targetPlayer = -1;
+        _RelativeTarget _targetPlayer = _RelativeTarget::OPPONENT;
 
         bool _waitingForCardDraw = false;
 
@@ -34,7 +34,7 @@ namespace cards
 
         CardType GetCardType() const { return CardType::OFFENSE; }
         std::wstring GetCardName() const { return L"Fire Moon"; }
-        std::wstring GetCardDescription() const { return L"Your opponent can't play any defensive cards."; }
+        std::wstring GetCardDescription() const { return L"Your opponent can't play any defensive cards on their next turn."; }
         std::wstring GetCardFlavorText() const { return L"Radiating hate and thirst for power"; }
 
     private:

@@ -4,8 +4,8 @@
 
 cards::PlayResult cards::HeavySlash::Play(Core* core, ActionProperties actionProps, PlayProperties* playProps)
 {
-    _playerIndex = actionProps.player;
-    _opponentIndex = actionProps.opponent;
+    if (actionProps.opponent == actionProps.player)
+        _opponent = _RelativeTarget::OWNER;
 
     return PlayResult::AddToActives();
 }
@@ -22,19 +22,19 @@ void cards::HeavySlash::_OnEnterActiveCards(Core* core, int playerIndex)
 
     _turnBeginHandler = std::make_unique<EventHandler<TurnBeginEvent>>(&core->Events(), [=](TurnBeginEvent event)
     {
-        if (event.playerIndex != _playerIndex)
+        if (event.playerIndex != _TargetPlayerIndex(_player))
             return;
 
         DamageProperties damageProps;
-        damageProps.source = _playerIndex;
-        damageProps.target = _opponentIndex;
-        if (core->GetState().players[_opponentIndex].armor > 0)
+        damageProps.source = _TargetPlayerIndex(_player);
+        damageProps.target = _TargetPlayerIndex(_opponent);
+        if (core->GetState().players[_TargetPlayerIndex(_opponent)].armor > 0)
             damageProps.amount = 1;
         else
             damageProps.amount = 3;
         core->Damage(damageProps);
 
-        auto cardPtr = core->RemoveCardFromActiveCards(this, _playerIndex);
+        auto cardPtr = core->RemoveCardFromActiveCards(this, GetPosition().playerIndex);
         core->AddCardToGraveyard(std::move(cardPtr));
     });
 }

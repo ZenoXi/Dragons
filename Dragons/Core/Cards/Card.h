@@ -170,5 +170,20 @@ namespace cards
         virtual void _OnEnterGraveyard(Core* core) {}
         virtual void _OnEnterDestroyedCards(Core* core) {}
         virtual void _OnEnterInPlayCards(Core* core) {}
+    protected:
+        enum class _RelativeTarget
+        {
+            OWNER,
+            OPPONENT
+        };
+        int _TargetPlayerIndex(_RelativeTarget target)
+        {
+            if (target == _RelativeTarget::OWNER)
+                return GetPosition().playerIndex;
+            else if (target == _RelativeTarget::OPPONENT)
+                return GetPosition().playerIndex == 0 ? 1 : 0;
+            else
+                return -1;
+        }
     };
 }

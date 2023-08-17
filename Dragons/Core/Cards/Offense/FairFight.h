@@ -18,8 +18,8 @@ namespace cards
     class FairFight : public Card
     {
         std::unique_ptr<EventHandler<TurnEndEvent>> _turnEndHandler = nullptr;
-        int _playerIndex = -1;
-        int _opponentIndex = -1;
+        _RelativeTarget _player = _RelativeTarget::OWNER;
+        _RelativeTarget _opponent = _RelativeTarget::OPPONENT;
 
     public:
         FairFight() {}

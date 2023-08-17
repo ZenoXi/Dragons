@@ -5,7 +5,8 @@
 
 cards::PlayResult cards::FireMoon::Play(Core* core, ActionProperties actionProps, PlayProperties* playProps)
 {
-    _targetPlayer = actionProps.opponent;
+    if (actionProps.opponent == actionProps.player)
+        _targetPlayer = _RelativeTarget::OWNER;
 
     if (core->GetState().players[actionProps.player].hand.size() >= GAME_HAND_SIZE)
         return PlayResult::AddToActives();
@@ -53,7 +54,7 @@ void cards::FireMoon::_OnEnterActiveCards(Core* core, int playerIndex)
 
     _turnBeginHandler = std::make_unique<EventHandler<TurnBeginEvent>>(&core->Events(), [=](TurnBeginEvent event)
     {
-        if (event.opponentIndex != GetPosition().playerIndex)
+        if (event.playerIndex != _TargetPlayerIndex(_targetPlayer))
             return;
 
         _activated = true;
@@ -63,14 +64,14 @@ void cards::FireMoon::_OnEnterActiveCards(Core* core, int playerIndex)
         if (!_activated)
             return;
 
-        auto cardPtr = core->RemoveCardFromActiveCards(this, event.opponentIndex);
+        auto cardPtr = core->RemoveCardFromActiveCards(this, GetPosition().playerIndex);
         core->AddCardToGraveyard(std::move(cardPtr));
     });
     _canPlayHandler = std::make_unique<EventHandler<CanPlayEvent>>(&core->Events(), [=](CanPlayEvent event)
     {
         if (!_activated)
             return;
-        if (event.actionProps->player != _targetPlayer)
+        if (event.actionProps->player != _TargetPlayerIndex(_targetPlayer))
             return;
 
         if (event.card->GetCardType() == CardType::DEFENSE)

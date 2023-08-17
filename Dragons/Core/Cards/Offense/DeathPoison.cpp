@@ -4,7 +4,9 @@
 
 cards::PlayResult cards::DeathPoison::Play(Core* core, ActionProperties actionProps, PlayProperties* playProps)
 {
-    _targetPlayer = actionProps.opponent;
+    if (actionProps.opponent == actionProps.player)
+        _targetPlayer = _RelativeTarget::OWNER;
+
     return PlayResult::AddToActives();
 }
 
@@ -23,7 +25,7 @@ void cards::DeathPoison::_OnEnterActiveCards(Core* core, int playerIndex)
     });
     _damageHandler = std::make_unique<EventHandler<PreDamageEvent_BuffPass>>(&core->Events(), [=](PreDamageEvent_BuffPass event)
     {
-        if (event.props->target == _targetPlayer)
+        if (event.props->target == _TargetPlayerIndex(_targetPlayer))
             event.props->amount++;
     });
 }

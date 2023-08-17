@@ -15,7 +15,7 @@ namespace cards
     {
         std::unique_ptr<EventHandler<TurnEndEvent>> _turnEndHandler = nullptr;
         std::unique_ptr<EventHandler<PreDamageEvent_BuffPass>> _damageHandler = nullptr;
-        int _targetPlayer = -1;
+        _RelativeTarget _targetPlayer = _RelativeTarget::OPPONENT;
 
     public:
         DeathPoison() {}
