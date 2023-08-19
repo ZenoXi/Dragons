@@ -74,6 +74,7 @@ struct UserInputParams_YesOrNo : public UserInputParams
 struct UserInputParams_ChooseNumber : public UserInputParams
 {
     // Request
+    int playerIndex;
     int lowerBound;
     int upperBound;
 

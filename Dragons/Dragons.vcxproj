@@ -159,6 +159,7 @@
     <ClCompile Include="Components\Base\TextInput.cpp" />
     <ClCompile Include="Components\Custom\Board.cpp" />
     <ClCompile Include="Components\Custom\Card.cpp" />
+    <ClCompile Include="Core\Cards\Card.cpp" />
     <ClCompile Include="Core\Cards\CardType.cpp" />
     <ClCompile Include="Core\Cards\Combo\Apocalypse.cpp" />
     <ClCompile Include="Core\Cards\Combo\AstroInfluence.cpp" />
@@ -244,6 +245,7 @@
     <ClCompile Include="Helper\StringHelper.cpp" />
     <ClCompile Include="Helper\Time.cpp" />
     <ClCompile Include="OldDragons.cpp" />
+    <ClCompile Include="Scenes\ConnectionScene.cpp" />
     <ClCompile Include="Scenes\EntryScene.cpp" />
     <ClCompile Include="Scenes\Scene.cpp" />
     <ClCompile Include="Window\DisplayWindow.cpp" />
@@ -369,9 +371,12 @@
     <ClInclude Include="Helper\Functions.h" />
     <ClInclude Include="Helper\ListUtils.h" />
     <ClInclude Include="Helper\Navigation.h" />
+    <ClInclude Include="Helper\NetBase2.h" />
+    <ClInclude Include="Helper\PacketTypes.h" />
     <ClInclude Include="Helper\ResourceManager.h" />
     <ClInclude Include="Helper\StringHelper.h" />
     <ClInclude Include="Helper\Time.h" />
+    <ClInclude Include="Scenes\ConnectionScene.h" />
     <ClInclude Include="Scenes\EntryScene.h" />
     <ClInclude Include="Scenes\Scene.h" />
     <ClInclude Include="Window\DisplayWindow.h" />

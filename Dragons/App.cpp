@@ -1,5 +1,6 @@
 #include "App.h"
 
+#include "Scenes/ConnectionScene.h"
 #include "Scenes/EntryScene.h"
 
 #include "Helper/Time.h"
@@ -22,6 +23,7 @@ void App::Init(DisplayWindow& dw)
     }
 
     // Add scenes
+    Instance()->_scenes.push_back(new ConnectionScene(_instance));
     Instance()->_scenes.push_back(new EntryScene(_instance));
 }
 

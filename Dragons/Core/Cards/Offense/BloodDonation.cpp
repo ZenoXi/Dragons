@@ -15,6 +15,7 @@ cards::PlayResult cards::BloodDonation::Play(Core* core, ActionProperties action
 
     // Request user input
     auto params = std::make_unique<UserInputParams_ChooseNumber>();
+    params->playerIndex = actionProps.player;
     params->lowerBound = 0;
     params->upperBound = 99;
 

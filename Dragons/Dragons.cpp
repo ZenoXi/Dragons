@@ -9,7 +9,10 @@
 #include "Window/WindowsEx.h"
 // Necessary for clsid's to work when creating custom effects
 #include <Mmsystem.h>
+#include <shlobj.h>
+#include <shobjidl_core.h>
 
+#include "Scenes/ConnectionScene.h"
 #include "Scenes/EntryScene.h"
 
 #include "Helper/ResourceManager.h"
@@ -53,6 +56,11 @@ int WINAPI main(HINSTANCE hInst, HINSTANCE, LPWSTR cmdLine, INT)
     // Create window
     DisplayWindow window(hInst, cmdLine, L"class");
 
+    //IVirtualDesktopManager* dmanager;
+    //CoCreateInstance(CLSID_VirtualDesktopManager, nullptr, CLSCTX_ALL, IID_PPV_ARGS(&dmanager));
+    //GUID guid;
+    //dmanager->GetWindowDesktopId(window.GetHWNDRef(), &guid);
+
     // Load resources
     ResourceManager::Init("Resources/Images/resources.resc", window.gfx.GetGraphics().target);
 
@@ -60,7 +68,7 @@ int WINAPI main(HINSTANCE hInst, HINSTANCE, LPWSTR cmdLine, INT)
     App::Init(window);
 
     // Init appropriate scenes
-    App::Instance()->InitScene(EntryScene::StaticName(), nullptr);
+    App::Instance()->InitScene(ConnectionScene::StaticName(), nullptr);
 
     Clock msgTimer = Clock(0);
 

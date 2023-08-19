@@ -35,7 +35,7 @@ class Core
 public:
     Core();
 
-    void InitState();
+    void InitState(uint32_t seed);
     void ClearState();
     const GameState& GetState() { return _state; }
     GameEvents& Events() { return _events; }

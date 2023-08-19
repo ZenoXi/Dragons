@@ -7,6 +7,7 @@
 #include "../UserInputRequest.h"
 
 #include <string>
+#include <cstdint>
 
 class Core;
 
@@ -85,6 +86,12 @@ namespace cards
         std::vector<CardSet> _allowedSets;
 
     public:
+        Card()
+        {
+            _sessionId = _sessionIdCounter;
+            _sessionIdCounter++;
+        }
+
         virtual bool CanPlay(Core* core, ActionProperties actionProps, PlayProperties* playProps) { return true; }
         virtual PlayResult Play(Core* core, ActionProperties actionProps, PlayProperties* playProps) = 0;
         virtual PlayResult Resume(UserInputResponse response, Core* core, ActionProperties actionProps, PlayProperties* playProps) { return PlayResult{}; }
@@ -118,7 +125,11 @@ namespace cards
         // Metadata
         virtual CardId GetCardId() const = 0;
         virtual std::unique_ptr<Card> CreateInstance() = 0;
-
+        uint32_t GetCardSessionId() const { return _sessionId; }
+    private:
+        uint32_t _sessionId;
+        static uint32_t _sessionIdCounter;
+    public:
         virtual CardType GetCardType() const = 0;
         virtual std::wstring GetCardName() const = 0;
         virtual std::wstring GetCardDescription() const = 0;

@@ -32,6 +32,7 @@ struct UIEvent
         USER_INPUT_REQUEST,
         TURN_BEGIN,
         TURN_END,
+        POST_CARD_PLAYED,
         ACTION_COUNT_CHANGED,
         POST_DAMAGE,
         POST_HEAL,
@@ -228,6 +229,8 @@ namespace zcom
 
     private:
         Core* _core = nullptr;
+        int _playerIndex = -1;
+        int _opponentIndex = -1;
         UIState _uiState;
 
         struct _Card
@@ -268,6 +271,7 @@ namespace zcom
         std::vector<std::unique_ptr<_Card>> _cards;
         _Card* _hoveredCard = nullptr;
         _Card* _heldCard = nullptr;
+        cards::Card* _cardInPlay = nullptr;
 
         static constexpr float CARD_WIDTH = 180;
         static constexpr float CARD_HEIGHT = 240;
@@ -300,6 +304,11 @@ namespace zcom
         int _drawCardPlayerIndex = -1;
         std::vector<cards::CardType> _allowedCardTypesToDraw;
         std::function<void(cards::Card*)> _drawCardHandler;
+
+        bool _discardCardMode = false;
+        int _discardCardPlayerIndex = -1;
+        std::vector<cards::CardType> _allowedCardTypesToDiscard;
+        std::function<void(cards::Card*)> _discardCardHandler;
 
         bool _noClickMode = false;
 
@@ -376,6 +385,7 @@ namespace zcom
 
         std::unique_ptr<EventHandler<TurnBeginEvent>> _turnBeginHandler = nullptr;
         std::unique_ptr<EventHandler<TurnEndEvent>> _turnEndHandler = nullptr;
+        std::unique_ptr<EventHandler<PostCardPlayedEvent>> _postCardPlayedHandler = nullptr;
         std::unique_ptr<EventHandler<ActionCountChangedEvent>> _actionCountChangedHandler = nullptr;
         std::unique_ptr<EventHandler<PostDamageEvent>> _postDamageHandler = nullptr;
         std::unique_ptr<EventHandler<PostHealEvent>> _postHealHandler = nullptr;
@@ -406,7 +416,27 @@ namespace zcom
         //UserInputRequest _userInputRequest;
         std::vector<UserInputRequest> _userInputRequests;
         int _requestCounter = 0;
+
+        std::function<void(cards::Card*)> _onCardPlay;
+        std::function<void(cards::CardType)> _onCardDraw;
+        std::function<void(cards::Card*)> _onCardDiscard;
     public:
+        void OnCardPlay(std::function<void(cards::Card*)> handler)
+        {
+            _onCardPlay = handler;
+        }
+        void OnCardDraw(std::function<void(cards::CardType)> handler)
+        {
+            _onCardDraw = handler;
+        }
+        void OnCardDiscard(std::function<void(cards::Card*)> handler)
+        {
+            _onCardDiscard = handler;
+        }
+        void PlayCard(uint32_t cardSessionId);
+        void DrawCard(cards::CardType cardType);
+        void DiscardCard(uint32_t cardSessionId);
+
         UserInputRequest* GetUserInputRequest();
         int GetRequestCounter();
         void SendUserInputResponse();
@@ -416,13 +446,15 @@ namespace zcom
         friend class Scene;
         friend class Base;
         Board(Scene* scene) : Base(scene) {}
-        void Init(Core* core)
+        void Init(Core* core, int playerIndex, int opponentIndex)
         {
             _displayedCardOffset.EnableAnimation();
             _displayedCardOffset.SetAnimationDuration(Duration(150, MILLISECONDS));
             _displayedCardOffset.SetInterpolationFunction([](float delta) { return 1.0f - std::powf(delta - 1.0f, 2.0f); });
 
             _core = core;
+            _playerIndex = playerIndex;
+            _opponentIndex = opponentIndex;
 
             _uiState.players.push_back(UIPlayer());
             _uiState.players.push_back(UIPlayer());
@@ -585,6 +617,10 @@ namespace zcom
             {
                 _uiEventQueue.push_back({ UIEvent::TURN_END, std::any(event) });
             });
+            _postCardPlayedHandler = std::make_unique<EventHandler<PostCardPlayedEvent>>(&_core->Events(), [=](PostCardPlayedEvent event)
+            {
+                _uiEventQueue.push_back({ UIEvent::POST_CARD_PLAYED, std::any(event) });
+            });
             _actionCountChangedHandler = std::make_unique<EventHandler<ActionCountChangedEvent>>(&_core->Events(), [=](ActionCountChangedEvent event)
             {
                 _uiEventQueue.push_back({ UIEvent::ACTION_COUNT_CHANGED, std::any(event) });
@@ -705,6 +741,9 @@ namespace zcom
 
     public:
         UIState& UIState() { return _uiState; }
+        bool CanPlay(int playerIndex) { return (!_cardInPlay && _uiState.currentPlayer == playerIndex) || (_playCardMode && _playCardPlayerIndex == playerIndex); }
+        bool CanDraw(int playerIndex) { return (!_cardInPlay && _uiState.currentPlayer == playerIndex) || (_drawCardMode && _drawCardPlayerIndex == playerIndex); }
+        bool CanDiscard(int playerIndex) { return (!_cardInPlay && _uiState.currentPlayer == playerIndex) || (_discardCardMode && _discardCardPlayerIndex == playerIndex); }
 
         void EnableNoClickMode();
         void DisableNoClickMode();
@@ -722,6 +761,8 @@ namespace zcom
         void DisablePlayCardMode();
         void EnableDrawCardMode(int playerIndex, std::vector<cards::CardType> allowedTypes, std::function<void(cards::Card*)> onCardDraw);
         void DisableDrawCardMode();
+        void EnableDiscardCardMode(int playerIndex, std::vector<cards::CardType> allowedTypes, std::function<void(cards::Card*)> onCardDiscard);
+        void DisableDiscardCardMode();
 
     private:
         void _GenerateCardBitmap(Graphics g, ID2D1Bitmap** bitmapRef, D2D1_COLOR_F color);

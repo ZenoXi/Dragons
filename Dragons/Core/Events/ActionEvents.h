@@ -2,6 +2,7 @@
 
 #include "../Cards/Card.h"
 #include "../ComboProperties.h"
+#include "../Player.h"
 
 struct CanPlayEvent
 {
@@ -63,4 +64,7 @@ struct CanDrawEvent
 struct ActionCountChangedEvent
 {
     static const char* _NAME_() { return "action_count_changed"; }
+    int playerIndex;
+    int newActionsLeft;
+    std::vector<ExtraAction> newExtraActions;
 };

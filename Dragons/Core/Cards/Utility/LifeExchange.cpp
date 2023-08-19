@@ -5,18 +5,19 @@
 
 bool cards::LifeExchange::CanPlay(Core* core, ActionProperties actionProps, PlayProperties* playProps)
 {
-    return core->GetState().players[actionProps.player].hand.size() < GAME_HAND_SIZE;
+    return core->GetState().players[actionProps.player].hand.size() <= GAME_HAND_SIZE;
 }
 
 cards::PlayResult cards::LifeExchange::Play(Core* core, ActionProperties actionProps, PlayProperties* playProps)
 {
-    if (core->GetState().players[actionProps.player].hand.size() >= GAME_HAND_SIZE)
+    if (core->GetState().players[actionProps.player].hand.size() > GAME_HAND_SIZE)
         return PlayResult::NotPlayed();
 
     auto params = std::make_unique<UserInputParams_DrawCard>();
     params->minCardCount = 3;
     params->maxCardCount = 3;
     params->playerIndex = actionProps.player;
+    params->ignoreHandSize = true;
 
     _waitingForCardDraw = true;
 

@@ -944,7 +944,7 @@ int oldmain()
     std::ios_base::sync_with_stdio(false);
 
     Core core;
-    core.InitState();
+    core.InitState(0);
     auto cardList = core.GetRegisteredCards();
 
     while (true)

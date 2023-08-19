@@ -166,13 +166,12 @@ Core::Core()
     _registeredCards.push_back(std::make_unique<cards::UltimateExchange>());
     _registeredCards.push_back(std::make_unique<cards::Underworld>());
     _registeredCards.push_back(std::make_unique<cards::Vampirism>());
-
-    std::random_device dev;
-    _rng = std::mt19937(dev());
 }
 
-void Core::InitState()
+void Core::InitState(uint32_t seed)
 {
+    _rng = std::mt19937(seed);
+
     ClearState();
 
     // Init decks
@@ -189,20 +188,31 @@ void Core::InitState()
 
     // Init players
     _state.players.push_back(Player{});
-    _state.players[0].health = GAME_STARTING_HEALTH;
-    //_state.players[0].health = 9;
+    //_state.players[0].health = GAME_STARTING_HEALTH;
+    _state.players[0].health = 9;
     _state.players[0].maxHealth = GAME_STARTING_MAX_HEALTH;
     _state.players[0].armor = GAME_STARTING_ARMOR;
     _state.players[0].actionsLeft = 0;
     _state.players[0].handRevealed = false;
     _state.players[0].index = 0;
     //AddCardToHand(std::make_unique<cards::FireMoon>(), 0);
-    //AddCardToHand(std::make_unique<cards::Stab>(), 0);
+    AddCardToHand(std::make_unique<cards::Stab>(), 0);
+    //AddCardToHand(std::make_unique<cards::Cheating>(), 0);
     //AddCardToHand(std::make_unique<cards::Stab>(), 0);
     //AddCardToHand(std::make_unique<cards::LastBreath>(), 0);
+    AddCardToHand(std::make_unique<cards::HiddenTreasures>(), 0);
+    AddCardToHand(std::make_unique<cards::HiddenTreasures>(), 0);
+    AddCardToHand(std::make_unique<cards::Apocalypse>(), 0);
+    AddCardToHand(std::make_unique<cards::LifeExchange>(), 0);
+    AddCardToHand(std::make_unique<cards::FrostFire>(), 0);
     //AddCardToHand(std::make_unique<cards::BloodDonation>(), 0);
+    //AddCardToHand(std::make_unique<cards::Underworld>(), 0);
+    //AddCardToHand(std::make_unique<cards::SummonDead>(), 0);
+    //AddCardToHand(std::make_unique<cards::DragonFlame>(), 0);
+    //AddCardToHand(std::make_unique<cards::WeaponScroll>(), 0);
+    //AddCardToHand(std::make_unique<cards::Barrier>(), 0);
+    //AddCardToHand(std::make_unique<cards::VitalSpot>(), 0);
     //AddCardToHand(std::make_unique<cards::WeaponOfChoice>(), 0);
-    //AddCardToHand(std::make_unique<cards::DragonSight>(), 0);
     //AddCardToHand(std::make_unique<cards::SummonDead>(), 0);
     //AddCardToHand(std::make_unique<cards::FrostFire>(), 0);
     //AddCardToHand(std::make_unique<cards::ElementalDragon>(), 0);
@@ -232,6 +242,9 @@ void Core::InitState()
     //AddCardToActiveCards(std::make_unique<cards::HeavySlash>(), 1);
     //AddCardToActiveCards(std::make_unique<cards::ShieldingNet>(), 1);
     //AddCardToActiveCards(std::make_unique<cards::CorpsePuppet>(), 1);
+    //AddCardToHand(std::make_unique<cards::Underworld>(), 1);
+    //AddCardToHand(std::make_unique<cards::SummonDead>(), 1);
+    //AddCardToHand(std::make_unique<cards::DragonFlame>(), 1);
 
     //AddCardToGraveyard(std::make_unique<cards::Stab>());
     //AddCardToGraveyard(std::make_unique<cards::BloodDonation>());
@@ -405,8 +418,6 @@ cards::PlayResult Core::PlayCard(cards::Card* card, std::optional<ActionProperti
                 player.actionsLeft--;
             }
         }
-
-        _events.RaiseEvent(ActionCountChangedEvent{});
     }
 
     // Emit pre play event
@@ -479,6 +490,12 @@ cards::PlayResult Core::_HandlePlayResult(cards::PlayResult result, cards::Card*
         postCardPlayedEvent.actionProps = &actionProps;
         postCardPlayedEvent.playProps = playProps;
         _events.RaiseEvent(postCardPlayedEvent);
+        
+        _events.RaiseEvent(ActionCountChangedEvent{
+            player.index,
+            player.actionsLeft,
+            player.extraActions
+        });
 
         // End turn
         // Check for end of turn should probably be done by checking only after primary card play has finished
@@ -495,8 +512,6 @@ cards::PlayResult Core::_HandlePlayResult(cards::PlayResult result, cards::Card*
         player.actionsLeft += _actionsConsumed;
         for (auto& action : _extraActionsConsumed)
             player.extraActions.push_back(action);
-
-        _events.RaiseEvent(ActionCountChangedEvent{});
     }
     return result;
 }
@@ -550,7 +565,11 @@ cards::Card* Core::DrawCard(cards::CardType type, int playerIndex, bool consumeA
         if (!extraActionUsed)
             player.actionsLeft--;
 
-        _events.RaiseEvent(ActionCountChangedEvent{});
+        _events.RaiseEvent(ActionCountChangedEvent{
+            player.index,
+            player.actionsLeft,
+            player.extraActions
+        });
 
         // End turn
         if (player.actionsLeft == 0 && player.extraActions.empty())
@@ -596,8 +615,12 @@ cards::Card* Core::DiscardCard(cards::Card* card, int playerIndex, bool consumeA
             }
             if (!extraActionUsed)
                 player.actionsLeft--;
-
-            _events.RaiseEvent(ActionCountChangedEvent{});
+            
+            _events.RaiseEvent(ActionCountChangedEvent{
+                player.index,
+                player.actionsLeft,
+                player.extraActions
+            });
 
             // End turn
             if (player.actionsLeft == 0 && player.extraActions.empty())
@@ -948,19 +971,31 @@ void Core::SetArmor(int target, int value, bool force)
 void Core::SetActionCount(int target, int amount)
 {
     _state.players[target].actionsLeft = amount;
-    _events.RaiseEvent(ActionCountChangedEvent{});
+    _events.RaiseEvent(ActionCountChangedEvent{
+        _state.players[target].index,
+        _state.players[target].actionsLeft,
+        _state.players[target].extraActions
+    });
 }
 
 void Core::AddActions(int target, int amount)
 {
     _state.players[target].actionsLeft += amount;
-    _events.RaiseEvent(ActionCountChangedEvent{});
+    _events.RaiseEvent(ActionCountChangedEvent{
+        _state.players[target].index,
+        _state.players[target].actionsLeft,
+        _state.players[target].extraActions
+    });
 }
 
 void Core::AddExtraAction(int target, ExtraAction action)
 {
     _state.players[target].extraActions.push_back(action);
-    _events.RaiseEvent(ActionCountChangedEvent{});
+    _events.RaiseEvent(ActionCountChangedEvent{
+        _state.players[target].index,
+        _state.players[target].actionsLeft,
+        _state.players[target].extraActions
+    });
 }
 
 void Core::AddCardToHand(std::unique_ptr<cards::Card> card, int playerIndex)
