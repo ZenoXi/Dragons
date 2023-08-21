@@ -9,6 +9,7 @@
 #include "Helper/Navigation.h"
 
 #include "Core/Core.h"
+#include "Core/GameConstants.h"
 #include "Core/Cards/CardPosition.h"
 #include "Core/Events/TurnEvents.h"
 #include "Core/Events/ActionEvents.h"
@@ -32,6 +33,7 @@ struct UIEvent
         USER_INPUT_REQUEST,
         TURN_BEGIN,
         TURN_END,
+        GAME_END,
         POST_CARD_PLAYED,
         ACTION_COUNT_CHANGED,
         POST_DAMAGE,
@@ -233,6 +235,12 @@ namespace zcom
         int _opponentIndex = -1;
         UIState _uiState;
 
+        bool _gameEnded = false;
+        std::function<void(int)> _gameEndExternalHandler;
+    public:
+        void OnGameEnd(std::function<void(int)> handler) { _gameEndExternalHandler = handler; }
+    private:
+
         struct _Card
         {
             cards::Card* card = nullptr;
@@ -385,6 +393,7 @@ namespace zcom
 
         std::unique_ptr<EventHandler<TurnBeginEvent>> _turnBeginHandler = nullptr;
         std::unique_ptr<EventHandler<TurnEndEvent>> _turnEndHandler = nullptr;
+        std::unique_ptr<EventHandler<GameEndEvent>> _gameEndHandler = nullptr;
         std::unique_ptr<EventHandler<PostCardPlayedEvent>> _postCardPlayedHandler = nullptr;
         std::unique_ptr<EventHandler<ActionCountChangedEvent>> _actionCountChangedHandler = nullptr;
         std::unique_ptr<EventHandler<PostDamageEvent>> _postDamageHandler = nullptr;
@@ -617,6 +626,10 @@ namespace zcom
             {
                 _uiEventQueue.push_back({ UIEvent::TURN_END, std::any(event) });
             });
+            _gameEndHandler = std::make_unique<EventHandler<GameEndEvent>>(&_core->Events(), [=](GameEndEvent event)
+            {
+                _uiEventQueue.push_back({ UIEvent::GAME_END, std::any(event) });
+            });
             _postCardPlayedHandler = std::make_unique<EventHandler<PostCardPlayedEvent>>(&_core->Events(), [=](PostCardPlayedEvent event)
             {
                 _uiEventQueue.push_back({ UIEvent::POST_CARD_PLAYED, std::any(event) });
@@ -742,7 +755,7 @@ namespace zcom
     public:
         UIState& UIState() { return _uiState; }
         bool CanPlay(int playerIndex) { return (!_cardInPlay && _uiState.currentPlayer == playerIndex) || (_playCardMode && _playCardPlayerIndex == playerIndex); }
-        bool CanDraw(int playerIndex) { return (!_cardInPlay && _uiState.currentPlayer == playerIndex) || (_drawCardMode && _drawCardPlayerIndex == playerIndex); }
+        bool CanDraw(int playerIndex) { return (!_cardInPlay && _uiState.currentPlayer == playerIndex && _uiState.players[playerIndex].hand.size() < GAME_HAND_SIZE) || (_drawCardMode && _drawCardPlayerIndex == playerIndex); }
         bool CanDiscard(int playerIndex) { return (!_cardInPlay && _uiState.currentPlayer == playerIndex) || (_discardCardMode && _discardCardPlayerIndex == playerIndex); }
 
         void EnableNoClickMode();

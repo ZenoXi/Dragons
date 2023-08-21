@@ -39,6 +39,8 @@ namespace cards
         return nullptr;
     }
 
+    class Card;
+
     struct PlayResult
     {
         bool discard = true;
@@ -46,6 +48,13 @@ namespace cards
         bool notPlayed = false;
         bool waitForInput = false;
         UserInputRequest inputRequest{};
+
+        Card* cardPlayed = nullptr;
+        PlayResult&& OfCard(Card* card)
+        {
+            cardPlayed = card;
+            return std::move(*this);
+        }
 
         static PlayResult Default()
         {

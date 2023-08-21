@@ -16,6 +16,8 @@ class Core
     GameState _state;
     GameEvents _events;
 
+    int _initialTurnsLeft = 4;
+
     std::vector<std::unique_ptr<cards::Card>> _registeredCards;
 
     std::mt19937 _rng;
@@ -50,11 +52,12 @@ public:
     cards::PlayResult ResumePlay(UserInputResponse&& response);
     void MoveCardAfterPlay(const cards::PlayResult& result, cards::Card* playedCard, ActionProperties actionProps, cards::PlayProperties* playProps);
 private:
-    cards::PlayResult _HandlePlayResult(cards::PlayResult result, cards::Card* playedCard, ActionProperties actionProps, cards::PlayProperties* playProps);
+    cards::PlayResult _HandlePlayResult(cards::PlayResult result, cards::Card* playedCard, ActionProperties actionProps, cards::PlayProperties* playProps, bool playIsResume = false);
     
 public:
     bool CanDrawCard(cards::CardType deck, int playerIndex);
     cards::Card* DrawCard(cards::CardType type, int playerIndex, bool consumeAction = true);
+    bool CanDiscardCard(cards::Card* card, int playerIndex);
     cards::Card* DiscardCard(cards::Card* card, int playerIndex, bool consumeAction = true);
 
     bool CanPlayComboCard(ComboProperties comboProps);

@@ -96,7 +96,7 @@ void zcom::Board::_OnDraw(Graphics g)
     // Draw spotlight on current player
     ID2D1GradientStopCollection* stopCollection = NULL;
     D2D1_GRADIENT_STOP gradientStops[2];
-    gradientStops[0].color = D2D1::ColorF(D2D1::ColorF::Gold, 0.1f);
+    gradientStops[0].color = D2D1::ColorF(D2D1::ColorF::Gold, 0.2f);
     gradientStops[0].position = 0.0f;
     gradientStops[1].color = D2D1::ColorF(D2D1::ColorF::Gold, 0.0f);
     gradientStops[1].position = 1.0f;
@@ -107,7 +107,7 @@ void zcom::Board::_OnDraw(Graphics g)
         D2D1_EXTEND_MODE_CLAMP,
         &stopCollection
     );
-    float spotlightHeight = 50.0f;
+    float spotlightHeight = 80.0f;
     if (_uiState.currentPlayer == _playerIndex)
     {
         ID2D1LinearGradientBrush* spotlightBrush = nullptr;
@@ -215,26 +215,14 @@ void zcom::Board::_OnDraw(Graphics g)
         if (card->displayed)
             horizontalOffset = -_displayedCardOffset.GetValue();
 
-        D2D1_RECT_F rect = D2D1::RectF(
-            card->xPos - (CARD_WIDTH / 2 - padding) * card->baseScale * card->scale + horizontalOffset,
-            card->yPos - (CARD_HEIGHT / 2 - padding) * card->baseScale * card->scale,
-            card->xPos + (CARD_WIDTH / 2 + padding) * card->baseScale * card->scale + horizontalOffset,
-            card->yPos + (CARD_HEIGHT / 2 + padding) * card->baseScale * card->scale
-        );
-        float selectedBorderThickness = 6.0f * card->baseScale * card->scale;
-        D2D1_RECT_F selectedBorderRect = D2D1::RectF(
-            rect.left + selectedBorderThickness / 2,
-            rect.top + selectedBorderThickness / 2,
-            rect.right - selectedBorderThickness / 2,
-            rect.bottom - selectedBorderThickness / 2
-        );
-
         bool cardFaceUp =
             card->set.set == cards::CardSets::ACTIVE_CARDS ||
             (card->set.set == cards::CardSets::HAND && card->set.playerIndex == _playerIndex) ||
             (card->set.set == cards::CardSets::HAND && _uiState.players[card->set.playerIndex].handRevealed) ||
             card->set.set == cards::CardSets::IN_PLAY ||
             card->displayed && _uiState.GetDisplayInfo(card->card).visibleTo[_playerIndex];
+        if (cardFaceUp && card->scale == 1.1f)
+            card->scale = 1.5f;
 
         bool cardSelected =
             (_chooseCardsFromHandMode && _chosenCardsFromHand.find(card->card) != _chosenCardsFromHand.end()) ||
@@ -250,7 +238,7 @@ void zcom::Board::_OnDraw(Graphics g)
             {
                 if (!_playCardMode && !_discardCardMode)
                 {
-                    dimCard = !_core->CanPlayCard(card->card);
+                    dimCard = !_core->CanPlayCard(card->card) || !_core->CanDiscardCard(card->card, _playerIndex);
                 }
                 else if (_discardCardMode)
                 {
@@ -262,13 +250,13 @@ void zcom::Board::_OnDraw(Graphics g)
                     actionProps.player = _playCardPlayerIndex;
                     actionProps.opponent = _playCardOpponentIndex;
                     actionProps.freeAction = true;
-                    dimCard = !_core->CanPlayCard(card->card, actionProps, nullptr) || (!_allowedCardTypesToPlay.empty() && !zutil::Contains(_allowedCardTypesToPlay, card->card->GetCardType()));
+                    dimCard = /*!_core->CanPlayCard(card->card, actionProps, nullptr)*/false || (!_allowedCardTypesToPlay.empty() && !zutil::Contains(_allowedCardTypesToPlay, card->card->GetCardType()));
                 }
                 if (cardEnlarged)
                     dimCard = false;
             }
         }
-        else if (card->set.set == cards::CardSets::DECK && card->card != _uiState.GetDeck(card->card->GetCardType()).back())
+        else if (card->set.set == cards::CardSets::DECK && card->card == _uiState.GetDeck(card->card->GetCardType()).back())
         {
             if (!_drawCardMode)
             {
@@ -279,6 +267,20 @@ void zcom::Board::_OnDraw(Graphics g)
                 dimCard = !_core->CanDrawCard(card->card->GetCardType(), _drawCardPlayerIndex) || (!_allowedCardTypesToDraw.empty() && !zutil::Contains(_allowedCardTypesToDraw, card->card->GetCardType()));
             }
         }
+
+        D2D1_RECT_F rect = D2D1::RectF(
+            card->xPos - (CARD_WIDTH / 2 - padding) * card->baseScale * card->scale + horizontalOffset,
+            card->yPos - (CARD_HEIGHT / 2 - padding) * card->baseScale * card->scale,
+            card->xPos + (CARD_WIDTH / 2 + padding) * card->baseScale * card->scale + horizontalOffset,
+            card->yPos + (CARD_HEIGHT / 2 + padding) * card->baseScale * card->scale
+        );
+        float selectedBorderThickness = 6.0f * card->baseScale * card->scale;
+        D2D1_RECT_F selectedBorderRect = D2D1::RectF(
+            rect.left + selectedBorderThickness / 2,
+            rect.top + selectedBorderThickness / 2,
+            rect.right - selectedBorderThickness / 2,
+            rect.bottom - selectedBorderThickness / 2
+        );
 
         g.target->SetTransform(D2D1::Matrix3x2F::Rotation(-card->rotation * RADIAN, { card->xPos, card->yPos }));
         if (cardFaceUp)
@@ -425,6 +427,9 @@ void zcom::Board::_OnResize(int width, int height)
 
 zcom::EventTargets zcom::Board::_OnMouseMove(int deltaX, int deltaY)
 {
+    if (_gameEnded)
+        return EventTargets().Add(this, GetMousePosX(), GetMousePosY());
+
     if (!_heldCard)
     {
         _DetectHoveredCard();
@@ -444,6 +449,9 @@ void zcom::Board::_OnMouseLeave()
 
 zcom::EventTargets zcom::Board::_OnLeftPressed(int x, int y)
 {
+    if (_gameEnded)
+        return EventTargets().Add(this, x, y);
+
     if (_hoveredCard && !_noClickMode)
     {
         if (_playCardMode)
@@ -564,7 +572,8 @@ zcom::EventTargets zcom::Board::_OnLeftPressed(int x, int y)
 
 zcom::EventTargets zcom::Board::_OnLeftReleased(int x, int y)
 {
-    //if (_)
+    if (_gameEnded)
+        return EventTargets().Add(this, x, y);
 
     if (_heldCard)
     {
@@ -575,7 +584,7 @@ zcom::EventTargets zcom::Board::_OnLeftReleased(int x, int y)
         if (_heldCard->set.set == cards::CardSets::DECK)
         {
             // Draw
-            if (GetMousePosX() > 500.0f && CanDraw(_playerIndex))
+            if (GetMousePosX() > 500.0f && CanDraw(_playerIndex) && _core->CanDrawCard(_heldCard->card->GetCardType(), _playerIndex))
             {
                 _heldCard->xPos = GetMousePosX();
                 _heldCard->yPos = GetMousePosY();
@@ -588,7 +597,7 @@ zcom::EventTargets zcom::Board::_OnLeftReleased(int x, int y)
                 _onCardDraw(_heldCard->card->GetCardType());
             }
         }
-        else if (_heldCard->set.set == cards::CardSets::HAND && (_heldCard->set.playerIndex == _playerIndex || _playCardMode))
+        else if (_heldCard->set.set == cards::CardSets::HAND && _heldCard->set.playerIndex == _playerIndex)
         {
             bool canPlayCard = true;
             if (!_playCardMode)
@@ -601,11 +610,11 @@ zcom::EventTargets zcom::Board::_OnLeftReleased(int x, int y)
                 actionProps.player = _playCardPlayerIndex;
                 actionProps.opponent = _playCardOpponentIndex;
                 actionProps.freeAction = true;
-                canPlayCard = _core->CanPlayCard(_heldCard->card, actionProps, nullptr) && (_allowedCardTypesToPlay.empty() || zutil::Contains(_allowedCardTypesToPlay, _heldCard->card->GetCardType()));
+                canPlayCard = /*_core->CanPlayCard(_heldCard->card, actionProps, nullptr)*/true && (_allowedCardTypesToPlay.empty() || zutil::Contains(_allowedCardTypesToPlay, _heldCard->card->GetCardType()));
             }
 
             // Discard
-            if (GetMousePosX() > viewWidth - 500.0f && CanDiscard(_playerIndex))
+            if (GetMousePosX() > viewWidth - 500.0f && CanDiscard(_playerIndex) && _core->CanDiscardCard(_heldCard->card, _playerIndex))
             {
                 if (!_playCardMode)
                 {
@@ -667,6 +676,16 @@ zcom::EventTargets zcom::Board::_OnLeftReleased(int x, int y)
         _heldCard = nullptr;
         _DetectHoveredCard();
     }
+    return EventTargets().Add(this, x, y);
+}
+
+zcom::EventTargets zcom::Board::_OnRightPressed(int x, int y)
+{
+    //DamageProperties props;
+    //props.amount = 10;
+    //props.source = _uiState.currentPlayer;
+    //props.target = _uiState.currentPlayer;
+    //_core->Damage(props);
     return EventTargets().Add(this, x, y);
 }
 
@@ -744,17 +763,11 @@ void zcom::Board::DiscardCard(uint32_t cardSessionId)
         _discardCardHandler(discardedCard);
 }
 
-zcom::EventTargets zcom::Board::_OnRightPressed(int x, int y)
-{
-    DamageProperties props;
-    props.target = 0;
-    props.amount = 1;
-    _core->Damage(props);
-    return EventTargets().Add(this, x, y);
-}
-
 zcom::EventTargets zcom::Board::_OnWheelUp(int x, int y)
 {
+    if (_gameEnded)
+        return EventTargets();
+
     if (_displayedCardScroll > 0)
     {
         _displayedCardScroll--;
@@ -766,6 +779,9 @@ zcom::EventTargets zcom::Board::_OnWheelUp(int x, int y)
 
 zcom::EventTargets zcom::Board::_OnWheelDown(int x, int y)
 {
+    if (_gameEnded)
+        return EventTargets();
+
     if (_displayedCardScroll < _maxDisplayedCardScroll)
     {
         _displayedCardScroll++;
@@ -791,7 +807,7 @@ void zcom::Board::_HandleInputRequest(cards::PlayResult& result)
         if (resumeResult.waitForInput)
             _HandleInputRequest(resumeResult);
         else if (_playCardMode)
-            _playCardHandler(_heldCard->card);
+            _playCardHandler(resumeResult.cardPlayed);
     }
     else
     {
@@ -826,7 +842,7 @@ void zcom::Board::SendUserInputResponse()
     if (resumeResult.waitForInput)
         _HandleInputRequest(resumeResult);
     else if (_playCardMode)
-        _playCardHandler(_heldCard->card);
+        _playCardHandler(resumeResult.cardPlayed);
 }
 
 void zcom::Board::_GenerateCardBitmap(Graphics g, ID2D1Bitmap** bitmapRef, D2D1_COLOR_F color)
@@ -1473,6 +1489,7 @@ EventTimings GetEventTimings(UIEvent::Type event)
     case UIEvent::USER_INPUT_REQUEST:           return { Duration(0, MILLISECONDS), Duration(0, MILLISECONDS) };
     case UIEvent::TURN_BEGIN:                   return { Duration(500, MILLISECONDS), Duration(500, MILLISECONDS) };
     case UIEvent::TURN_END:                     return { Duration(500, MILLISECONDS), Duration(500, MILLISECONDS) };
+    case UIEvent::GAME_END:                     return { Duration(500, MILLISECONDS), Duration(0, MILLISECONDS) };
     case UIEvent::POST_CARD_PLAYED:             return { Duration(0, MILLISECONDS), Duration(0, MILLISECONDS) };
     case UIEvent::ACTION_COUNT_CHANGED:         return { Duration(0, MILLISECONDS), Duration(0, MILLISECONDS) };
     case UIEvent::POST_DAMAGE:                  return { Duration(500, MILLISECONDS), Duration(500, MILLISECONDS) };
@@ -1503,6 +1520,9 @@ EventTimings GetEventTimings(UIEvent::Type event)
 
 void zcom::Board::_HandleEvents()
 {
+    if (_gameEnded)
+        return;
+
     while (!_uiEventQueue.empty())
     {
         if (ztime::Main() < _prevEventTime + _minTimeUntilNextEvent)
@@ -1544,6 +1564,17 @@ void zcom::Board::_HandleEvents()
             //    card->moveDuration = Duration(600, MILLISECONDS);
             //}
 
+            break;
+        }
+        case UIEvent::TURN_END:
+        {
+            break;
+        }
+        case UIEvent::GAME_END:
+        {
+            GameEndEvent gameEndEvent = std::any_cast<GameEndEvent>(event.event);
+            _gameEnded = true;
+            _gameEndExternalHandler(gameEndEvent.winnerIndex);
             break;
         }
         case UIEvent::POST_CARD_PLAYED:
@@ -1770,7 +1801,7 @@ void zcom::Board::_HandleEvents()
             if (!card)
                 break;
 
-            _uiState.RemoveCardFromHand(card->card, cardLeaveActivesEvent.playerIndex);
+            _uiState.RemoveCardFromActiveCards(card->card, cardLeaveActivesEvent.playerIndex);
             _ProcessCardMove(card, pairedEvent);
             break;
         }
@@ -2065,6 +2096,26 @@ void zcom::Board::EnableChooseCardFromHandMode(int choosingPlayerIndex, int targ
     _chooseCardsFromHandAllowedTypes = allowedTypes;
     _selectedCardInHandHandler = onCardSelect;
     _deselectedCardInHandHandler = onCardDeselect;
+    _chosenCardsFromHand.clear();
+
+    if (targetPlayerIndex != choosingPlayerIndex && !_uiState.players[targetPlayerIndex].handRevealed)
+    {
+        auto& hand = _uiState.players[targetPlayerIndex].hand;
+        std::mt19937 engine(ztime::Main().GetTicks());
+        std::shuffle(hand.begin(), hand.end(), engine);
+
+        for (auto& card : hand)
+        {
+            _Card* uiCard = _GetCardFromPointer(card);
+            uiCard->startXPos = uiCard->xPos;
+            uiCard->startYPos = uiCard->yPos;
+            uiCard->startRotation = uiCard->rotation;
+            uiCard->moving = true;
+            uiCard->moveStartTime = ztime::Main();
+            uiCard->moveDuration = Duration(300, MILLISECONDS);
+            _CalculateCardTargetPositions();
+        }
+    }
 
     if (_heldCard)
     {
@@ -2097,6 +2148,7 @@ void zcom::Board::EnableChooseCardFromActiveCardsMode(int choosingPlayerIndex, i
     _chooseCardsFromActiveCardsAllowedTypes = allowedTypes;
     _selectedCardInActiveCardsHandler = onCardSelect;
     _deselectedCardInActiveCardsHandler = onCardDeselect;
+    _chosenCardsFromActiveCards.clear();
 
     if (_heldCard)
     {
@@ -2128,6 +2180,7 @@ void zcom::Board::EnableChooseCardFromDisplayedCardsMode(int playerIndex, int ma
     _chooseCardsFromDisplayedCardsAllowedTypes = allowedTypes;
     _selectedCardInDisplayedCardsHandler = onCardSelect;
     _deselectedCardInDisplayedCardsHandler = onCardDeselect;
+    _chosenCardsFromDisplayedCards.clear();
 
     if (_heldCard)
     {
@@ -2159,6 +2212,7 @@ void zcom::Board::EnableChooseCardFromGraveyardMode(int playerIndex, int maxCard
     _chooseCardsFromGraveyardAllowedTypes = allowedTypes;
     _selectedCardInGraveyardHandler = onCardSelect;
     _deselectedCardInGraveyardHandler = onCardDeselect;
+    _chosenCardsFromGraveyard.clear();
 
     if (_heldCard)
     {
@@ -2275,6 +2329,7 @@ void zcom::Board::EnableChooseDeckMode(int playerIndex, int maxDecks, std::vecto
     _chooseDecksAllowedTypes = allowedTypes;
     _selectedDeckHandler = onDeckSelect;
     _deselectedDeckHandler = onDeckDeselect;
+    _chosenDecks.clear();
 
     if (_heldCard)
     {

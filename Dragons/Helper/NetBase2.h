@@ -35,6 +35,15 @@ namespace znet
         {
             WORD ver = MAKEWORD(2, 2);
             int wsOk = WSAStartup(ver, &wsData);
+            if (wsOk != 0)
+            {
+                std::cout << "Yeet\n";
+                std::cout << WSAGetLastError() << '\n';
+            }
+            else
+            {
+                std::cout << "Ok\n";
+            }
         }
         ~WSAHolder()
         {
@@ -1387,7 +1396,11 @@ namespace znet
         {
             // Create socket
             SOCKET sock = socket(AF_INET, SOCK_STREAM, 0);
-            if (sock == INVALID_SOCKET) return -1;
+            if (sock == INVALID_SOCKET)
+            {
+                std::cout << "Bruh\n";
+                return WSAGetLastError();
+            }
 
             sockaddr_in addr;
             addr.sin_family = AF_INET;
@@ -1398,7 +1411,8 @@ namespace znet
             int connResult = connect(sock, (sockaddr*)&addr, sizeof(addr));
             if (connResult == SOCKET_ERROR) {
                 closesocket(sock);
-                return -1;
+                std::cout << "Moment\n";
+                return WSAGetLastError();
             }
 
             int64_t newId = _GetID();

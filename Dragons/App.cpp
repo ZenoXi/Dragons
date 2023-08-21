@@ -1,7 +1,9 @@
 #include "App.h"
 
 #include "Scenes/ConnectionScene.h"
+#include "Scenes/IntroScene.h"
 #include "Scenes/EntryScene.h"
+#include "Scenes/GameEndScene.h"
 
 #include "Helper/Time.h"
 
@@ -24,7 +26,9 @@ void App::Init(DisplayWindow& dw)
 
     // Add scenes
     Instance()->_scenes.push_back(new ConnectionScene(_instance));
+    Instance()->_scenes.push_back(new IntroScene(_instance));
     Instance()->_scenes.push_back(new EntryScene(_instance));
+    Instance()->_scenes.push_back(new GameEndScene(_instance));
 }
 
 void App::Start()

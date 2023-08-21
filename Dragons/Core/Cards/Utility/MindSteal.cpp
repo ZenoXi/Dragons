@@ -25,7 +25,7 @@ cards::PlayResult cards::MindSteal::Play(Core* core, ActionProperties actionProp
     PlayResult result;
     result.waitForInput = true;
     result.inputRequest.inputType = UserInputType::CHOOSE_CARD_FROM_HAND;
-    result.inputRequest.inputPrompt = L"Select cards to swap";
+    result.inputRequest.inputPrompt = L"Select cards to give";
     result.inputRequest.inputParams = std::unique_ptr<UserInputParams>(params.release());
     return result;
 }
@@ -44,24 +44,40 @@ cards::PlayResult cards::MindSteal::Resume(UserInputResponse response, Core* cor
         if (responseParams->chosenCards.size() > core->GetState().players[actionProps.opponent].hand.size())
             return PlayResult::Default();
 
-        std::vector<std::unique_ptr<Card>> cardsToGive;
+        _chosenCardsToGive = responseParams->chosenCards;
+
+        auto params = std::make_unique<UserInputParams_ChooseCardFromHand>();
+        params->choosingPlayerIndex = actionProps.player;
+        params->handPlayerIndex = actionProps.opponent;
+        params->minCardCount = _chosenCardsToGive.size();
+        params->maxCardCount = _chosenCardsToGive.size();
+
+        _waitingForOpponentCardChoice = true;
+
+        PlayResult result;
+        result.waitForInput = true;
+        result.inputRequest.inputType = UserInputType::CHOOSE_CARD_FROM_HAND;
+        result.inputRequest.inputPrompt = L"Select cards to take";
+        result.inputRequest.inputParams = std::unique_ptr<UserInputParams>(params.release());
+        return result;
+    }
+    else if (_waitingForOpponentCardChoice)
+    {
+        _waitingForOpponentCardChoice = false;
+
+        UserInputParams_ChooseCardFromHand* responseParams = reinterpret_cast<UserInputParams_ChooseCardFromHand*>(response.inputParams.get());
+        if (!responseParams)
+            return PlayResult::Default();
+        if (responseParams->chosenCards.empty())
+            return PlayResult::Default();
+        if (responseParams->chosenCards.size() != _chosenCardsToGive.size())
+            return PlayResult::Default();
+
+        for (auto& chosenCard : _chosenCardsToGive)
+            core->AddCardToHand(core->RemoveCardFromHand(chosenCard, actionProps.player), actionProps.opponent);
+
         for (auto& chosenCard : responseParams->chosenCards)
-        {
-            cardsToGive.push_back(core->RemoveCardFromHand(chosenCard, actionProps.player));
-        }
-
-        for (int i = 0; i < cardsToGive.size(); i++)
-        {
-            int cardIndex = core->GenerateRandomNumber(0, core->GetState().players[actionProps.opponent].hand.size());
-            auto cardPtr = core->RemoveCardFromHand(cardIndex, actionProps.opponent);
-            core->AddCardToHand(std::move(cardPtr), actionProps.player);
-        }
-
-        for (int i = 0; i < cardsToGive.size(); i++)
-        {
-            core->AddCardToHand(std::move(cardsToGive[i]), actionProps.opponent);
-        }
-        cardsToGive.clear();
+            core->AddCardToHand(core->RemoveCardFromHand(chosenCard, actionProps.opponent), actionProps.player);
 
         return PlayResult::Default();
     }

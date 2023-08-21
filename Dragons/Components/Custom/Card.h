@@ -9,6 +9,8 @@
 #include "Core/Cards/Card.h"
 #include "Core/Cards/CardPosition.h"
 
+#include "Helper/ResourceManager.h"
+
 namespace zcom
 {
     class Card : public Base
@@ -87,9 +89,10 @@ namespace zcom
             _title->SetVerticalTextAlignment(zcom::Alignment::CENTER);
             _title->SetBackgroundColor(D2D1::ColorF(1.0f, 1.0f, 1.0f, 0.4f));
 
-            _image = Create<zcom::Image>(nullptr);
+            _image = Create<zcom::Image>(ResourceManager::GetImage(card->GetCardId().name));
             _image->SetOffsetPixels(5.0f, 79.0f);
             _image->SetBaseSize(590, 400);
+            _image->SetPlacement(ImagePlacement::FILL);
             _image->SetBorderVisibility(true);
             _image->SetBorderWidth(5.0f);
             _image->SetBorderColor(D2D1::ColorF(1.0f, 1.0f, 1.0f, 0.8f));

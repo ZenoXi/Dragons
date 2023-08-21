@@ -7,15 +7,8 @@
 #include "Components/Base/Panel.h"
 #include "Components/Base/Button.h"
 
-#include "Components/Custom/Board.h"
-
-#include "Core/Core.h"
-#include "Core/Events/TurnEvents.h"
-
 #include "Helper/NetBase2.h"
 #include "Helper/Time.h"
-
-#include <set>
 
 struct ConnectionSceneOptions : public SceneOptionsBase
 {
@@ -35,7 +28,12 @@ class ConnectionScene : public Scene
     TimePoint _startTime;
     bool _serverMode = false;
     bool _player2Mode = false;
+    bool _localhost = false;
+    bool _skipIntro = false;
     bool _setUpDone = false;
+
+    Scene* _introScene = nullptr;
+    bool _readyPacketSent = false;
 
 public:
     ConnectionScene(App* app);

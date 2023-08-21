@@ -188,23 +188,31 @@ void Core::InitState(uint32_t seed)
 
     // Init players
     _state.players.push_back(Player{});
-    //_state.players[0].health = GAME_STARTING_HEALTH;
-    _state.players[0].health = 9;
+    _state.players[0].health = GAME_STARTING_HEALTH;
+    //_state.players[0].health = 9;
     _state.players[0].maxHealth = GAME_STARTING_MAX_HEALTH;
     _state.players[0].armor = GAME_STARTING_ARMOR;
     _state.players[0].actionsLeft = 0;
     _state.players[0].handRevealed = false;
     _state.players[0].index = 0;
+    //AddCardToHand(std::make_unique<cards::CorpsePuppet>(), 0);
+    //AddCardToHand(std::make_unique<cards::ArmorUp>(), 0);
+    //AddCardToHand(std::make_unique<cards::Healer>(), 0);
+    //AddCardToHand(std::make_unique<cards::PowerUp>(), 0);
+    //AddCardToHand(std::make_unique<cards::LastBreath>(), 0);
+    //AddCardToHand(std::make_unique<cards::DevilsDeal>(), 0);
+    //AddCardToHand(std::make_unique<cards::TheThief>(), 0);
+    //AddCardToHand(std::make_unique<cards::MindSteal>(), 0);
     //AddCardToHand(std::make_unique<cards::FireMoon>(), 0);
-    AddCardToHand(std::make_unique<cards::Stab>(), 0);
+    //AddCardToHand(std::make_unique<cards::Stab>(), 0);
     //AddCardToHand(std::make_unique<cards::Cheating>(), 0);
     //AddCardToHand(std::make_unique<cards::Stab>(), 0);
     //AddCardToHand(std::make_unique<cards::LastBreath>(), 0);
-    AddCardToHand(std::make_unique<cards::HiddenTreasures>(), 0);
-    AddCardToHand(std::make_unique<cards::HiddenTreasures>(), 0);
-    AddCardToHand(std::make_unique<cards::Apocalypse>(), 0);
-    AddCardToHand(std::make_unique<cards::LifeExchange>(), 0);
-    AddCardToHand(std::make_unique<cards::FrostFire>(), 0);
+    //AddCardToHand(std::make_unique<cards::HiddenTreasures>(), 0);
+    //AddCardToHand(std::make_unique<cards::HiddenTreasures>(), 0);
+    //AddCardToHand(std::make_unique<cards::Apocalypse>(), 0);
+    //AddCardToHand(std::make_unique<cards::LifeExchange>(), 0);
+    //AddCardToHand(std::make_unique<cards::FrostFire>(), 0);
     //AddCardToHand(std::make_unique<cards::BloodDonation>(), 0);
     //AddCardToHand(std::make_unique<cards::Underworld>(), 0);
     //AddCardToHand(std::make_unique<cards::SummonDead>(), 0);
@@ -231,7 +239,7 @@ void Core::InitState(uint32_t seed)
     _state.players[1].actionsLeft = 0;
     _state.players[1].handRevealed = false;
     _state.players[1].index = 1;
-    //AddCardToHand(std::make_unique<cards::DeathPoison>(), 1);
+    //AddCardToHand(std::make_unique<cards::Stab>(), 1);
     //AddCardToHand(std::make_unique<cards::Barrier>(), 1);
     //AddCardToHand(std::make_unique<cards::Barrier>(), 1);
     //AddCardToHand(std::make_unique<cards::ElementalDragon>(), 1);
@@ -246,7 +254,7 @@ void Core::InitState(uint32_t seed)
     //AddCardToHand(std::make_unique<cards::SummonDead>(), 1);
     //AddCardToHand(std::make_unique<cards::DragonFlame>(), 1);
 
-    //AddCardToGraveyard(std::make_unique<cards::Stab>());
+    //AddCardToGraveyard(std::make_unique<cards::Healer>());
     //AddCardToGraveyard(std::make_unique<cards::BloodDonation>());
     //AddCardToGraveyard(std::make_unique<cards::WeaponOfChoice>());
     //AddCardToGraveyard(std::make_unique<cards::Underworld>());
@@ -260,14 +268,14 @@ void Core::InitState(uint32_t seed)
     //AddCardToGraveyard(std::make_unique<cards::DragonFlame>());
     //AddCardToGraveyard(std::make_unique<cards::DragonSight>());
 
-    DrawCard(cards::CardType::OFFENSE, 0, false);
-    DrawCard(cards::CardType::DEFENSE, 0, false);
-    DrawCard(cards::CardType::UTILITY, 0, false);
-    DrawCard(cards::CardType::COMBO, 0, false);
-    DrawCard(cards::CardType::OFFENSE, 1, false);
-    DrawCard(cards::CardType::DEFENSE, 1, false);
-    DrawCard(cards::CardType::UTILITY, 1, false);
-    DrawCard(cards::CardType::COMBO, 1, false);
+    //DrawCard(cards::CardType::OFFENSE, 0, false);
+    //DrawCard(cards::CardType::DEFENSE, 0, false);
+    //DrawCard(cards::CardType::UTILITY, 0, false);
+    //DrawCard(cards::CardType::COMBO, 0, false);
+    //DrawCard(cards::CardType::OFFENSE, 1, false);
+    //DrawCard(cards::CardType::DEFENSE, 1, false);
+    //DrawCard(cards::CardType::UTILITY, 1, false);
+    //DrawCard(cards::CardType::COMBO, 1, false);
 
     _state.currentPlayer = 0;
     _state.opposingPlayer = 1;
@@ -282,12 +290,19 @@ void Core::ClearState()
 
 void Core::EndTurn()
 {
-    // Apply fatigue
-    DamageProperties props;
-    props.target = _state.currentPlayer;
-    props.amount = 1;
-    props.fatigue = true;
-    Damage(props);
+    if (_initialTurnsLeft == 0)
+    {
+        // Apply fatigue
+        DamageProperties props;
+        props.target = _state.currentPlayer;
+        props.amount = 1;
+        props.fatigue = true;
+        Damage(props);
+    }
+    else
+    {
+        _initialTurnsLeft--;
+    }
 
 
     TurnEndEvent turnEndEvent;
@@ -322,6 +337,9 @@ bool Core::CanPlayCard(cards::Card* card)
 
 bool Core::CanPlayCard(cards::Card* card, std::optional<ActionProperties> actionProps, cards::PlayProperties* playProps)
 {
+    if (_initialTurnsLeft > 0)
+        return false;
+
     ActionProperties actionPropsLocal;
     if (actionProps)
         actionPropsLocal = actionProps.value();
@@ -440,7 +458,8 @@ cards::PlayResult Core::ResumePlay(UserInputResponse&& response)
         _currentlyPlayingCards.back().card->Resume(std::move(response), this, _currentlyPlayingCards.back().actionProps, _currentlyPlayingCards.back().playProps),
         _currentlyPlayingCards.back().card,
         _currentlyPlayingCards.back().actionProps,
-        _currentlyPlayingCards.back().playProps
+        _currentlyPlayingCards.back().playProps,
+        true
     );
 }
 
@@ -466,11 +485,13 @@ void Core::MoveCardAfterPlay(const cards::PlayResult& result, cards::Card* playe
     }
 }
 
-cards::PlayResult Core::_HandlePlayResult(cards::PlayResult result, cards::Card* playedCard, ActionProperties actionProps, cards::PlayProperties* playProps)
+cards::PlayResult Core::_HandlePlayResult(cards::PlayResult result, cards::Card* playedCard, ActionProperties actionProps, cards::PlayProperties* playProps, bool playIsResume)
 {
+    result.cardPlayed = playedCard;
     if (result.waitForInput)
     {
-        _currentlyPlayingCards.push_back({ playedCard, actionProps, playProps });
+        if (!playIsResume)
+            _currentlyPlayingCards.push_back({ playedCard, actionProps, playProps });
         return result;
     }
     else
@@ -518,6 +539,18 @@ cards::PlayResult Core::_HandlePlayResult(cards::PlayResult result, cards::Card*
 
 bool Core::CanDrawCard(cards::CardType deck, int playerIndex)
 {
+    if (_initialTurnsLeft > 0)
+    {
+        for (auto& card : _state.players[playerIndex].hand)
+        {
+            if (card->GetCardType() == deck)
+            {
+                return false;
+            }
+        }
+        return true;
+    }
+
     bool canDraw = true;
     CanDrawEvent canDrawEvent;
     canDrawEvent.playerIndex = playerIndex;
@@ -581,6 +614,15 @@ cards::Card* Core::DrawCard(cards::CardType type, int playerIndex, bool consumeA
     return card;
 }
 
+bool Core::CanDiscardCard(cards::Card* card, int playerIndex)
+{
+    if (_initialTurnsLeft > 0)
+    {
+        return false;
+    }
+    return true;
+}
+
 cards::Card* Core::DiscardCard(cards::Card* card, int playerIndex, bool consumeAction)
 {
     auto cardPtr = RemoveCardFromHand(card, playerIndex);
@@ -641,6 +683,9 @@ bool Core::CanPlayComboCard(ComboProperties comboProps)
 
 bool Core::CanPlayComboCard(ComboProperties comboProps, std::optional<ActionProperties> actionProps, cards::PlayProperties* playProps)
 {
+    if (_initialTurnsLeft > 0)
+        return false;
+
     ActionProperties actionPropsLocal;
     if (actionProps)
         actionPropsLocal = actionProps.value();
@@ -799,6 +844,13 @@ DamageResult Core::Damage(DamageProperties props)
         postHealthChange.newValue = newHealthValue;
         postHealthChange.sourceCard = props.sourceCard;
         _events.RaiseEvent(postHealthChange);
+
+        if (targetPlayer.health <= 0)
+        {
+            GameEndEvent gameEnd;
+            gameEnd.winnerIndex = props.target == 0 ? 1 : 0;
+            _events.RaiseEvent(gameEnd);
+        }
     }
 
     postDamageEvent.result = result;

@@ -9,6 +9,8 @@ namespace cards
     class MindSteal : public Card
     {
         bool _waitingForCardChoice = false;
+        std::vector<Card*> _chosenCardsToGive;
+        bool _waitingForOpponentCardChoice = false;
 
     public:
         MindSteal() {}

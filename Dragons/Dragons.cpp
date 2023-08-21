@@ -17,6 +17,7 @@
 
 #include "Helper/ResourceManager.h"
 #include "Helper/Time.h"
+#include "Helper/NetBase2.h"
 #include "Window/DisplayWindow.h"
 #include "App.h"
 
@@ -24,6 +25,8 @@
 
 int WINAPI main(HINSTANCE hInst, HINSTANCE, LPWSTR cmdLine, INT)
 {
+    znet::WSAHolder holder;
+
     // Set working directory
     std::wstring dir;
     dir.resize(MAX_PATH);

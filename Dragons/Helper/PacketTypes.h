@@ -3,8 +3,9 @@
 enum class PacketType
 {
     GAME_SEED = 1,
-    PLAYER_INDEX = 2,
-    CLIENT_READY = 3,
+    SKIP_INTRO = 2,
+    PLAYER_INDEX = 3,
+    CLIENT_READY = 4,
     CARD_PLAY = 10,
     CARD_DRAW = 11,
     CARD_DISCARD = 12,

@@ -47,6 +47,8 @@ cards::PlayResult cards::HelpingHand::Resume(UserInputResponse response, Core* c
 
         auto cardPtr = core->RemoveCardFromHand(params->chosenCards[0], actionProps.player);
         core->AddCardToHand(std::move(cardPtr), actionProps.opponent);
+
+        return PlayResult::Default();
     }
 
     PlayResult result;

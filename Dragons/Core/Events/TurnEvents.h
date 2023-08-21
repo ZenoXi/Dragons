@@ -13,3 +13,9 @@ struct TurnEndEvent
     int playerIndex;
     int opponentIndex;
 };
+
+struct GameEndEvent
+{
+    static const char* _NAME_() { return "game_end"; }
+    int winnerIndex;
+};

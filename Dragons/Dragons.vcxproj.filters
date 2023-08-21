@@ -315,6 +315,12 @@
     <ClCompile Include="Scenes\ConnectionScene.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Scenes\GameEndScene.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Scenes\IntroScene.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Core\Core.h">
@@ -723,6 +729,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Helper\PacketTypes.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Scenes\GameEndScene.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Scenes\IntroScene.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

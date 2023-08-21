@@ -1,5 +1,6 @@
 #include "App.h" // App.h must be included first
 #include "EntryScene.h"
+#include "GameEndScene.h"
 
 #include "Core/GameConstants.h"
 #include "Helper/Functions.h"
@@ -45,6 +46,13 @@ void EntryScene::_Init(const SceneOptionsBase* options)
         _connection->Send(znet::Packet(12).From(card->GetCardSessionId()));
     });
 
+    _board->OnGameEnd([&](int winnerIndex) {
+        GameEndSceneOptions opt;
+        opt.victory = winnerIndex == _playerIndex;
+        _app->InitScene(GameEndScene::StaticName(), &opt);
+        _app->MoveSceneToFront(GameEndScene::StaticName());
+    });
+
     _canvas->AddComponent(_board.get());
     _canvas->SetBackgroundColor(D2D1::ColorF(0.2f, 0.12f, 0.06f));
 }
@@ -80,9 +88,6 @@ void EntryScene::_Resize(int width, int height)
 
 void EntryScene::_ProcessOpponentActions()
 {
-    if (_board->UIState().currentPlayer == _playerIndex)
-        return;
-
     while (_connection->PacketCount() > 0)
     {
         znet::PacketView view = _connection->PeekPacket();
@@ -1391,8 +1396,8 @@ void EntryScene::_ProcessNewInputRequests()
                     _gettingUserInput = false;
 
                     _connection->Send(znet::Packet((int)PacketType::PLAY_CARDS_DONE));
-                    _board->SendUserInputResponse();
                     _board->DisablePlayCardMode();
+                    _board->SendUserInputResponse();
 
                     _canvas->RemoveComponent(_playCardsLabel.get());
                     _canvas->RemoveComponent(_playCardsDoneButton.get());
@@ -1415,8 +1420,8 @@ void EntryScene::_ProcessNewInputRequests()
                     _waitingForCardPlay = false;
                     _gettingUserInput = false;
 
-                    _board->SendUserInputResponse();
                     _board->DisablePlayCardMode();
+                    _board->SendUserInputResponse();
 
                     _canvas->RemoveComponent(_playCardsLabel.get());
                     _canvas->RemoveComponent(_playCardsDoneButton.get());
